@@ -1,6 +1,6 @@
 'use client';
 
-import { createContext, useContext, ReactNode } from 'react';
+import { createContext, useContext, ReactNode, useEffect } from 'react';
 import { ProfileStatusResponseDto } from '../../services/model';
 import { useMe } from '@/hooks/users/use-me';
 import { usePathname, useRouter } from 'next/navigation';
@@ -19,10 +19,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
     const { data: user, isLoading, error } = useMe(pathname === '/login');
 
-    if (!isLoading && !error && user && !user.isComplete) {
-        router.replace('/profile-setup');
-    }
+    useEffect(() => {
+        if (isLoading || error || !user) return;
 
+        if (!user.isComplete && pathname !== '/profile-setup') {
+            router.replace('/profile-setup');
+            return;
+        }
+
+        // If user manually type OR accidently visit /profile-setup but they ARE complete, kick them back out
+        if (user.isComplete && pathname === '/profile-setup') {
+            router.replace('/');
+            return;
+        }
+    }, [user, isLoading, error, pathname, router]);
     return (
         <AuthContext.Provider value={{ user, isLoading, error: error as Error | null }}>
             {children}

@@ -88,7 +88,11 @@ axiosInstance.interceptors.response.use(
 
                 try {
                     // httpOnly refresh cookie is auto-sent
-                    const { data } = await axiosInstance.post('/auth/refresh');
+                    const data = await axiosInstance.post<any, { access_token: string }>(
+                        '/auth/refresh',
+                    );
+
+                    console.log('Token refreshed successfully', data);
 
                     onRefreshed();
 
