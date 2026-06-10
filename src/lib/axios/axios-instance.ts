@@ -45,7 +45,7 @@ axiosInstance.interceptors.request.use(
 
 // ─── Response: unwrap axios layer ─────────────────────────────────────────
 axiosInstance.interceptors.response.use(
-    (response) => response.data, // kills one data. level globally
+    (response) => response.data.data, // kills one data. level globally
     async (error: AxiosError) => {
         const err = error?.response?.data as {
             statusCode: number;

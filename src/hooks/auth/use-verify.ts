@@ -6,13 +6,12 @@ import { useAuthStore } from '@/stores/auth-store';
 export function useVerify() {
     const router = useRouter();
 
-    const { setToken, clearPendingEmail } = useAuthStore();
+    const { setToken } = useAuthStore();
 
     return useAuthControllerVerify({
         mutation: {
             onSuccess: (data) => {
                 setToken(data.access_token);
-                clearPendingEmail();
 
                 if (data.profileCompleted) {
                     router.replace('/discover');

@@ -8,12 +8,14 @@ import { useLogin } from '@/hooks/auth/use-login';
 import { useVerify } from '@/hooks/auth/use-verify';
 import { LoginSchema } from '@/schema/login.schama';
 import { VerifySchema } from '@/schema/verify.schema';
-import { useAuthStore } from '@/stores/auth-store';
 import { useForm } from '@tanstack/react-form';
 import { useState } from 'react';
 
 export function LoginForm() {
-    const [pendingEmail, setPendingEmail] = useState('');
+    const [emailInAction, setEmailInAction] = useState('');
+
+    const login = useLogin((email) => setEmailInAction(email));
+    const verify = useVerify();
 
     const emailForm = useForm({
         defaultValues: { email: '' },
@@ -27,23 +29,20 @@ export function LoginForm() {
         defaultValues: { code: '' },
         validators: { onSubmit: VerifySchema },
         onSubmit: async ({ value }) => {
-            if (!pendingEmail) return;
+            if (!emailInAction) return;
 
-            await verify.mutateAsync({ data: { email: pendingEmail, code: value.code } });
+            await verify.mutateAsync({ data: { email: emailInAction, code: value.code } });
         },
     });
 
-    const login = useLogin((email) => setPendingEmail(email));
-    const verify = useVerify();
-
-    if (pendingEmail) {
+    if (emailInAction) {
         return (
             <Card className="max-w-md w-full">
                 <CardHeader>
                     <CardTitle>Check your email</CardTitle>
                     <CardDescription>
                         We sent a 6-digit code to{' '}
-                        <span className="font-medium text-foreground">{pendingEmail}</span>
+                        <span className="font-medium text-foreground">{emailInAction}</span>
                     </CardDescription>
                 </CardHeader>
                 <CardContent>
@@ -98,7 +97,7 @@ export function LoginForm() {
                                     <button
                                         type="button"
                                         className="underline underline-offset-4"
-                                        onClick={() => useAuthStore.getState().clearPendingEmail()}
+                                        onClick={() => setEmailInAction('')}
                                     >
                                         Go back
                                     </button>
