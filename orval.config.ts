@@ -1,34 +1,44 @@
-import { defineConfig } from 'orval';
-import dotenv from 'dotenv';
+import dotenv from "dotenv";
+import { defineConfig } from "orval";
 
 dotenv.config();
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL!;
 
-console.log('API_URL:', API_URL);
+console.log("API_URL:", API_URL);
 
 export default defineConfig({
-    bkkRentApi: {
-        input: {
-            target: `${API_URL}/api/json`,
-        },
-        output: {
-            mode: 'tags-split', // one file per controller tag (saves, listings, agents...)
-            target: 'services/generated', // generated hooks go here
-            schemas: 'services/model', // generated TS interfaces go here
-            client: 'react-query',
-            httpClient: 'axios',
-            clean: true, // wipe generated folder on each run
-            override: {
-                mutator: {
-                    path: 'src/lib/axios/axios-instance.ts',
-                    name: 'axiosInstanceFn',
-                },
-                query: {
-                    useInfinite: true,
-                    useInfiniteQueryParam: 'nextCursor',
-                },
-            },
-        },
+  bkkRentApi: {
+    input: {
+      target: `${API_URL}/api/json`,
     },
+    output: {
+      mode: "tags-split", // one file per controller tag (saves, listings, agents...)
+      target: "services/generated", // generated hooks go here
+      schemas: "services/model", // generated TS interfaces go here
+      client: "react-query",
+      httpClient: "axios",
+      clean: true, // wipe generated folder on each run
+      override: {
+        mutator: {
+          path: "src/lib/axios/axios-instance.ts",
+          name: "axiosInstanceFn",
+        },
+        operations: {
+          DiscoveryController_getDiscovery: {
+            query: {
+              useInfinite: true,
+              useInfiniteQueryParam: "cursor",
+            },
+          },
+          NotificationsController_getNotifications: {
+            query: {
+              useInfinite: true,
+              useInfiniteQueryParam: "cursor",
+            },
+          },
+        },
+      },
+    },
+  },
 });

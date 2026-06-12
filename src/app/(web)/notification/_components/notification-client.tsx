@@ -1,46 +1,46 @@
 "use client";
 
-import { Bell, Heart, Megaphone, MessageCircle, Star } from "lucide-react";
-import { useState } from "react";
-import { MobileScreen, TopBar } from "@/components/mobile/app-chrome";
-
-const notifications = [
-  {
-    id: "n1",
-    title: "New Match!",
-    body: "You and Sophie from Architecture just matched. Send a message!",
-    time: "2m",
-    icon: Heart,
-    unread: true,
-  },
-  {
-    id: "n2",
-    title: "James sent a message",
-    body: "Hey! I saw your post about the library study group...",
-    time: "15m",
-    icon: MessageCircle,
-    unread: true,
-  },
-  {
-    id: "n3",
-    title: "New Campus Shoutout",
-    body: "Someone posted a shoutout to 'The girl in the red scarf'.",
-    time: "2h",
-    icon: Megaphone,
-    unread: false,
-  },
-  {
-    id: "n4",
-    title: "Profile Verified",
-    body: "Your student ID has been successfully verified.",
-    time: "Yesterday",
-    icon: Bell,
-    unread: false,
-  },
-];
+import { Bell, Heart, Megaphone, MessageCircle } from "lucide-react";
+import { useEffect, useRef } from "react";
+import {
+  EmptyState,
+  MobileScreen,
+  TopBar,
+} from "@/components/mobile/app-chrome";
+import { useMarkAllNotificationsRead } from "@/hooks/notifications/use-mark-all-notifications-read";
+import { useNotificationsList } from "@/hooks/notifications/use-notifications-list";
+import { relativeTime } from "@/lib/profile-utils";
+import type { NotificationItemDto } from "../../../../../services/model";
+import { NotificationItemDtoType } from "../../../../../services/model";
 
 export function NotificationClient() {
-  const [allRead, setAllRead] = useState(false);
+  const {
+    notifications,
+    isLoading,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useNotificationsList(30);
+  const markAllRead = useMarkAllNotificationsRead();
+  const loadMoreRef = useRef<HTMLDivElement | null>(null);
+  const hasUnread = notifications.some((item) => !item.isRead);
+
+  useEffect(() => {
+    const target = loadMoreRef.current;
+    if (!target || !hasNextPage) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && !isFetchingNextPage) {
+          fetchNextPage();
+        }
+      },
+      { rootMargin: "160px 0px" },
+    );
+
+    observer.observe(target);
+    return () => observer.disconnect();
+  }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
 
   return (
     <MobileScreen className="bg-[#fcf8f8]">
@@ -49,10 +49,14 @@ export function NotificationClient() {
           <button
             type="button"
             className="text-xs font-semibold text-primary disabled:text-[#a1a1a1]"
-            disabled={allRead}
-            onClick={() => setAllRead(true)}
+            disabled={!hasUnread || markAllRead.isPending}
+            onClick={() => markAllRead.mutate()}
           >
-            {allRead ? "All read" : "Mark all as read"}
+            {markAllRead.isPending
+              ? "Marking..."
+              : hasUnread
+                ? "Mark all as read"
+                : "All read"}
           </button>
         }
       />
@@ -60,36 +64,33 @@ export function NotificationClient() {
         <div className="px-5 pb-4 pt-8">
           <h1 className="text-2xl font-bold">Notifications</h1>
         </div>
-        <Section title="Today">
-          {notifications.slice(0, 3).map((item) => (
-            <NotificationRow
-              key={item.id}
-              {...item}
-              unread={item.unread && !allRead}
-            />
-          ))}
-        </Section>
-        <Section title="Earlier">
-          {notifications.slice(3).map((item) => (
-            <NotificationRow key={item.id} {...item} unread={false} />
-          ))}
-          <div className="mx-5 mt-6 overflow-hidden rounded-xl border border-black/10 bg-primary p-4 text-white">
-            <div className="flex items-start justify-between gap-4">
-              <div>
-                <span className="rounded-full bg-white/20 px-2 py-0.5 text-xs font-semibold">
-                  UPGRADE
-                </span>
-                <h2 className="mt-3 text-xl font-bold leading-tight">
-                  See who is already into you.
-                </h2>
-                <p className="mt-2 max-w-[260px] text-sm leading-6 text-white/90">
-                  Unlock your likes list and start more conversations.
-                </p>
-              </div>
-              <Star className="size-16 shrink-0 fill-white/15 text-white/15" />
+        {isLoading ? (
+          <EmptyState
+            title="Loading notifications"
+            body="Fetching your latest notifications."
+          />
+        ) : notifications.length ? (
+          <Section title="Latest">
+            {notifications.map((item) => (
+              <NotificationRow key={item.id} notification={item} />
+            ))}
+            <div
+              ref={loadMoreRef}
+              className="px-5 py-4 text-center text-xs text-[#6b6b6b]"
+            >
+              {isFetchingNextPage
+                ? "Loading more..."
+                : hasNextPage
+                  ? ""
+                  : "No more notifications"}
             </div>
-          </div>
-        </Section>
+          </Section>
+        ) : (
+          <EmptyState
+            title="No notifications"
+            body="Notifications returned by the API will appear here."
+          />
+        )}
       </main>
     </MobileScreen>
   );
@@ -113,24 +114,18 @@ function Section({
 }
 
 function NotificationRow({
-  title,
-  body,
-  time,
-  icon: Icon,
-  unread,
+  notification,
 }: {
-  title: string;
-  body: string;
-  time: string;
-  icon: typeof Heart;
-  unread: boolean;
+  notification: NotificationItemDto;
 }) {
+  const Icon = getNotificationIcon(notification.type);
+
   return (
     <div
       className={
-        unread
-          ? "border-b border-black/10 bg-[#fff1ed]"
-          : "border-b border-black/10 bg-white"
+        notification.isRead
+          ? "border-b border-black/10 bg-white"
+          : "border-b border-black/10 bg-[#fff1ed]"
       }
     >
       <div className="flex gap-4 px-5 py-4">
@@ -139,12 +134,30 @@ function NotificationRow({
         </div>
         <div className="min-w-0 flex-1">
           <div className="mb-0.5 flex items-start justify-between gap-3">
-            <h3 className="font-semibold">{title}</h3>
-            <span className="text-xs text-[#6b6b6b]">{time}</span>
+            <h3 className="font-semibold">{notification.title}</h3>
+            <span className="shrink-0 text-xs text-[#6b6b6b]">
+              {relativeTime(notification.createdAt)}
+            </span>
           </div>
-          <p className="text-sm leading-6 text-[#434655]">{body}</p>
+          {notification.body && (
+            <p className="text-sm leading-6 text-[#434655]">
+              {notification.body}
+            </p>
+          )}
         </div>
       </div>
     </div>
   );
+}
+
+function getNotificationIcon(type: NotificationItemDto["type"]) {
+  if (type === NotificationItemDtoType.NEW_MATCH) return Heart;
+  if (type === NotificationItemDtoType.NEW_MESSAGE) return MessageCircle;
+  if (
+    type === NotificationItemDtoType.SHOUTOUT_RECEIVED ||
+    type === NotificationItemDtoType.SHOUTOUT_REPLIED
+  ) {
+    return Megaphone;
+  }
+  return Bell;
 }

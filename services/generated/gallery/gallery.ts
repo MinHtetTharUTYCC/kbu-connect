@@ -27,7 +27,7 @@ import type {
 import type {
   GalleryImageDeleteResponseDto,
   GalleryItemResponseDto,
-  ProfileStatusResponseDto
+  UploadGalleryImagesResponseDto
 } from '../../model';
 
 import { axiosInstanceFn } from '../../../src/lib/axios/axios-instance';
@@ -44,7 +44,7 @@ export const galleryControllerUploadGalleryImages = (
 ) => {
 
 
-      return axiosInstanceFn<ProfileStatusResponseDto>(
+      return axiosInstanceFn<UploadGalleryImagesResponseDto>(
       {url: `/gallery/upload`, method: 'POST', signal
     },
       );

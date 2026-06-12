@@ -10,7 +10,7 @@ import {
   TopBar,
 } from "@/components/mobile/app-chrome";
 import { useToggleDiscoverable } from "@/hooks/profile/use-toggle-discoverable";
-import { ageFromBirthYear, formatEnum } from "@/lib/app-data";
+import { ageFromBirthYear, formatEnum } from "@/lib/profile-utils";
 import { useAuthStore } from "@/stores/auth-store";
 
 export function MyProfileClient() {

@@ -3,47 +3,64 @@
 import { PlusCircle, Send } from "lucide-react";
 import { useEffect, useMemo, useState } from "react";
 import { useAuthContext } from "@/components/auth-provider";
-import { Avatar, MobileScreen, TopBar } from "@/components/mobile/app-chrome";
+import {
+  Avatar,
+  EmptyState,
+  MobileScreen,
+  TopBar,
+} from "@/components/mobile/app-chrome";
 import { useConversationMessages } from "@/hooks/chat/use-conversation-messages";
 import { useConversationsList } from "@/hooks/chat/use-conversations-list";
 import { useMarkConversationSeen } from "@/hooks/chat/use-mark-conversation-seen";
-import { fallbackConversations, relativeTime } from "@/lib/app-data";
+import { relativeTime } from "@/lib/profile-utils";
 import { cn } from "@/lib/utils";
 import type { MessageItemDto } from "../../../../../services/model";
 
 export function ChatListClient() {
-  const { conversations } = useConversationsList(30);
+  const { conversations, isLoading } = useConversationsList(30);
 
   return (
     <MobileScreen>
       <TopBar title="Messages" />
       <main className="flex-1 overflow-y-auto">
-        {conversations.map((conversation) => (
-          <a
-            key={conversation.id}
-            href={`/chat/${conversation.id}`}
-            className="flex items-center border-b border-black/10 px-5 py-4"
-          >
-            <Avatar
-              src={conversation.otherUser.avatarUrl as string | null}
-              name={conversation.otherUser.name}
-              className="size-12"
-            />
-            <div className="ml-3 min-w-0 flex-1">
-              <div className="flex items-baseline justify-between gap-3">
-                <span className="truncate font-semibold">
-                  {conversation.otherUser.name}
-                </span>
-                <span className="text-xs text-[#6b6b6b]">
-                  {relativeTime(conversation.updatedAt)}
-                </span>
+        {isLoading ? (
+          <EmptyState
+            title="Loading messages"
+            body="Fetching your conversations."
+          />
+        ) : conversations.length ? (
+          conversations.map((conversation) => (
+            <a
+              key={conversation.id}
+              href={`/chat/${conversation.id}`}
+              className="flex items-center border-b border-black/10 px-5 py-4"
+            >
+              <Avatar
+                src={conversation.otherUser.avatarUrl as string | null}
+                name={conversation.otherUser.name}
+                className="size-12"
+              />
+              <div className="ml-3 min-w-0 flex-1">
+                <div className="flex items-baseline justify-between gap-3">
+                  <span className="truncate font-semibold">
+                    {conversation.otherUser.name}
+                  </span>
+                  <span className="text-xs text-[#6b6b6b]">
+                    {relativeTime(conversation.updatedAt)}
+                  </span>
+                </div>
+                <p className="truncate text-sm text-[#6b6b6b]">
+                  {conversation.lastMessage?.content ?? "No messages yet."}
+                </p>
               </div>
-              <p className="truncate text-sm text-[#6b6b6b]">
-                {conversation.lastMessage?.content ?? "No messages yet."}
-              </p>
-            </div>
-          </a>
-        ))}
+            </a>
+          ))
+        ) : (
+          <EmptyState
+            title="No conversations"
+            body="Your real conversations will appear here after you match and message."
+          />
+        )}
       </main>
     </MobileScreen>
   );
@@ -52,14 +69,12 @@ export function ChatListClient() {
 export function ChatClient({ chatId }: { chatId: string }) {
   const { user } = useAuthContext();
   const messagesQuery = useConversationMessages(chatId);
-  const { conversations } = useConversationsList(30);
+  const { conversations, isLoading: conversationsLoading } =
+    useConversationsList(30);
   const markSeen = useMarkConversationSeen();
   const [draft, setDraft] = useState("");
   const [localMessages, setLocalMessages] = useState<MessageItemDto[]>([]);
-  const conversation =
-    conversations.find((item) => item.id === chatId) ??
-    fallbackConversations.find((item) => item.id === chatId) ??
-    fallbackConversations[0];
+  const conversation = conversations.find((item) => item.id === chatId);
   const apiMessages = messagesQuery.messages;
   const messages = useMemo(
     () => [...apiMessages, ...localMessages],
@@ -68,10 +83,10 @@ export function ChatClient({ chatId }: { chatId: string }) {
   const myId = user?.user?.id ?? "me";
 
   useEffect(() => {
-    if (chatId && !conversation?.isRead) {
+    if (chatId && conversation && !conversation.isRead) {
       markSeen.mutate({ conversationId: chatId });
     }
-  }, [chatId, conversation?.isRead, markSeen.mutate]);
+  }, [chatId, conversation, markSeen.mutate]);
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -89,6 +104,30 @@ export function ChatClient({ chatId }: { chatId: string }) {
     setDraft("");
   }
 
+  if (conversationsLoading) {
+    return (
+      <MobileScreen>
+        <TopBar title="Messages" backHref="/matches" />
+        <EmptyState
+          title="Loading conversation"
+          body="Fetching the latest messages."
+        />
+      </MobileScreen>
+    );
+  }
+
+  if (!conversation) {
+    return (
+      <MobileScreen>
+        <TopBar title="Messages" backHref="/matches" />
+        <EmptyState
+          title="Conversation unavailable"
+          body="This conversation was not returned by the API."
+        />
+      </MobileScreen>
+    );
+  }
+
   return (
     <MobileScreen>
       <TopBar
@@ -103,37 +142,44 @@ export function ChatClient({ chatId }: { chatId: string }) {
         }
       />
       <main className="flex flex-1 flex-col gap-3 overflow-y-auto bg-white px-5 py-6">
-        <div className="mb-3 flex justify-center">
-          <span className="rounded-full border border-black/10 bg-[#f9f9f8] px-3 py-1 text-[10px] font-medium uppercase tracking-wide text-[#6b6b6b]">
-            Today
-          </span>
-        </div>
-        {messages.map((message) => {
-          const mine = message.senderId === myId || message.senderId === "me";
-          return (
-            <div
-              key={message.id}
-              className={cn(
-                "flex max-w-[85%] flex-col",
-                mine ? "self-end items-end" : "items-start",
-              )}
-            >
+        {messagesQuery.isLoading ? (
+          <EmptyState
+            title="Loading messages"
+            body="Fetching message history."
+          />
+        ) : messages.length ? (
+          messages.map((message) => {
+            const mine = message.senderId === myId || message.senderId === "me";
+            return (
               <div
+                key={message.id}
                 className={cn(
-                  "rounded-xl p-3 text-sm leading-6",
-                  mine
-                    ? "rounded-tr-none bg-primary text-white"
-                    : "rounded-tl-none border border-black/10 bg-[#f9f9f8]",
+                  "flex max-w-[85%] flex-col",
+                  mine ? "self-end items-end" : "items-start",
                 )}
               >
-                {message.content}
+                <div
+                  className={cn(
+                    "rounded-xl p-3 text-sm leading-6",
+                    mine
+                      ? "rounded-tr-none bg-primary text-white"
+                      : "rounded-tl-none border border-black/10 bg-[#f9f9f8]",
+                  )}
+                >
+                  {message.content}
+                </div>
+                <span className="mt-1 px-1 text-[10px] text-[#6b6b6b]">
+                  {relativeTime(message.timestamp)}
+                </span>
               </div>
-              <span className="mt-1 px-1 text-[10px] text-[#6b6b6b]">
-                {relativeTime(message.timestamp)}
-              </span>
-            </div>
-          );
-        })}
+            );
+          })
+        ) : (
+          <EmptyState
+            title="No messages yet"
+            body="Messages returned by the API will appear here."
+          />
+        )}
       </main>
       <form
         onSubmit={handleSubmit}

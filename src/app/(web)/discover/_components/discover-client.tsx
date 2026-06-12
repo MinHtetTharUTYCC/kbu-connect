@@ -2,7 +2,7 @@
 
 import { Heart, Star, X } from "lucide-react";
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import {
   Chip,
   EmptyState,
@@ -19,7 +19,23 @@ export function DiscoverClient() {
   const discovery = useDiscoveryProfiles(10);
   const swipe = useSwipeProfile();
   const profiles = discovery.profiles;
-  const profile = profiles[index % profiles.length];
+  const profile = profiles[index];
+  const remainingProfiles = profiles.length - index;
+
+  useEffect(() => {
+    if (
+      remainingProfiles <= 3 &&
+      discovery.hasNextPage &&
+      !discovery.isFetchingNextPage
+    ) {
+      discovery.fetchNextPage();
+    }
+  }, [
+    discovery.fetchNextPage,
+    discovery.hasNextPage,
+    discovery.isFetchingNextPage,
+    remainingProfiles,
+  ]);
 
   function handleSwipe(type: "LIKE" | "DISLIKE") {
     if (!profile) return;
@@ -35,7 +51,31 @@ export function DiscoverClient() {
     }, 260);
   }
 
-  if (!profile && !discovery.isLoading) {
+  if (discovery.isLoading) {
+    return (
+      <MobileScreen>
+        <TopBar />
+        <EmptyState
+          title="Loading profiles"
+          body="Fetching real discovery profiles from the API."
+        />
+      </MobileScreen>
+    );
+  }
+
+  if (!profile) {
+    if (discovery.isFetchingNextPage) {
+      return (
+        <MobileScreen>
+          <TopBar />
+          <EmptyState
+            title="Loading more profiles"
+            body="Fetching the next discovery page from the API."
+          />
+        </MobileScreen>
+      );
+    }
+
     return (
       <MobileScreen>
         <TopBar />
@@ -106,10 +146,7 @@ export function DiscoverClient() {
                 </p>
               )}
               <div className="flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-                {(profile?.interests.length
-                  ? profile.interests
-                  : ["Campus", "Coffee", "Study Group"]
-                ).map((interest) => (
+                {profile.interests.map((interest) => (
                   <Chip key={interest}>{interest}</Chip>
                 ))}
               </div>
