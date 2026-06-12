@@ -1,20 +1,12 @@
 "use client";
 
 import Link from "next/link";
-import {
-  Avatar,
-  EmptyState,
-  MobileScreen,
-  TopBar,
-} from "@/components/mobile/app-chrome";
-import { useConversationsList } from "@/hooks/chat/use-conversations-list";
+import { Avatar, MobileScreen, TopBar } from "@/components/mobile/app-chrome";
 import { useMatchesList } from "@/hooks/matches/use-matches-list";
-import { getUserName, relativeTime } from "@/lib/profile-utils";
+import { getUserName } from "@/lib/profile-utils";
 
 export function MatchesClient() {
   const { matches, isLoading: matchesLoading } = useMatchesList(20);
-  const { conversations, isLoading: conversationsLoading } =
-    useConversationsList(20);
 
   return (
     <MobileScreen>
@@ -74,88 +66,6 @@ export function MatchesClient() {
               <p className="py-4 text-sm text-[#6b6b6b]">
                 No matches returned yet.
               </p>
-            )}
-          </div>
-        </section>
-
-        <section className="mt-4 bg-white">
-          <div className="flex items-center justify-between px-5 py-4">
-            <h2 className="text-xl font-semibold">Messages</h2>
-            <button
-              type="button"
-              className="rounded-xl border border-black/10 bg-[#f9f9f8] px-3 py-1.5 text-xs font-medium"
-            >
-              Filter
-            </button>
-          </div>
-          <div className="flex flex-col">
-            {conversationsLoading ? (
-              <EmptyState
-                title="Loading messages"
-                body="Fetching your conversations."
-              />
-            ) : conversations.length ? (
-              conversations.map((conversation) => (
-                <Link
-                  key={conversation.id}
-                  href={`/chat/${conversation.id}`}
-                  className="relative flex items-center border-t border-black/10 px-5 py-4 transition hover:bg-[#f9f9f8]"
-                >
-                  {!conversation.isRead && (
-                    <span className="absolute left-0 top-1/4 bottom-1/4 w-0.5 rounded-r-full bg-primary" />
-                  )}
-                  <div className="relative">
-                    <Avatar
-                      src={conversation.otherUser.avatarUrl as string | null}
-                      name={conversation.otherUser.name}
-                      className="size-10"
-                    />
-                    {conversation.isOnline && (
-                      <span className="absolute bottom-0 right-0 size-3 rounded-full border-2 border-white bg-primary" />
-                    )}
-                  </div>
-                  <div className="ml-3 min-w-0 flex-1">
-                    <div className="mb-0.5 flex items-baseline justify-between gap-3">
-                      <span
-                        className={
-                          conversation.isRead
-                            ? "truncate font-medium"
-                            : "truncate font-bold"
-                        }
-                      >
-                        {conversation.otherUser.name}
-                      </span>
-                      <span
-                        className={
-                          conversation.isRead
-                            ? "shrink-0 text-xs text-[#6b6b6b]"
-                            : "shrink-0 text-xs font-semibold text-primary"
-                        }
-                      >
-                        {relativeTime(
-                          conversation.lastMessage?.timestamp ??
-                            conversation.updatedAt,
-                        )}
-                      </span>
-                    </div>
-                    <p
-                      className={
-                        conversation.isRead
-                          ? "truncate text-sm text-[#6b6b6b]"
-                          : "truncate text-sm font-semibold"
-                      }
-                    >
-                      {conversation.lastMessage?.content ??
-                        "Start the conversation."}
-                    </p>
-                  </div>
-                </Link>
-              ))
-            ) : (
-              <EmptyState
-                title="No conversations"
-                body="Conversations from the API will appear here after you match."
-              />
             )}
           </div>
         </section>
