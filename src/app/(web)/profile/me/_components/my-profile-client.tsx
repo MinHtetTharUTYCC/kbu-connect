@@ -1,14 +1,10 @@
 "use client";
 
-import { ChevronRight, LogOut, Pencil } from "lucide-react";
+import { LogOut, Pencil } from "lucide-react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useAuthContext } from "@/components/auth-provider";
-import {
-  Avatar,
-  Chip,
-  MobileScreen,
-  TopBar,
-} from "@/components/mobile/app-chrome";
+import { Avatar, MobileScreen, TopBar } from "@/components/mobile/app-chrome";
 import { useToggleDiscoverable } from "@/hooks/profile/use-toggle-discoverable";
 import { ageFromBirthYear, formatEnum } from "@/lib/profile-utils";
 import { useAuthStore } from "@/stores/auth-store";
@@ -19,10 +15,6 @@ export function MyProfileClient() {
   const logout = useAuthStore((state) => state.logout);
   const toggleDiscoverable = useToggleDiscoverable();
   const profile = user?.user;
-  const interests = profile?.interests?.length
-    ? profile.interests.map(String)
-    : ["Architecture", "Coffee", "Study Group"];
-
   return (
     <MobileScreen>
       <TopBar />
@@ -34,13 +26,13 @@ export function MyProfileClient() {
               name={profile?.name}
               className="size-24"
             />
-            <button
-              type="button"
+            <Link
+              href="/profile-setup"
               className="absolute bottom-0 right-0 grid size-8 place-items-center rounded-full border-2 border-white bg-primary text-white shadow-sm"
-              aria-label="Edit profile photo"
+              aria-label="Edit profile"
             >
               <Pencil className="size-4" />
-            </button>
+            </Link>
           </div>
           <h1 className="text-xl font-semibold">
             {profile?.name ?? "KBU Student"}
@@ -56,28 +48,15 @@ export function MyProfileClient() {
           </p>
         </section>
 
-        <SettingsSection title="My Profile">
-          <SettingsRow label="Personal Information" />
-          <SettingsRow label="Photo Gallery" />
-        </SettingsSection>
-
-        <SettingsSection title="Preferences">
-          <div className="border-b border-black/10 px-5 py-5">
-            <div className="mb-3 flex justify-between text-sm">
-              <span>Preferred faculties</span>
-              <span className="text-primary">Edit</span>
-            </div>
-            <div className="flex flex-wrap gap-2">
-              {interests.slice(0, 4).map((interest) => (
-                <Chip key={interest}>{interest}</Chip>
-              ))}
-            </div>
-          </div>
-          <SettingsRow
-            label="Preferred genders"
-            value={formatEnum(profile?.preferredGender as string) || "Everyone"}
-          />
-        </SettingsSection>
+        <section className="px-5 pb-6">
+          <Link
+            href="/profile-setup"
+            className="flex h-12 w-full items-center justify-center gap-2 rounded-xl bg-primary text-sm font-semibold text-white transition active:scale-[0.99]"
+          >
+            <Pencil className="size-4" />
+            Edit profile
+          </Link>
+        </section>
 
         <SettingsSection title="Privacy">
           <div className="flex items-center justify-between border-b border-black/10 px-5 py-4">
@@ -102,10 +81,12 @@ export function MyProfileClient() {
         </SettingsSection>
 
         <SettingsSection title="Account">
-          <SettingsRow
-            label="Email address"
-            value={profile?.email ?? "student@ms.kbu.ac.th"}
-          />
+          <div className="flex items-center justify-between border-b border-black/10 px-5 py-4">
+            <span className="text-sm">Email address</span>
+            <span className="max-w-[190px] truncate text-sm text-[#6b6b6b]">
+              {profile?.email ?? "student@ms.kbu.ac.th"}
+            </span>
+          </div>
           <button
             type="button"
             onClick={() => {
@@ -142,20 +123,5 @@ function SettingsSection({
       </h2>
       <div className="border-y border-black/10 bg-white">{children}</div>
     </section>
-  );
-}
-
-function SettingsRow({ label, value }: { label: string; value?: string }) {
-  return (
-    <button
-      type="button"
-      className="flex w-full items-center justify-between border-b border-black/10 px-5 py-4 text-left last:border-b-0 active:bg-[#f9f9f8]"
-    >
-      <span className="text-sm">{label}</span>
-      <span className="flex min-w-0 items-center gap-1 text-sm text-[#6b6b6b]">
-        {value && <span className="max-w-[180px] truncate">{value}</span>}
-        <ChevronRight className="size-4 opacity-60" />
-      </span>
-    </button>
   );
 }

@@ -6,9 +6,8 @@
  * OpenAPI spec version: 1.0
  */
 
-export interface BlockResponseDto {
-  /** Success message */
-  message: string;
-  /** ID of the blocked user */
-  blockedUserId: string;
-}
+/**
+ * Cursor for pagination (null if no more shoutouts)
+ * @nullable
+ */
+export type ShoutoutsListResponseDtoNextCursor = { [key: string]: unknown } | null;

@@ -7,6 +7,8 @@
  */
 
 export interface UnblockResponseDto {
+  /** Success message */
   message: string;
+  /** ID of the unblocked user */
   unblockedUserId: string;
 }

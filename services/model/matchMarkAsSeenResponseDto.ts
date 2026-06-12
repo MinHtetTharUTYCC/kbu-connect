@@ -8,5 +8,6 @@
 
 export interface MatchMarkAsSeenResponseDto {
   message: string;
+  /** ID of the match that was marked as seen */
   matchId: string;
 }

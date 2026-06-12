@@ -7,6 +7,8 @@
  */
 
 export interface DeleteMessageResponseDto {
+  /** Success message */
   message: string;
+  /** ID of the deleted message */
   id: string;
 }

@@ -7,7 +7,7 @@
  */
 
 /**
- * Cursor for pagination
+ * Cursor for pagination (null if no more matches)
  * @nullable
  */
 export type MatchListResponseDtoNextCursor = { [key: string]: unknown } | null;

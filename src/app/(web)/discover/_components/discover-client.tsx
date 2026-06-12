@@ -9,6 +9,7 @@ import {
   MobileScreen,
   TopBar,
 } from "@/components/mobile/app-chrome";
+import { useSendShoutout } from "@/hooks/chat/use-send-shoutout";
 import { useDiscoveryProfiles } from "@/hooks/discovery/use-discovery-profiles";
 import { useSwipeProfile } from "@/hooks/swipes/use-swipe-profile";
 import { cn } from "@/lib/utils";
@@ -16,6 +17,8 @@ import { cn } from "@/lib/utils";
 export function DiscoverClient() {
   const [index, setIndex] = useState(0);
   const [direction, setDirection] = useState<"left" | "right" | null>(null);
+  const [isShoutoutOpen, setIsShoutoutOpen] = useState(false);
+  const [shoutoutMessage, setShoutoutMessage] = useState("");
   const {
     profiles,
     isLoading,
@@ -24,6 +27,8 @@ export function DiscoverClient() {
     isFetchingNextPage,
   } = useDiscoveryProfiles(10);
   const { like, dislike, isPending: isSwipePending } = useSwipeProfile();
+  const { mutateAsync: sendShoutout, isPending: isSendingShoutout } =
+    useSendShoutout();
   const profile = profiles[index];
   const remainingProfiles = profiles.length - index;
 
@@ -47,6 +52,20 @@ export function DiscoverClient() {
     }, 260);
   }
 
+  async function handleSendShoutout(e: React.FormEvent) {
+    e.preventDefault();
+    if (!profile || !shoutoutMessage.trim()) return;
+
+    await sendShoutout({
+      data: {
+        receiverId: profile.id,
+        message: shoutoutMessage.trim(),
+      },
+    });
+    setShoutoutMessage("");
+    setIsShoutoutOpen(false);
+  }
+
   if (isLoading) {
     return (
       <MobileScreen>
@@ -66,7 +85,7 @@ export function DiscoverClient() {
           <TopBar />
           <EmptyState
             title="Loading more profiles"
-            body="Looking for more people nearby."
+            body="Looking for more people from the campus."
           />
         </MobileScreen>
       );
@@ -157,7 +176,12 @@ export function DiscoverClient() {
           >
             <X className="size-7" />
           </ActionButton>
-          <ActionButton label="Star" compact>
+          <ActionButton
+            label="Send shoutout"
+            compact
+            onClick={() => setIsShoutoutOpen(true)}
+            disabled={isSendingShoutout}
+          >
             <Star className="size-6 fill-primary" />
           </ActionButton>
           <ActionButton
@@ -169,7 +193,74 @@ export function DiscoverClient() {
           </ActionButton>
         </section>
       </main>
+      {isShoutoutOpen && (
+        <ShoutoutSheet
+          message={shoutoutMessage}
+          name={profile.name}
+          isSending={isSendingShoutout}
+          onChange={setShoutoutMessage}
+          onClose={() => setIsShoutoutOpen(false)}
+          onSubmit={handleSendShoutout}
+        />
+      )}
     </MobileScreen>
+  );
+}
+
+function ShoutoutSheet({
+  name,
+  message,
+  isSending,
+  onChange,
+  onClose,
+  onSubmit,
+}: {
+  name: string;
+  message: string;
+  isSending: boolean;
+  onChange: (value: string) => void;
+  onClose: () => void;
+  onSubmit: (e: React.FormEvent) => void;
+}) {
+  return (
+    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/35 px-4 pb-4">
+      <form
+        onSubmit={onSubmit}
+        className="w-full max-w-[398px] rounded-t-2xl bg-white p-5 shadow-xl"
+      >
+        <div className="mb-4 flex items-start justify-between gap-4">
+          <div>
+            <h2 className="text-lg font-semibold">Send shoutout</h2>
+            <p className="mt-1 text-sm text-[#6b6b6b]">Write to {name}.</p>
+            <p className="mt-1 text-xs text-[#a1a1a1]">
+              You can send 5 shoutouts a day.
+            </p>
+          </div>
+          <button
+            type="button"
+            onClick={onClose}
+            className="grid size-9 place-items-center rounded-full bg-[#f9f9f8] text-[#6b6b6b]"
+            aria-label="Close shoutout"
+          >
+            <X className="size-5" />
+          </button>
+        </div>
+        <textarea
+          value={message}
+          onChange={(e) => onChange(e.target.value)}
+          placeholder="Say something short..."
+          rows={4}
+          className="w-full resize-none rounded-xl border border-black/10 bg-[#f9f9f8] p-3 text-sm leading-6 outline-none focus:border-primary"
+        />
+        <button
+          type="submit"
+          disabled={!message.trim() || isSending}
+          className="mt-4 h-11 w-full rounded-xl bg-primary text-sm font-semibold text-white transition active:scale-[0.99] disabled:opacity-50"
+        >
+          {isSending ? "Sending..." : "Send"}
+        </button>
+      </form>
+    </div>
   );
 }
 

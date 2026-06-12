@@ -6,9 +6,9 @@
  * OpenAPI spec version: 1.0
  */
 
-export interface BlockResponseDto {
-  /** Success message */
+export interface SendShoutoutDto {
+  /** ID of the user to send the shoutout to */
+  receiverId: string;
+  /** Shoutout message content */
   message: string;
-  /** ID of the blocked user */
-  blockedUserId: string;
 }

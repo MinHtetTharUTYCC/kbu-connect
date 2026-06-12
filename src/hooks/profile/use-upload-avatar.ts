@@ -1,8 +1,8 @@
 "use client";
 
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { toast } from "sonner";
 import axiosInstanceFn from "@/lib/axios/axios-instance";
+import { handleBackendError } from "@/lib/error/error-util";
 import type { UploadAvatarResponseDto } from "../../../services/model";
 
 const validImageTypes = [
@@ -39,10 +39,6 @@ export function useUploadAvatar() {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ["/users/me"] });
     },
-    onError: (error) => {
-      const message =
-        error instanceof Error ? error.message : "Avatar upload failed";
-      toast.error(message);
-    },
+    onError: (error) => handleBackendError(error),
   });
 }

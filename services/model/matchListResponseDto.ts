@@ -9,9 +9,10 @@ import type { MatchItemDto } from './matchItemDto';
 import type { MatchListResponseDtoNextCursor } from './matchListResponseDtoNextCursor';
 
 export interface MatchListResponseDto {
+  /** List of matches */
   matches: MatchItemDto[];
   /**
-     * Cursor for pagination
+     * Cursor for pagination (null if no more matches)
      * @nullable
      */
   nextCursor: MatchListResponseDtoNextCursor;

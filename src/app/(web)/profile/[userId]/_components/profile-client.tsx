@@ -8,6 +8,8 @@ import {
   UserRound,
 } from "lucide-react";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { useEffect } from "react";
 import {
   Avatar,
   Chip,
@@ -15,14 +17,25 @@ import {
   MobileScreen,
   TopBar,
 } from "@/components/mobile/app-chrome";
+import { useMe } from "@/hooks/users/use-me";
 import { useUserProfile } from "@/hooks/users/use-user-profile";
 import { ageFromBirthYear, formatEnum } from "@/lib/profile-utils";
 
 export function ProfileClient({ userId }: { userId: string }) {
+  const router = useRouter();
+  const { data: me } = useMe();
+  const myId = me?.user?.id;
+  const isOwnProfile = Boolean(myId && myId === userId);
   const profileQuery = useUserProfile(userId);
   const profile = profileQuery.data;
 
-  if (profileQuery.isLoading) {
+  useEffect(() => {
+    if (isOwnProfile) {
+      router.replace("/profile/me");
+    }
+  }, [isOwnProfile, router]);
+
+  if (isOwnProfile || profileQuery.isLoading) {
     return (
       <MobileScreen>
         <TopBar title="Profile" backHref="/matches" />

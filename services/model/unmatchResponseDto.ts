@@ -8,6 +8,8 @@
 
 export interface UnmatchResponseDto {
   message: string;
+  /** ID of the unmatched user */
   userId: string;
+  /** ID of the match that was removed */
   matchId: string;
 }

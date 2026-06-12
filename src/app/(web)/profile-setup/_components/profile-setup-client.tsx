@@ -58,7 +58,10 @@ const steps: Array<{ id: SetupStep; eyebrow: string; title: string }> = [
 export function ProfileSetupClient() {
   const { user } = useAuthContext();
   const current = user?.user;
-  const updateProfile = useUpdateMyProfile();
+  const isEditMode = Boolean(user?.isComplete);
+  const updateProfile = useUpdateMyProfile(
+    isEditMode ? "/profile/me" : "/discover",
+  );
   const [stepIndex, setStepIndex] = useState(0);
   const [name, setName] = useState(current?.name ?? "");
   const [bio, setBio] = useState(current?.bio ? String(current.bio) : "");
@@ -80,23 +83,33 @@ export function ProfileSetupClient() {
       UpdateProfileDtoFaculty.CIVIL,
   );
   const [gender, setGender] = useState<UpdateProfileDtoGender>(
-    UpdateProfileDtoGender.OTHER,
+    (current?.gender as UpdateProfileDtoGender) ?? UpdateProfileDtoGender.OTHER,
   );
   const [preferredGender, setPreferredGender] =
     useState<UpdateProfileDtoPreferredGender>(
-      UpdateProfileDtoPreferredGender.ALL,
+      (current?.preferredGender as UpdateProfileDtoPreferredGender) ??
+        UpdateProfileDtoPreferredGender.ALL,
     );
   const [nationality, setNationality] = useState<UpdateProfileDtoNationality>(
-    UpdateProfileDtoNationality.THAI,
+    (current?.nationality as UpdateProfileDtoNationality) ??
+      UpdateProfileDtoNationality.THAI,
   );
-  const [minPreferredAge, setMinPreferredAge] = useState(18);
-  const [maxPreferredAge, setMaxPreferredAge] = useState(28);
+  const [minPreferredAge, setMinPreferredAge] = useState(
+    current?.minPreferredAge ? Number(current.minPreferredAge) : 18,
+  );
+  const [maxPreferredAge, setMaxPreferredAge] = useState(
+    current?.maxPreferredAge ? Number(current.maxPreferredAge) : 28,
+  );
   const [selectedInterests, setSelectedInterests] = useState<
     UpdateProfileDtoInterestsItem[]
-  >([
-    UpdateProfileDtoInterestsItem.MUSIC,
-    UpdateProfileDtoInterestsItem.SPORTS,
-  ]);
+  >(() =>
+    current?.interests?.length
+      ? (current.interests as UpdateProfileDtoInterestsItem[])
+      : [
+          UpdateProfileDtoInterestsItem.MUSIC,
+          UpdateProfileDtoInterestsItem.SPORTS,
+        ],
+  );
   const activeStep = steps[stepIndex];
   const isLastStep = stepIndex === steps.length - 1;
   const canGoNext = useMemo(() => {
@@ -161,8 +174,8 @@ export function ProfileSetupClient() {
   return (
     <MobileScreen>
       <TopBar
-        title="UniMatch"
-        backHref="/login"
+        title={isEditMode ? "Edit Profile" : "UniMatch"}
+        backHref={isEditMode ? "/profile/me" : "/login"}
         action={<div className="w-10" />}
       />
       <div className="h-1 bg-[#f6f3f2]">
@@ -174,7 +187,9 @@ export function ProfileSetupClient() {
       <main className="flex flex-1 flex-col overflow-y-auto px-5 pb-28 pt-8">
         <section className="mb-8">
           <p className="mb-1 text-xs font-semibold text-primary">
-            {activeStep.eyebrow}
+            {isEditMode
+              ? activeStep.eyebrow.replace("STEP", "EDIT")
+              : activeStep.eyebrow}
           </p>
           <h1 className="text-xl font-medium leading-7">{activeStep.title}</h1>
         </section>
@@ -370,7 +385,9 @@ export function ProfileSetupClient() {
           {isLastStep
             ? updateProfile.isPending
               ? "Saving..."
-              : "Finish"
+              : isEditMode
+                ? "Save"
+                : "Finish"
             : "Next"}
           {isLastStep ? (
             <Check className="size-5" />

@@ -2,30 +2,18 @@
 
 import type { InfiniteData } from "@tanstack/react-query";
 import { useChatControllerGetShoutoutsInfinite } from "../../../services/generated/chat/chat";
-import type { ChatControllerGetShoutoutsType } from "../../../services/model";
+import type {
+  ChatControllerGetShoutoutsType,
+  ShoutoutItemDto,
+  ShoutoutsListResponseDto,
+} from "../../../services/model";
 
 export type ShoutoutType = ChatControllerGetShoutoutsType;
-
-export type ShoutoutItem = {
-  id: string;
-  content: string;
-  type: ShoutoutType;
-  createdAt: string;
-  otherUser: {
-    id: string;
-    name: string;
-    avatarUrl: string | null;
-  };
-};
-
-type ShoutoutsListPage = {
-  shoutouts: ShoutoutItem[];
-  nextCursor: string | null;
-};
+export type ShoutoutItem = ShoutoutItemDto;
 
 export function useShoutoutsList(type: ShoutoutType = "received", limit = 20) {
   const query = useChatControllerGetShoutoutsInfinite<
-    InfiniteData<ShoutoutsListPage, string | undefined>
+    InfiniteData<ShoutoutsListResponseDto, string | undefined>
   >(
     { type, limit },
     {

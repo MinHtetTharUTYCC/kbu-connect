@@ -167,17 +167,15 @@ const LoadMoreRow = ({
   ref,
   hasNextPage,
   isFetchingNextPage,
+  endLabel = "No more shoutouts",
 }: {
   ref: React.Ref<HTMLDivElement>;
   hasNextPage: boolean;
   isFetchingNextPage: boolean;
+  endLabel?: string;
 }) => (
   <div ref={ref} className="px-5 py-4 text-center text-xs text-[#6b6b6b]">
-    {isFetchingNextPage
-      ? "Loading more..."
-      : hasNextPage
-        ? ""
-        : "No more shoutouts"}
+    {isFetchingNextPage ? "Loading more..." : hasNextPage ? "" : endLabel}
   </div>
 );
 
@@ -187,7 +185,7 @@ function ShoutoutRow({ shoutout }: { shoutout: ShoutoutItem }) {
       <div className="flex items-start gap-3">
         <div className="relative">
           <Avatar
-            src={shoutout.otherUser.avatarUrl}
+            src={shoutout.otherUser.avatarUrl as string | null}
             name={shoutout.otherUser.name}
             className="size-12"
           />
@@ -225,7 +223,31 @@ function ShoutoutRow({ shoutout }: { shoutout: ShoutoutItem }) {
 }
 
 export function ChatListClient() {
-  const { conversations, isLoading } = useConversationsList(30);
+  const {
+    conversations,
+    isLoading,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useConversationsList(30);
+  const loadMoreRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    const target = loadMoreRef.current;
+    if (!target || !hasNextPage) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && !isFetchingNextPage) {
+          fetchNextPage();
+        }
+      },
+      { rootMargin: "180px 0px" },
+    );
+
+    observer.observe(target);
+    return () => observer.disconnect();
+  }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
 
   if (isLoading) {
     return (
@@ -270,13 +292,20 @@ export function ChatListClient() {
           </div>
         </Link>
       ))}
+      <LoadMoreRow
+        ref={loadMoreRef}
+        hasNextPage={hasNextPage}
+        isFetchingNextPage={isFetchingNextPage}
+        endLabel="No more chats"
+      />
     </div>
   );
 }
 
 export function ChatClient({ chatId }: { chatId: string }) {
   const { user } = useAuthContext();
-  const messagesQuery = useConversationMessages(chatId);
+  const messagesQuery = useConversationMessages(chatId, 20);
+  const loadMoreMessagesRef = useRef<HTMLDivElement | null>(null);
   const { conversations, isLoading: conversationsLoading } =
     useConversationsList(30);
   const markSeen = useMarkConversationSeen();
@@ -295,6 +324,27 @@ export function ChatClient({ chatId }: { chatId: string }) {
       markSeen.mutate({ conversationId: chatId });
     }
   }, [chatId, conversation, markSeen.mutate]);
+
+  useEffect(() => {
+    const target = loadMoreMessagesRef.current;
+    if (!target || !messagesQuery.hasNextPage) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && !messagesQuery.isFetchingNextPage) {
+          messagesQuery.fetchNextPage();
+        }
+      },
+      { rootMargin: "180px 0px" },
+    );
+
+    observer.observe(target);
+    return () => observer.disconnect();
+  }, [
+    messagesQuery.fetchNextPage,
+    messagesQuery.hasNextPage,
+    messagesQuery.isFetchingNextPage,
+  ]);
 
   function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -385,6 +435,12 @@ export function ChatClient({ chatId }: { chatId: string }) {
             body="Send the first message to start the conversation."
           />
         )}
+        <LoadMoreRow
+          ref={loadMoreMessagesRef}
+          hasNextPage={messagesQuery.hasNextPage}
+          isFetchingNextPage={messagesQuery.isFetchingNextPage}
+          endLabel="No more messages"
+        />
       </main>
       <form
         onSubmit={handleSubmit}

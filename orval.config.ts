@@ -43,6 +43,12 @@ export default defineConfig({
               useInfiniteQueryParam: "cursor",
             },
           },
+          ChatController_getConversations: {
+            query: {
+              useInfinite: true,
+              useInfiniteQueryParam: "cursor",
+            },
+          },
         },
       },
     },
