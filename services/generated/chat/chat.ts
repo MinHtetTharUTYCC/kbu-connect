@@ -6,18 +6,23 @@
  * OpenAPI spec version: 1.0
  */
 import {
+  useInfiniteQuery,
   useMutation,
   useQuery
 } from '@tanstack/react-query';
 import type {
   DataTag,
   DefinedInitialDataOptions,
+  DefinedUseInfiniteQueryResult,
   DefinedUseQueryResult,
+  InfiniteData,
   MutationFunction,
   QueryClient,
   QueryFunction,
   QueryKey,
   UndefinedInitialDataOptions,
+  UseInfiniteQueryOptions,
+  UseInfiniteQueryResult,
   UseMutationOptions,
   UseMutationResult,
   UseQueryOptions,
@@ -26,12 +31,14 @@ import type {
 
 import type {
   ChatControllerGetConversationsParams,
+  ChatControllerGetShoutoutsParams,
   ConversationItemDto,
   ConversationsListResponseDto,
   DeleteConversationResponseDto,
   DeleteMessageResponseDto,
   MessageItemDto,
   MessagesListResponseDto,
+  ShoutoutsListResponseDto,
   SuccessMessageResponseDto,
   UpdateMessageDto
 } from '../../model';
@@ -103,6 +110,172 @@ export const useChatControllerSendShoutout = <TError = void,
       return useMutation(getChatControllerSendShoutoutMutationOptions(options), queryClient);
     }
     /**
+ * @summary Get shoutouts for the current user
+ */
+export const chatControllerGetShoutouts = (
+    params?: ChatControllerGetShoutoutsParams,
+ signal?: AbortSignal
+) => {
+
+
+      return axiosInstanceFn<ShoutoutsListResponseDto>(
+      {url: `/chats/shoutouts`, method: 'GET',
+        params, signal
+    },
+      );
+    }
+
+
+
+
+export const getChatControllerGetShoutoutsInfiniteQueryKey = (params?: ChatControllerGetShoutoutsParams,) => {
+    return [
+    'infinite', `/chats/shoutouts`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+export const getChatControllerGetShoutoutsQueryKey = (params?: ChatControllerGetShoutoutsParams,) => {
+    return [
+    `/chats/shoutouts`, ...(params ? [params] : [])
+    ] as const;
+    }
+
+
+export const getChatControllerGetShoutoutsInfiniteQueryOptions = <TData = InfiniteData<Awaited<ReturnType<typeof chatControllerGetShoutouts>>, ChatControllerGetShoutoutsParams['cursor']>, TError = unknown>(params?: ChatControllerGetShoutoutsParams, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof chatControllerGetShoutouts>>, TError, TData, QueryKey, ChatControllerGetShoutoutsParams['cursor']>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getChatControllerGetShoutoutsInfiniteQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof chatControllerGetShoutouts>>, QueryKey, ChatControllerGetShoutoutsParams['cursor']> = ({ signal, pageParam }) => chatControllerGetShoutouts({...params, 'cursor': pageParam ?? params?.['cursor']}, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseInfiniteQueryOptions<Awaited<ReturnType<typeof chatControllerGetShoutouts>>, TError, TData, QueryKey, ChatControllerGetShoutoutsParams['cursor']> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ChatControllerGetShoutoutsInfiniteQueryResult = NonNullable<Awaited<ReturnType<typeof chatControllerGetShoutouts>>>
+export type ChatControllerGetShoutoutsInfiniteQueryError = unknown
+
+
+export function useChatControllerGetShoutoutsInfinite<TData = InfiniteData<Awaited<ReturnType<typeof chatControllerGetShoutouts>>, ChatControllerGetShoutoutsParams['cursor']>, TError = unknown>(
+ params: undefined |  ChatControllerGetShoutoutsParams, options: { query:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof chatControllerGetShoutouts>>, TError, TData, QueryKey, ChatControllerGetShoutoutsParams['cursor']>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof chatControllerGetShoutouts>>,
+          TError,
+          Awaited<ReturnType<typeof chatControllerGetShoutouts>>, QueryKey
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useChatControllerGetShoutoutsInfinite<TData = InfiniteData<Awaited<ReturnType<typeof chatControllerGetShoutouts>>, ChatControllerGetShoutoutsParams['cursor']>, TError = unknown>(
+ params?: ChatControllerGetShoutoutsParams, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof chatControllerGetShoutouts>>, TError, TData, QueryKey, ChatControllerGetShoutoutsParams['cursor']>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof chatControllerGetShoutouts>>,
+          TError,
+          Awaited<ReturnType<typeof chatControllerGetShoutouts>>, QueryKey
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useChatControllerGetShoutoutsInfinite<TData = InfiniteData<Awaited<ReturnType<typeof chatControllerGetShoutouts>>, ChatControllerGetShoutoutsParams['cursor']>, TError = unknown>(
+ params?: ChatControllerGetShoutoutsParams, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof chatControllerGetShoutouts>>, TError, TData, QueryKey, ChatControllerGetShoutoutsParams['cursor']>>, }
+ , queryClient?: QueryClient
+  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Get shoutouts for the current user
+ */
+
+export function useChatControllerGetShoutoutsInfinite<TData = InfiniteData<Awaited<ReturnType<typeof chatControllerGetShoutouts>>, ChatControllerGetShoutoutsParams['cursor']>, TError = unknown>(
+ params?: ChatControllerGetShoutoutsParams, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof chatControllerGetShoutouts>>, TError, TData, QueryKey, ChatControllerGetShoutoutsParams['cursor']>>, }
+ , queryClient?: QueryClient
+ ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getChatControllerGetShoutoutsInfiniteQueryOptions(params,options)
+
+  const query = useInfiniteQuery(queryOptions, queryClient) as  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+export const getChatControllerGetShoutoutsQueryOptions = <TData = Awaited<ReturnType<typeof chatControllerGetShoutouts>>, TError = unknown>(params?: ChatControllerGetShoutoutsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof chatControllerGetShoutouts>>, TError, TData>>, }
+) => {
+
+const {query: queryOptions} = options ?? {};
+
+  const queryKey =  queryOptions?.queryKey ?? getChatControllerGetShoutoutsQueryKey(params);
+
+
+
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof chatControllerGetShoutouts>>> = ({ signal }) => chatControllerGetShoutouts(params, signal);
+
+
+
+
+
+   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof chatControllerGetShoutouts>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
+}
+
+export type ChatControllerGetShoutoutsQueryResult = NonNullable<Awaited<ReturnType<typeof chatControllerGetShoutouts>>>
+export type ChatControllerGetShoutoutsQueryError = unknown
+
+
+export function useChatControllerGetShoutouts<TData = Awaited<ReturnType<typeof chatControllerGetShoutouts>>, TError = unknown>(
+ params: undefined |  ChatControllerGetShoutoutsParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof chatControllerGetShoutouts>>, TError, TData>> & Pick<
+        DefinedInitialDataOptions<
+          Awaited<ReturnType<typeof chatControllerGetShoutouts>>,
+          TError,
+          Awaited<ReturnType<typeof chatControllerGetShoutouts>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useChatControllerGetShoutouts<TData = Awaited<ReturnType<typeof chatControllerGetShoutouts>>, TError = unknown>(
+ params?: ChatControllerGetShoutoutsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof chatControllerGetShoutouts>>, TError, TData>> & Pick<
+        UndefinedInitialDataOptions<
+          Awaited<ReturnType<typeof chatControllerGetShoutouts>>,
+          TError,
+          Awaited<ReturnType<typeof chatControllerGetShoutouts>>
+        > , 'initialData'
+      >, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useChatControllerGetShoutouts<TData = Awaited<ReturnType<typeof chatControllerGetShoutouts>>, TError = unknown>(
+ params?: ChatControllerGetShoutoutsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof chatControllerGetShoutouts>>, TError, TData>>, }
+ , queryClient?: QueryClient
+  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+/**
+ * @summary Get shoutouts for the current user
+ */
+
+export function useChatControllerGetShoutouts<TData = Awaited<ReturnType<typeof chatControllerGetShoutouts>>, TError = unknown>(
+ params?: ChatControllerGetShoutoutsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof chatControllerGetShoutouts>>, TError, TData>>, }
+ , queryClient?: QueryClient
+ ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+
+  const queryOptions = getChatControllerGetShoutoutsQueryOptions(params,options)
+
+  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+
+  return { ...query, queryKey: queryOptions.queryKey };
+}
+
+
+
+
+
+
+/**
  * @summary Reply to a shoutout - creates conversation and sends message
  */
 export const chatControllerReplyToShoutout = (

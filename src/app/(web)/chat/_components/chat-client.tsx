@@ -1,10 +1,13 @@
 "use client";
 
-import { PlusCircle, Send } from "lucide-react";
-import { useEffect, useMemo, useState } from "react";
+import { Lock, PlusCircle, Send } from "lucide-react";
+import Link from "next/link";
+import { useSearchParams } from "next/navigation";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { useAuthContext } from "@/components/auth-provider";
 import {
   Avatar,
+  Chip,
   EmptyState,
   MobileScreen,
   TopBar,
@@ -12,57 +15,262 @@ import {
 import { useConversationMessages } from "@/hooks/chat/use-conversation-messages";
 import { useConversationsList } from "@/hooks/chat/use-conversations-list";
 import { useMarkConversationSeen } from "@/hooks/chat/use-mark-conversation-seen";
+import {
+  type ShoutoutItem,
+  type ShoutoutType,
+  useShoutoutsList,
+} from "@/hooks/chat/use-shoutouts-list";
 import { relativeTime } from "@/lib/profile-utils";
 import { cn } from "@/lib/utils";
 import type { MessageItemDto } from "../../../../../services/model";
 
-export function ChatListClient() {
-  const { conversations, isLoading } = useConversationsList(30);
+type ChatTab = "chats" | "shoutouts";
+
+export function ChatHomeClient() {
+  const searchParams = useSearchParams();
+  const activeTab: ChatTab =
+    searchParams.get("tab") === "shoutouts" ? "shoutouts" : "chats";
 
   return (
     <MobileScreen>
-      <TopBar title="Messages" />
-      <main className="flex-1 overflow-y-auto">
-        {isLoading ? (
-          <EmptyState
-            title="Loading messages"
-            body="Fetching your conversations."
-          />
-        ) : conversations.length ? (
-          conversations.map((conversation) => (
-            <a
-              key={conversation.id}
-              href={`/chat/${conversation.id}`}
-              className="flex items-center border-b border-black/10 px-5 py-4"
+      <TopBar title="Chats" />
+      <main className="flex-1 overflow-y-auto pb-5">
+        <div className="bg-white px-5 py-4">
+          <div className="flex rounded-xl border border-black/10 bg-[#f9f9f8] p-1">
+            <Link
+              href="/chats"
+              className={cn(
+                "flex-1 rounded-lg py-2 text-center text-xs font-semibold",
+                activeTab === "chats"
+                  ? "border border-primary bg-white text-primary shadow-sm"
+                  : "text-[#6b6b6b]",
+              )}
             >
-              <Avatar
-                src={conversation.otherUser.avatarUrl as string | null}
-                name={conversation.otherUser.name}
-                className="size-12"
-              />
-              <div className="ml-3 min-w-0 flex-1">
-                <div className="flex items-baseline justify-between gap-3">
-                  <span className="truncate font-semibold">
-                    {conversation.otherUser.name}
-                  </span>
-                  <span className="text-xs text-[#6b6b6b]">
-                    {relativeTime(conversation.updatedAt)}
-                  </span>
-                </div>
-                <p className="truncate text-sm text-[#6b6b6b]">
-                  {conversation.lastMessage?.content ?? "No messages yet."}
-                </p>
-              </div>
-            </a>
-          ))
-        ) : (
-          <EmptyState
-            title="No conversations"
-            body="Your real conversations will appear here after you match and message."
-          />
-        )}
+              Chats
+            </Link>
+            <Link
+              href="/chats?tab=shoutouts"
+              className={cn(
+                "flex-1 rounded-lg py-2 text-center text-xs font-semibold",
+                activeTab === "shoutouts"
+                  ? "border border-primary bg-white text-primary shadow-sm"
+                  : "text-[#6b6b6b]",
+              )}
+            >
+              Shoutouts
+            </Link>
+          </div>
+        </div>
+        {activeTab === "shoutouts" ? <ShoutoutsPanel /> : <ChatListClient />}
       </main>
     </MobileScreen>
+  );
+}
+
+function ShoutoutsPanel() {
+  const searchParams = useSearchParams();
+  const activeSubTab: ShoutoutType =
+    searchParams.get("shoutouts") === "sent" ? "sent" : "received";
+  const {
+    shoutouts,
+    isLoading,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useShoutoutsList(activeSubTab, 20);
+  const loadMoreRef = useRef<HTMLDivElement | null>(null);
+
+  useEffect(() => {
+    const target = loadMoreRef.current;
+    if (!target || !hasNextPage) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && !isFetchingNextPage) {
+          fetchNextPage();
+        }
+      },
+      { rootMargin: "180px 0px" },
+    );
+
+    observer.observe(target);
+    return () => observer.disconnect();
+  }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
+
+  return (
+    <section>
+      <div className="px-5 pb-4">
+        <div className="flex border-b border-black/10">
+          <Link
+            href="/chats?tab=shoutouts&shoutouts=received"
+            className={cn(
+              "flex-1 border-b-2 pb-3 text-center text-sm font-medium",
+              activeSubTab === "received"
+                ? "border-primary text-primary"
+                : "border-transparent text-[#6b6b6b]",
+            )}
+          >
+            Received
+          </Link>
+          <Link
+            href="/chats?tab=shoutouts&shoutouts=sent"
+            className={cn(
+              "flex-1 border-b-2 pb-3 text-center text-sm font-medium",
+              activeSubTab === "sent"
+                ? "border-primary text-primary"
+                : "border-transparent text-[#6b6b6b]",
+            )}
+          >
+            Sent
+          </Link>
+        </div>
+      </div>
+      {isLoading ? (
+        <EmptyState title="Loading shoutouts" body="Checking your shoutouts." />
+      ) : shoutouts.length ? (
+        <div>
+          {shoutouts.map((item) => (
+            <ShoutoutRow key={item.id} shoutout={item} />
+          ))}
+          <LoadMoreRow
+            ref={loadMoreRef}
+            hasNextPage={hasNextPage}
+            isFetchingNextPage={isFetchingNextPage}
+          />
+        </div>
+      ) : (
+        <div>
+          <EmptyState
+            title={
+              activeSubTab === "received"
+                ? "No received shoutouts"
+                : "No sent shoutouts"
+            }
+            body={
+              activeSubTab === "received"
+                ? "Shoutouts people send you will show here."
+                : "Shoutouts you send will show here."
+            }
+          />
+          <LoadMoreRow
+            ref={loadMoreRef}
+            hasNextPage={hasNextPage}
+            isFetchingNextPage={isFetchingNextPage}
+          />
+        </div>
+      )}
+    </section>
+  );
+}
+
+const LoadMoreRow = ({
+  ref,
+  hasNextPage,
+  isFetchingNextPage,
+}: {
+  ref: React.Ref<HTMLDivElement>;
+  hasNextPage: boolean;
+  isFetchingNextPage: boolean;
+}) => (
+  <div ref={ref} className="px-5 py-4 text-center text-xs text-[#6b6b6b]">
+    {isFetchingNextPage
+      ? "Loading more..."
+      : hasNextPage
+        ? ""
+        : "No more shoutouts"}
+  </div>
+);
+
+function ShoutoutRow({ shoutout }: { shoutout: ShoutoutItem }) {
+  return (
+    <article className="border-b border-black/10 bg-white p-5">
+      <div className="flex items-start gap-3">
+        <div className="relative">
+          <Avatar
+            src={shoutout.otherUser.avatarUrl}
+            name={shoutout.otherUser.name}
+            className="size-12"
+          />
+          {shoutout.type === "received" && (
+            <div className="absolute inset-0 grid place-items-center text-white">
+              <Lock className="size-5 fill-black/20 drop-shadow" />
+            </div>
+          )}
+        </div>
+        <div className="min-w-0 flex-1">
+          <div className="mb-1 flex items-center justify-between gap-3">
+            <h2 className="truncate text-xs font-bold text-primary">
+              {shoutout.otherUser.name}
+            </h2>
+            <span className="text-xs text-[#a1a1a1]">
+              {relativeTime(shoutout.createdAt)}
+            </span>
+          </div>
+          <p className="line-clamp-2 text-sm leading-6">{shoutout.content}</p>
+          <div className="mt-4 flex items-center justify-between gap-3">
+            <Chip>{shoutout.type === "received" ? "Received" : "Sent"}</Chip>
+            {shoutout.type === "received" && (
+              <Link
+                href={`/profile/${shoutout.otherUser.id}`}
+                className="rounded-lg bg-primary px-4 py-1.5 text-xs font-semibold text-white active:scale-95"
+              >
+                View
+              </Link>
+            )}
+          </div>
+        </div>
+      </div>
+    </article>
+  );
+}
+
+export function ChatListClient() {
+  const { conversations, isLoading } = useConversationsList(30);
+
+  if (isLoading) {
+    return (
+      <EmptyState title="Loading chats" body="Checking your conversations." />
+    );
+  }
+
+  if (!conversations.length) {
+    return (
+      <EmptyState
+        title="No chats"
+        body="After you match and start a conversation, it will show here."
+      />
+    );
+  }
+
+  return (
+    <div className="flex flex-col">
+      {conversations.map((conversation) => (
+        <Link
+          key={conversation.id}
+          href={`/chats/${conversation.id}`}
+          className="flex items-center border-b border-black/10 px-5 py-4"
+        >
+          <Avatar
+            src={conversation.otherUser.avatarUrl as string | null}
+            name={conversation.otherUser.name}
+            className="size-12"
+          />
+          <div className="ml-3 min-w-0 flex-1">
+            <div className="flex items-baseline justify-between gap-3">
+              <span className="truncate font-semibold">
+                {conversation.otherUser.name}
+              </span>
+              <span className="text-xs text-[#6b6b6b]">
+                {relativeTime(conversation.updatedAt)}
+              </span>
+            </div>
+            <p className="truncate text-sm text-[#6b6b6b]">
+              {conversation.lastMessage?.content ?? "No messages yet."}
+            </p>
+          </div>
+        </Link>
+      ))}
+    </div>
   );
 }
 
@@ -107,10 +315,10 @@ export function ChatClient({ chatId }: { chatId: string }) {
   if (conversationsLoading) {
     return (
       <MobileScreen>
-        <TopBar title="Messages" backHref="/matches" />
+        <TopBar title="Messages" backHref="/chats" />
         <EmptyState
           title="Loading conversation"
-          body="Fetching the latest messages."
+          body="Opening your conversation."
         />
       </MobileScreen>
     );
@@ -119,10 +327,10 @@ export function ChatClient({ chatId }: { chatId: string }) {
   if (!conversation) {
     return (
       <MobileScreen>
-        <TopBar title="Messages" backHref="/matches" />
+        <TopBar title="Messages" backHref="/chats" />
         <EmptyState
           title="Conversation unavailable"
-          body="This conversation was not returned by the API."
+          body="This chat may have been deleted or is no longer available."
         />
       </MobileScreen>
     );
@@ -132,7 +340,7 @@ export function ChatClient({ chatId }: { chatId: string }) {
     <MobileScreen>
       <TopBar
         title={conversation.otherUser.name}
-        backHref="/matches"
+        backHref="/chats"
         action={
           <Avatar
             src={conversation.otherUser.avatarUrl as string | null}
@@ -143,10 +351,7 @@ export function ChatClient({ chatId }: { chatId: string }) {
       />
       <main className="flex flex-1 flex-col gap-3 overflow-y-auto bg-white px-5 py-6">
         {messagesQuery.isLoading ? (
-          <EmptyState
-            title="Loading messages"
-            body="Fetching message history."
-          />
+          <EmptyState title="Loading messages" body="Opening your messages." />
         ) : messages.length ? (
           messages.map((message) => {
             const mine = message.senderId === myId || message.senderId === "me";
@@ -177,7 +382,7 @@ export function ChatClient({ chatId }: { chatId: string }) {
         ) : (
           <EmptyState
             title="No messages yet"
-            body="Messages returned by the API will appear here."
+            body="Send the first message to start the conversation."
           />
         )}
       </main>

@@ -12,26 +12,9 @@ export function MatchesClient() {
     <MobileScreen>
       <TopBar />
       <main className="flex-1 overflow-y-auto pb-5">
-        <section className="bg-white px-5 py-4">
-          <div className="flex border-b border-black/10">
-            <button
-              type="button"
-              className="flex-1 border-b-2 border-primary pb-3 text-sm font-medium"
-            >
-              Matches
-            </button>
-            <button
-              type="button"
-              className="flex-1 border-b-2 border-transparent pb-3 text-sm text-[#6b6b6b]"
-            >
-              Shoutouts
-            </button>
-          </div>
-        </section>
-
         <section className="bg-white py-2">
           <div className="mb-4 flex items-end justify-between px-5">
-            <h1 className="text-xl font-semibold">New Matches</h1>
+            <h1 className="text-xl font-semibold">Matches</h1>
           </div>
           <div className="flex gap-4 overflow-x-auto px-5 pb-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
             {matchesLoading ? (
@@ -42,7 +25,7 @@ export function MatchesClient() {
                   key={match.id}
                   href={
                     match.conversationId
-                      ? `/chat/${match.conversationId}`
+                      ? `/chats/${match.conversationId}`
                       : `/profile/${match.matcher.id}`
                   }
                   className="flex min-w-16 flex-col items-center gap-2 active:scale-95"
@@ -63,8 +46,9 @@ export function MatchesClient() {
                 </Link>
               ))
             ) : (
-              <p className="py-4 text-sm text-[#6b6b6b]">
-                No matches returned yet.
+              <p className="w-full px-5 py-10 text-center text-sm text-[#6b6b6b]">
+                No matches yet. When someone likes you back, they will show
+                here.
               </p>
             )}
           </div>

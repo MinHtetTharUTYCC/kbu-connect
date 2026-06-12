@@ -76,7 +76,7 @@ export function Avatar({
   return (
     <div
       className={cn(
-        "grid shrink-0 place-items-center overflow-hidden rounded-full border border-black/10 bg-[#fff1ed] text-sm font-bold text-primary",
+        "relative grid shrink-0 place-items-center overflow-hidden rounded-full border border-black/10 bg-[#fff1ed] text-sm font-bold text-primary",
         className,
       )}
     >

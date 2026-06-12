@@ -6,7 +6,7 @@ import { userLinks } from "@/lib/constants/links";
 import { cn } from "@/lib/utils";
 import { useAuthContext } from "../auth-provider";
 
-const HIDDEN_ON_PATHS = ["/login", "/chat/", "/profile-setup"];
+const HIDDEN_ON_PATHS = ["/login", "/chat/", "/chats/", "/profile-setup"];
 
 export default function BottomNav() {
   const pathname = usePathname();

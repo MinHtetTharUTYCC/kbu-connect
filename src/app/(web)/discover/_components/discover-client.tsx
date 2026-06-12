@@ -16,34 +16,30 @@ import { cn } from "@/lib/utils";
 export function DiscoverClient() {
   const [index, setIndex] = useState(0);
   const [direction, setDirection] = useState<"left" | "right" | null>(null);
-  const discovery = useDiscoveryProfiles(10);
-  const swipe = useSwipeProfile();
-  const profiles = discovery.profiles;
+  const {
+    profiles,
+    isLoading,
+    fetchNextPage,
+    hasNextPage,
+    isFetchingNextPage,
+  } = useDiscoveryProfiles(10);
+  const { like, dislike, isPending: isSwipePending } = useSwipeProfile();
   const profile = profiles[index];
   const remainingProfiles = profiles.length - index;
 
   useEffect(() => {
-    if (
-      remainingProfiles <= 3 &&
-      discovery.hasNextPage &&
-      !discovery.isFetchingNextPage
-    ) {
-      discovery.fetchNextPage();
+    if (remainingProfiles <= 3 && hasNextPage && !isFetchingNextPage) {
+      fetchNextPage();
     }
-  }, [
-    discovery.fetchNextPage,
-    discovery.hasNextPage,
-    discovery.isFetchingNextPage,
-    remainingProfiles,
-  ]);
+  }, [fetchNextPage, hasNextPage, isFetchingNextPage, remainingProfiles]);
 
   function handleSwipe(type: "LIKE" | "DISLIKE") {
     if (!profile) return;
     setDirection(type === "LIKE" ? "right" : "left");
     if (type === "LIKE") {
-      swipe.like(profile.id);
+      like(profile.id);
     } else {
-      swipe.dislike(profile.id);
+      dislike(profile.id);
     }
     window.setTimeout(() => {
       setIndex((value) => value + 1);
@@ -51,26 +47,26 @@ export function DiscoverClient() {
     }, 260);
   }
 
-  if (discovery.isLoading) {
+  if (isLoading) {
     return (
       <MobileScreen>
         <TopBar />
         <EmptyState
           title="Loading profiles"
-          body="Fetching real discovery profiles from the API."
+          body="Finding people you may want to meet."
         />
       </MobileScreen>
     );
   }
 
   if (!profile) {
-    if (discovery.isFetchingNextPage) {
+    if (isFetchingNextPage) {
       return (
         <MobileScreen>
           <TopBar />
           <EmptyState
             title="Loading more profiles"
-            body="Fetching the next discovery page from the API."
+            body="Looking for more people nearby."
           />
         </MobileScreen>
       );
@@ -157,7 +153,7 @@ export function DiscoverClient() {
           <ActionButton
             label="Pass"
             onClick={() => handleSwipe("DISLIKE")}
-            disabled={swipe.isPending}
+            disabled={isSwipePending}
           >
             <X className="size-7" />
           </ActionButton>
@@ -167,7 +163,7 @@ export function DiscoverClient() {
           <ActionButton
             label="Like"
             onClick={() => handleSwipe("LIKE")}
-            disabled={swipe.isPending}
+            disabled={isSwipePending}
           >
             <Heart className="size-7 fill-primary" />
           </ActionButton>

@@ -61,13 +61,10 @@ export function NotificationClient() {
         }
       />
       <main className="flex-1 overflow-y-auto pb-8">
-        <div className="px-5 pb-4 pt-8">
-          <h1 className="text-2xl font-bold">Notifications</h1>
-        </div>
         {isLoading ? (
           <EmptyState
             title="Loading notifications"
-            body="Fetching your latest notifications."
+            body="Checking for new activity."
           />
         ) : notifications.length ? (
           <Section title="Latest">
@@ -88,7 +85,7 @@ export function NotificationClient() {
         ) : (
           <EmptyState
             title="No notifications"
-            body="Notifications returned by the API will appear here."
+            body="You are all caught up. New matches, messages, and updates will show here."
           />
         )}
       </main>

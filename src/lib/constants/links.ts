@@ -3,7 +3,7 @@ import {
   Heart,
   Home,
   type LucideIcon,
-  Megaphone,
+  MessageCircle,
   Search,
   User,
 } from "lucide-react";
@@ -17,7 +17,7 @@ export type NavItem = {
 export const userLinks: NavItem[] = [
   { href: "/discover", label: "Discover", icon: Search },
   { href: "/matches", label: "Matches", icon: Heart },
-  { href: "/shoutouts", label: "Shoutouts", icon: Megaphone },
+  { href: "/chats", label: "Chats", icon: MessageCircle },
   { href: "/notification", label: "Alerts", icon: Bell },
   { href: "/profile/me", label: "Profile", icon: User },
 ];

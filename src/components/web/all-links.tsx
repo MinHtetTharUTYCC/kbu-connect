@@ -15,11 +15,11 @@ const links: Array<{ href: string; label: string }> = [
     label: "Profile Id Page",
   },
   {
-    href: "/chat/123",
+    href: "/chats/123",
     label: "Chat Id Page",
   },
   {
-    href: "/chat",
+    href: "/chats",
     label: "Chat Page",
   },
   {

@@ -37,6 +37,12 @@ export default defineConfig({
               useInfiniteQueryParam: "cursor",
             },
           },
+          ChatController_getShoutouts: {
+            query: {
+              useInfinite: true,
+              useInfiniteQueryParam: "cursor",
+            },
+          },
         },
       },
     },

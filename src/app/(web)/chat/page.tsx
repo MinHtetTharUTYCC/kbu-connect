@@ -1,5 +1,5 @@
-import { ChatListClient } from "./_components/chat-client";
+import { redirect } from "next/navigation";
 
 export default function ChatPage() {
-  return <ChatListClient />;
+  redirect("/chats");
 }

@@ -1,4 +1,4 @@
-import { redirect } from "next/navigation";
+import { ChatClient } from "../../chat/_components/chat-client";
 
 interface ChatPageProps {
   params: Promise<{ chatId: string }>;
@@ -6,5 +6,5 @@ interface ChatPageProps {
 
 export default async function ChatIdPage({ params }: ChatPageProps) {
   const { chatId } = await params;
-  redirect(`/chats/${chatId}`);
+  return <ChatClient chatId={chatId} />;
 }
