@@ -1,8 +1,8 @@
 "use client";
 
-import { Heart, Star, X } from "lucide-react";
+import { Heart, MessageCircle, X } from "lucide-react";
 import Image from "next/image";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import {
   Chip,
   EmptyState,
@@ -14,11 +14,18 @@ import { useDiscoveryProfiles } from "@/hooks/discovery/use-discovery-profiles";
 import { useSwipeProfile } from "@/hooks/swipes/use-swipe-profile";
 import { cn } from "@/lib/utils";
 
+const SWIPE_THRESHOLD = 80;
+
 export function DiscoverClient() {
   const [index, setIndex] = useState(0);
   const [direction, setDirection] = useState<"left" | "right" | null>(null);
   const [isShoutoutOpen, setIsShoutoutOpen] = useState(false);
   const [shoutoutMessage, setShoutoutMessage] = useState("");
+  const [dragX, setDragX] = useState(0);
+  const touchStartX = useRef(0);
+  const touchStartY = useRef(0);
+  const isDragging = useRef(false);
+  const cardRef = useRef<HTMLDivElement>(null);
   const {
     profiles,
     isLoading,
@@ -38,18 +45,51 @@ export function DiscoverClient() {
     }
   }, [fetchNextPage, hasNextPage, isFetchingNextPage, remainingProfiles]);
 
-  function handleSwipe(type: "LIKE" | "DISLIKE") {
-    if (!profile) return;
-    setDirection(type === "LIKE" ? "right" : "left");
-    if (type === "LIKE") {
-      like(profile.id);
-    } else {
-      dislike(profile.id);
+  const handleSwipe = useCallback(
+    (type: "LIKE" | "DISLIKE") => {
+      if (!profile || direction) return;
+      setDirection(type === "LIKE" ? "right" : "left");
+      setDragX(0);
+      if (type === "LIKE") {
+        like(profile.id);
+      } else {
+        dislike(profile.id);
+      }
+      window.setTimeout(() => {
+        setIndex((value) => value + 1);
+        setDirection(null);
+      }, 260);
+    },
+    [profile, direction, like, dislike],
+  );
+
+  function handleTouchStart(e: React.TouchEvent) {
+    touchStartX.current = e.touches[0].clientX;
+    touchStartY.current = e.touches[0].clientY;
+    isDragging.current = false;
+  }
+
+  function handleTouchMove(e: React.TouchEvent) {
+    if (isSwipePending || direction) return;
+    const dx = e.touches[0].clientX - touchStartX.current;
+    const dy = e.touches[0].clientY - touchStartY.current;
+    if (Math.abs(dx) > Math.abs(dy) && Math.abs(dx) > 10) {
+      isDragging.current = true;
+      setDragX(dx);
     }
-    window.setTimeout(() => {
-      setIndex((value) => value + 1);
-      setDirection(null);
-    }, 260);
+  }
+
+  function handleTouchEnd() {
+    if (isDragging.current) {
+      if (dragX > SWIPE_THRESHOLD) {
+        handleSwipe("LIKE");
+      } else if (dragX < -SWIPE_THRESHOLD) {
+        handleSwipe("DISLIKE");
+      } else {
+        setDragX(0);
+      }
+    }
+    isDragging.current = false;
   }
 
   async function handleSendShoutout(e: React.FormEvent) {
@@ -68,7 +108,7 @@ export function DiscoverClient() {
 
   if (isLoading) {
     return (
-      <MobileScreen>
+      <MobileScreen className="h-full min-h-0">
         <TopBar />
         <EmptyState
           title="Loading profiles"
@@ -81,7 +121,7 @@ export function DiscoverClient() {
   if (!profile) {
     if (isFetchingNextPage) {
       return (
-        <MobileScreen>
+        <MobileScreen className="h-full min-h-0">
           <TopBar />
           <EmptyState
             title="Loading more profiles"
@@ -92,7 +132,7 @@ export function DiscoverClient() {
     }
 
     return (
-      <MobileScreen>
+      <MobileScreen className="h-full min-h-0">
         <TopBar />
         <EmptyState
           title="No profiles nearby"
@@ -102,17 +142,35 @@ export function DiscoverClient() {
     );
   }
 
+  const dragRotation = dragX * 0.06;
+  const dragOpacity = Math.max(0, 1 - Math.abs(dragX) / 300);
+  const showLikeStamp =
+    direction === "right" || (!direction && dragX > SWIPE_THRESHOLD * 0.5);
+  const showPassStamp =
+    direction === "left" || (!direction && dragX < -SWIPE_THRESHOLD * 0.5);
+
   return (
-    <MobileScreen className="bg-[#fcf8f8]">
+    <MobileScreen className="h-full min-h-0 overflow-hidden bg-[#fcf8f8]">
       <TopBar />
-      <main className="flex flex-1 flex-col px-5 pb-6 pt-5">
-        <section className="relative flex min-h-[560px] flex-1 items-center justify-center">
+      <main className="flex flex-1 flex-col overflow-hidden px-5 pb-6 pt-5">
+        <section className="relative flex min-h-0 flex-1 items-center justify-center">
           <div
+            ref={cardRef}
             className={cn(
-              "relative flex h-full max-h-[610px] min-h-[500px] w-full flex-col overflow-hidden rounded-xl border border-black/10 bg-white shadow-sm transition duration-300",
+              "relative flex h-full min-h-[400px] w-full max-w-full flex-col overflow-hidden rounded-xl border border-black/10 bg-white shadow-sm",
+              !dragX && "transition duration-300",
               direction === "left" && "-translate-x-24 -rotate-6 opacity-0",
               direction === "right" && "translate-x-24 rotate-6 opacity-0",
             )}
+            style={{
+              transform: direction
+                ? undefined
+                : `translateX(${dragX}px) rotate(${dragRotation}deg)`,
+              opacity: direction ? undefined : dragOpacity,
+            }}
+            onTouchStart={handleTouchStart}
+            onTouchMove={handleTouchMove}
+            onTouchEnd={handleTouchEnd}
           >
             <div className="relative flex-1 overflow-hidden bg-[#ebe7e7]">
               {profile?.avatarUrl ? (
@@ -129,16 +187,16 @@ export function DiscoverClient() {
                 <div className="h-full w-full bg-[linear-gradient(135deg,#ffdbd1,#ebe7e7_45%,#f9f9f8)]" />
               )}
               <div className="absolute inset-x-0 bottom-0 h-36 bg-gradient-to-t from-black/50 to-transparent" />
-              {direction === "left" && (
-                <SwipeStamp
-                  label="PASS"
-                  className="left-8 -rotate-12 border-[#737686] text-[#737686]"
-                />
-              )}
-              {direction === "right" && (
+              {showLikeStamp && (
                 <SwipeStamp
                   label="LIKE"
                   className="right-8 rotate-12 border-primary text-primary"
+                />
+              )}
+              {showPassStamp && (
+                <SwipeStamp
+                  label="PASS"
+                  className="left-8 -rotate-12 border-[#737686] text-[#737686]"
                 />
               )}
             </div>
@@ -168,7 +226,7 @@ export function DiscoverClient() {
             </div>
           </div>
         </section>
-        <section className="mt-7 flex items-center justify-center gap-8">
+        <section className="mt-4 flex shrink-0 items-center justify-center gap-8 pb-2">
           <ActionButton
             label="Pass"
             onClick={() => handleSwipe("DISLIKE")}
@@ -182,7 +240,7 @@ export function DiscoverClient() {
             onClick={() => setIsShoutoutOpen(true)}
             disabled={isSendingShoutout}
           >
-            <Star className="size-6 fill-primary" />
+            <MessageCircle className="size-6" />
           </ActionButton>
           <ActionButton
             label="Like"
@@ -223,7 +281,7 @@ function ShoutoutSheet({
   onSubmit: (e: React.FormEvent) => void;
 }) {
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center bg-black/35 px-4 pb-4">
+    <div className="fixed inset-0 z-[60] flex items-end justify-center bg-black/35 px-4 pb-4">
       <form
         onSubmit={onSubmit}
         className="w-full max-w-[398px] rounded-t-2xl bg-white p-5 shadow-xl"
