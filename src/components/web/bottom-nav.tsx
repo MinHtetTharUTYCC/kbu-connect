@@ -1,52 +1,48 @@
-'use client';
+"use client";
 
-import { cn } from '@/lib/utils';
-import Link from 'next/dist/client/link';
-import { usePathname } from 'next/navigation';
-import { useAuthContext } from '../auth-provider';
-import { userLinks } from '@/lib/constants/links';
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { userLinks } from "@/lib/constants/links";
+import { cn } from "@/lib/utils";
+import { useAuthContext } from "../auth-provider";
 
-const HIDDEN_ON_PATHS = ['/login', '/chats/'];
+const HIDDEN_ON_PATHS = ["/login", "/chat/", "/profile-setup"];
 
 export default function BottomNav() {
-    const pathname = usePathname();
+  const pathname = usePathname();
 
-    const { user, isLoading } = useAuthContext();
-    // const { unreadCount } = useChatUnreadCount(!!user && !isLoading);
+  const { user, isLoading } = useAuthContext();
+  // const { unreadCount } = useChatUnreadCount(!!user && !isLoading);
 
-    const navItems = !isLoading && user ? userLinks : [];
+  const navItems = !isLoading && user ? userLinks : [];
 
-    const isHidden = HIDDEN_ON_PATHS.some((path) => pathname.startsWith(path));
+  const isHidden = HIDDEN_ON_PATHS.some((path) => pathname.startsWith(path));
 
-    if (isHidden || isLoading) return null;
+  if (isHidden || isLoading) return null;
 
-    return (
-        <nav className="h-16 border-t bg-muted md:hidden pb-[env(safe-area-inset-bottom)]">
-            <ul className="flex h-full items-center justify-around">
-                {navItems.map(({ label, href, icon: Icon }) => (
-                    <li key={href}>
-                        <Link
-                            href={href}
-                            className={cn(
-                                'flex flex-col items-center gap-1 px-3 py-2 text-xs transition-colors',
-                                pathname === href ? 'text-purple-500' : 'text-gray-400',
-                            )}
-                        >
-                            <div className="relative">
-                                <Icon size={22} />
-
-                                {/* TODO: handle count */}
-                                {href === '/chats' && (
-                                    <span className="absolute -top-1.5 -right-2 flex h-5 min-w-5 items-center justify-center rounded-full bg-red-500 px-1 text-[10px] font-medium text-white leading-none">
-                                        {0}
-                                    </span>
-                                )}
-                            </div>
-                            <span>{label}</span>
-                        </Link>
-                    </li>
-                ))}
-            </ul>
-        </nav>
-    );
+  return (
+    <nav className="sticky bottom-0 z-50 h-16 border-t border-black/10 bg-white/95 pb-[env(safe-area-inset-bottom)] backdrop-blur md:hidden">
+      <ul className="flex h-full items-center justify-around">
+        {navItems.map(({ label, href, icon: Icon }) => (
+          <li key={href}>
+            <Link
+              href={href}
+              className={cn(
+                "flex min-w-12 flex-col items-center gap-1 px-2 py-2 text-[10px] font-medium transition-colors",
+                pathname === href ||
+                  (href !== "/discover" && pathname.startsWith(href))
+                  ? "text-primary"
+                  : "text-[#737686]",
+              )}
+            >
+              <div className="relative">
+                <Icon size={22} strokeWidth={pathname === href ? 2.5 : 2} />
+              </div>
+              <span>{label}</span>
+            </Link>
+          </li>
+        ))}
+      </ul>
+    </nav>
+  );
 }
