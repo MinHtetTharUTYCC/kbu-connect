@@ -42,4 +42,5 @@ yarn-error.log*
 next-env.d.ts
 
 # orval generated files (TODO:: remove for prod)
-/services
+/services/model/
+/services/generated/
