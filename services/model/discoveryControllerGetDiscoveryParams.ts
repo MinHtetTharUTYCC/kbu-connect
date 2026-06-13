@@ -7,14 +7,14 @@
  */
 
 export type DiscoveryControllerGetDiscoveryParams = {
-/**
- * Cursor for pagination (user ID)
- */
-cursor?: string;
-/**
- * Number of users to return
- * @minimum 1
- * @maximum 10
- */
-limit?: number;
+  /**
+   * Cursor for pagination (user ID)
+   */
+  cursor?: string;
+  /**
+   * Number of users to return
+   * @minimum 1
+   * @maximum 10
+   */
+  limit?: number;
 };

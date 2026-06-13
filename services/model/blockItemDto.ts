@@ -5,8 +5,6 @@
  * Exclusive dating platform for KBU students
  * OpenAPI spec version: 1.0
  */
-import type { BlockItemDtoBlockedUserAvatarUrl } from './blockItemDtoBlockedUserAvatarUrl';
-import type { BlockItemDtoReason } from './blockItemDtoReason';
 
 export interface BlockItemDto {
   /** Blocked user ID */
@@ -18,15 +16,15 @@ export interface BlockItemDto {
   /** Name of the blocked user */
   blockedUserName: string;
   /**
-     * Avatar URL of the blocked user
-     * @nullable
-     */
-  blockedUserAvatarUrl: BlockItemDtoBlockedUserAvatarUrl;
+   * Avatar URL of the blocked user
+   * @nullable
+   */
+  blockedUserAvatarUrl: string | null;
   /** Timestamp when the block was created */
   blockedAt: string;
   /**
-     * Reason for blocking
-     * @nullable
-     */
-  reason: BlockItemDtoReason;
+   * Reason for blocking
+   * @nullable
+   */
+  reason: string | null;
 }

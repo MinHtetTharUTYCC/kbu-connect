@@ -5,86 +5,98 @@
  * Exclusive dating platform for KBU students
  * OpenAPI spec version: 1.0
  */
-import {
-  useMutation
-} from '@tanstack/react-query';
+import { useMutation } from "@tanstack/react-query";
 import type {
   MutationFunction,
   QueryClient,
   UseMutationOptions,
-  UseMutationResult
-} from '@tanstack/react-query';
+  UseMutationResult,
+} from "@tanstack/react-query";
 
-import type {
-  CreateSwipeDto,
-  SwipeResponseDto
-} from '../../model';
+import type { CreateSwipeDto, SwipeResponseDto } from "../../model";
 
-import { axiosInstanceFn } from '../../../src/lib/axios/axios-instance';
-
-
-
+import { axiosInstanceFn } from "../../../src/lib/axios/axios-instance";
 
 /**
  * @summary Register a swipe action (LIKE or DISLIKE)
  */
 export const swipesControllerSwipe = (
-    createSwipeDto: CreateSwipeDto,
- signal?: AbortSignal
+  createSwipeDto: CreateSwipeDto,
+  signal?: AbortSignal,
 ) => {
+  return axiosInstanceFn<SwipeResponseDto>({
+    url: `/swipes`,
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    data: createSwipeDto,
+    signal,
+  });
+};
 
+export const getSwipesControllerSwipeMutationOptions = <
+  TError = void,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof swipesControllerSwipe>>,
+    TError,
+    { data: CreateSwipeDto },
+    TContext
+  >;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof swipesControllerSwipe>>,
+  TError,
+  { data: CreateSwipeDto },
+  TContext
+> => {
+  const mutationKey = ["swipesControllerSwipe"];
+  const { mutation: mutationOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey } };
 
-      return axiosInstanceFn<SwipeResponseDto>(
-      {url: `/swipes`, method: 'POST',
-      headers: {'Content-Type': 'application/json', },
-      data: createSwipeDto, signal
-    },
-      );
-    }
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof swipesControllerSwipe>>,
+    { data: CreateSwipeDto }
+  > = (props) => {
+    const { data } = props ?? {};
 
+    return swipesControllerSwipe(data);
+  };
 
+  return { mutationFn, ...mutationOptions };
+};
 
-export const getSwipesControllerSwipeMutationOptions = <TError = void,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof swipesControllerSwipe>>, TError,{data: CreateSwipeDto}, TContext>, }
-): UseMutationOptions<Awaited<ReturnType<typeof swipesControllerSwipe>>, TError,{data: CreateSwipeDto}, TContext> => {
+export type SwipesControllerSwipeMutationResult = NonNullable<
+  Awaited<ReturnType<typeof swipesControllerSwipe>>
+>;
+export type SwipesControllerSwipeMutationBody = CreateSwipeDto;
+export type SwipesControllerSwipeMutationError = void;
 
-const mutationKey = ['swipesControllerSwipe'];
-const {mutation: mutationOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }};
-
-
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof swipesControllerSwipe>>, {data: CreateSwipeDto}> = (props) => {
-          const {data} = props ?? {};
-
-          return  swipesControllerSwipe(data,)
-        }
-
-
-
-
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type SwipesControllerSwipeMutationResult = NonNullable<Awaited<ReturnType<typeof swipesControllerSwipe>>>
-    export type SwipesControllerSwipeMutationBody = CreateSwipeDto
-    export type SwipesControllerSwipeMutationError = void
-
-    /**
+/**
  * @summary Register a swipe action (LIKE or DISLIKE)
  */
-export const useSwipesControllerSwipe = <TError = void,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof swipesControllerSwipe>>, TError,{data: CreateSwipeDto}, TContext>, }
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof swipesControllerSwipe>>,
-        TError,
-        {data: CreateSwipeDto},
-        TContext
-      > => {
-      return useMutation(getSwipesControllerSwipeMutationOptions(options), queryClient);
-    }
+export const useSwipesControllerSwipe = <TError = void, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof swipesControllerSwipe>>,
+      TError,
+      { data: CreateSwipeDto },
+      TContext
+    >;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof swipesControllerSwipe>>,
+  TError,
+  { data: CreateSwipeDto },
+  TContext
+> => {
+  return useMutation(
+    getSwipesControllerSwipeMutationOptions(options),
+    queryClient,
+  );
+};

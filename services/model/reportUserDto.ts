@@ -6,8 +6,11 @@
  * OpenAPI spec version: 1.0
  */
 
-/**
- * Cursor for pagination (null if no more matches)
- * @nullable
- */
-export type MatchListResponseDtoNextCursor = { [key: string]: unknown } | null;
+export interface ReportUserDto {
+  /** User ID */
+  id: string;
+  /** User name */
+  name: string;
+  /** User email */
+  email: string;
+}

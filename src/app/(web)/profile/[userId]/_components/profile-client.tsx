@@ -18,16 +18,18 @@ import {
   TopBar,
 } from "@/components/mobile/app-chrome";
 import { useMe } from "@/hooks/users/use-me";
-import { useUserProfile } from "@/hooks/users/use-user-profile";
+import { useVisitProfile } from "@/hooks/users/use-visit-profile";
 import { ageFromBirthYear, formatEnum } from "@/lib/profile-utils";
 
 export function ProfileClient({ userId }: { userId: string }) {
   const router = useRouter();
+
   const { data: me } = useMe();
+
   const myId = me?.user?.id;
   const isOwnProfile = Boolean(myId && myId === userId);
-  const profileQuery = useUserProfile(userId);
-  const profile = profileQuery.data;
+
+  const { data: profile, isLoading } = useVisitProfile(userId);
 
   useEffect(() => {
     if (isOwnProfile) {
@@ -35,7 +37,7 @@ export function ProfileClient({ userId }: { userId: string }) {
     }
   }, [isOwnProfile, router]);
 
-  if (isOwnProfile || profileQuery.isLoading) {
+  if (isOwnProfile || isLoading) {
     return (
       <MobileScreen>
         <TopBar title="Profile" backHref="/matches" />
@@ -56,21 +58,13 @@ export function ProfileClient({ userId }: { userId: string }) {
     );
   }
 
-  const birthYear = numberValue(profile.birthYear);
+  const { birthYear, bio, faculty, gender, nationality, avatarUrl } = profile;
+
   const age = ageFromBirthYear(birthYear);
-  const bio = stringValue(profile.bio);
-  const faculty = stringValue(profile.faculty);
-  const gender = stringValue(profile.gender);
-  const nationality = stringValue(profile.nationality);
   const interests = (profile.interests ?? []).map(String);
-  const preferredGender = stringValue(profile.preferredGender);
-  const preferredNationalities = (profile.preferredNationalities ?? []).map(
-    String,
-  );
-  const preferredFaculties = (profile.preferredFaculties ?? []).map(String);
   const gallery = (profile.gallery ?? []).toSorted((a, b) => a.order - b.order);
-  const primaryImage =
-    gallery.at(0)?.imageUrl ?? stringValue(profile.avatarUrl);
+  const primaryImage = gallery.at(0)?.imageUrl ?? avatarUrl;
+
   const metadataItems = [
     gender && { icon: UserRound, label: formatEnum(gender) },
     age && { icon: Cake, label: String(age) },
@@ -84,11 +78,7 @@ export function ProfileClient({ userId }: { userId: string }) {
       <main className="flex-1 overflow-y-auto bg-[#fcf8f8] pb-8">
         <section className="bg-white px-5 pb-5 pt-6">
           <div className="flex items-center gap-4">
-            <Avatar
-              src={stringValue(profile.avatarUrl)}
-              name={profile.name}
-              className="size-20"
-            />
+            <Avatar src={avatarUrl} name={profile.name} className="size-20" />
             <div className="min-w-0 flex-1">
               <h1 className="truncate text-2xl font-bold">{profile.name}</h1>
               {metadataItems.length > 0 ? (
@@ -157,22 +147,22 @@ export function ProfileClient({ userId }: { userId: string }) {
           </ProfileSection>
         )}
 
-        <ProfileSection title="Looking For">
-          <InfoGrid
-            items={[
-              ["Gender", preferredGender && formatEnum(preferredGender)],
-              [
-                "Age range",
-                formatAgeRange(
-                  numberValue(profile.minPreferredAge),
-                  numberValue(profile.maxPreferredAge),
-                ),
-              ],
-              ["Faculties", formatList(preferredFaculties)],
-              ["Nationalities", formatList(preferredNationalities)],
-            ]}
-          />
-        </ProfileSection>
+        {/* <ProfileSection title="Looking For">
+                    <InfoGrid
+                        items={[
+                            ['Gender', preferredGender && formatEnum(preferredGender)],
+                            [
+                                'Age range',
+                                formatAgeRange(
+                                    numberValue(profile.minPreferredAge),
+                                    numberValue(profile.maxPreferredAge),
+                                ),
+                            ],
+                            ['Faculties', formatList(preferredFaculties)],
+                            ['Nationalities', formatList(preferredNationalities)],
+                        ]}
+                    />
+                </ProfileSection> */}
       </main>
     </MobileScreen>
   );
@@ -211,39 +201,24 @@ function ProfileSection({
   );
 }
 
-function InfoGrid({ items }: { items: Array<[string, string | undefined]> }) {
-  const visibleItems = items.filter(([, value]) => value);
+// function InfoGrid({ items }: { items: Array<[string, string | undefined]> }) {
+//     const visibleItems = items.filter(([, value]) => value);
 
-  if (!visibleItems.length) {
-    return <p className="text-sm text-[#6b6b6b]">No details shared yet.</p>;
-  }
+//     if (!visibleItems.length) {
+//         return <p className="text-sm text-[#6b6b6b]">No details shared yet.</p>;
+//     }
 
-  return (
-    <div className="grid grid-cols-2 gap-3">
-      {visibleItems.map(([label, value]) => (
-        <div
-          key={label}
-          className="rounded-lg border border-black/10 bg-[#f9f9f8] p-3"
-        >
-          <p className="text-xs font-medium text-[#6b6b6b]">{label}</p>
-          <p className="mt-1 break-words text-sm font-semibold">{value}</p>
-        </div>
-      ))}
-    </div>
-  );
-}
-
-function stringValue(value: unknown) {
-  return typeof value === "string" && value.trim().length > 0
-    ? value
-    : undefined;
-}
-
-function numberValue(value: unknown) {
-  return typeof value === "number" && Number.isFinite(value)
-    ? value
-    : undefined;
-}
+//     return (
+//         <div className="grid grid-cols-2 gap-3">
+//             {visibleItems.map(([label, value]) => (
+//                 <div key={label} className="rounded-lg border border-black/10 bg-[#f9f9f8] p-3">
+//                     <p className="text-xs font-medium text-[#6b6b6b]">{label}</p>
+//                     <p className="mt-1 break-words text-sm font-semibold">{value}</p>
+//                 </div>
+//             ))}
+//         </div>
+//     );
+// }
 
 function formatAgeRange(minAge?: number, maxAge?: number) {
   if (minAge && maxAge) return `${minAge}-${maxAge}`;

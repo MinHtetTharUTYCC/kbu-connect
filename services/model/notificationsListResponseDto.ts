@@ -5,15 +5,14 @@
  * Exclusive dating platform for KBU students
  * OpenAPI spec version: 1.0
  */
-import type { NotificationItemDto } from './notificationItemDto';
-import type { NotificationsListResponseDtoNextCursor } from './notificationsListResponseDtoNextCursor';
+import type { NotificationItemDto } from "./notificationItemDto";
 
 export interface NotificationsListResponseDto {
   /** List of notifications */
   notifications: NotificationItemDto[];
   /**
-     * Cursor for pagination (null if no more notifications)
-     * @nullable
-     */
-  nextCursor: NotificationsListResponseDtoNextCursor;
+   * Cursor for pagination (null if no more notifications)
+   * @nullable
+   */
+  nextCursor: string | null;
 }

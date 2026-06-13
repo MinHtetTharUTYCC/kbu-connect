@@ -5,10 +5,7 @@
  * Exclusive dating platform for KBU students
  * OpenAPI spec version: 1.0
  */
-import type { DiscoveryUserItemDtoBio } from './discoveryUserItemDtoBio';
-import type { DiscoveryUserItemDtoLastSeen } from './discoveryUserItemDtoLastSeen';
-import type { DiscoveryUserItemDtoNationality } from './discoveryUserItemDtoNationality';
-import type { GalleryItemResponseDto } from './galleryItemResponseDto';
+import type { GalleryItemResponseDto } from "./galleryItemResponseDto";
 
 export interface DiscoveryUserItemDto {
   /** Unique identifier of the user */
@@ -18,20 +15,20 @@ export interface DiscoveryUserItemDto {
   /** Faculty the user belongs to */
   faculty: string;
   /**
-     * Nationality of the user
-     * @nullable
-     */
-  nationality: DiscoveryUserItemDtoNationality;
+   * Nationality of the user
+   * @nullable
+   */
+  nationality: string | null;
   /**
-     * Short bio of the user
-     * @nullable
-     */
-  bio: DiscoveryUserItemDtoBio;
+   * Short bio of the user
+   * @nullable
+   */
+  bio: string | null;
   /**
-     * Last seen timestamp of the user
-     * @nullable
-     */
-  lastSeen: DiscoveryUserItemDtoLastSeen;
+   * Last seen timestamp of the user
+   * @nullable
+   */
+  lastSeen: string | null;
   /** Gallery images of the user */
   gallery: GalleryItemResponseDto[];
 }

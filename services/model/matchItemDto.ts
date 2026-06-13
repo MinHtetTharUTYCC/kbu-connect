@@ -5,8 +5,7 @@
  * Exclusive dating platform for KBU students
  * OpenAPI spec version: 1.0
  */
-import type { MatchItemDtoConversationId } from './matchItemDtoConversationId';
-import type { UserSummaryDto } from './userSummaryDto';
+import type { UserSummaryDto } from "./userSummaryDto";
 
 export interface MatchItemDto {
   /** The ID of the match */
@@ -15,8 +14,11 @@ export interface MatchItemDto {
   matchedAt: string;
   /** Indicates if the match is new */
   isNew: boolean;
-  /** The ID of the conversation */
-  conversationId?: MatchItemDtoConversationId;
+  /**
+   * The ID of the conversation
+   * @nullable
+   */
+  conversationId: string | null;
   /** Summary of the matched user */
   matcher: UserSummaryDto;
 }

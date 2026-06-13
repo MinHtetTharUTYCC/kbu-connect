@@ -5,15 +5,14 @@
  * Exclusive dating platform for KBU students
  * OpenAPI spec version: 1.0
  */
-import type { BlockItemDto } from './blockItemDto';
-import type { BlocksListResponseDtoNextCursor } from './blocksListResponseDtoNextCursor';
+import type { BlockItemDto } from "./blockItemDto";
 
 export interface BlocksListResponseDto {
   /** List of blocked users */
   blocks: BlockItemDto[];
   /**
-     * Cursor for pagination (null if no more blocked users)
-     * @nullable
-     */
-  nextCursor: BlocksListResponseDtoNextCursor;
+   * Cursor for pagination (null if no more blocked users)
+   * @nullable
+   */
+  nextCursor: string | null;
 }

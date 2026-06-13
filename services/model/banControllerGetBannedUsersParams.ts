@@ -7,12 +7,12 @@
  */
 
 export type BanControllerGetBannedUsersParams = {
-/**
- * Page number for pagination (default: 1, max: 1000)
- */
-page?: number;
-/**
- * Number of items per page for pagination (default: 20, max: 100)
- */
-limit?: number;
+  /**
+   * Page number for pagination (default: 1, max: 1000)
+   */
+  page?: number;
+  /**
+   * Number of items per page for pagination (default: 20, max: 100)
+   */
+  limit?: number;
 };

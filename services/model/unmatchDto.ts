@@ -5,7 +5,7 @@
  * Exclusive dating platform for KBU students
  * OpenAPI spec version: 1.0
  */
-import type { UnmatchDtoReason } from './unmatchDtoReason';
+import type { UnmatchDtoReason } from "./unmatchDtoReason";
 
 export interface UnmatchDto {
   /** Reason for unmatching */

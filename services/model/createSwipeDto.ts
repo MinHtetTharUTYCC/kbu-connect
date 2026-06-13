@@ -5,7 +5,7 @@
  * Exclusive dating platform for KBU students
  * OpenAPI spec version: 1.0
  */
-import type { CreateSwipeDtoType } from './createSwipeDtoType';
+import type { CreateSwipeDtoType } from "./createSwipeDtoType";
 
 export interface CreateSwipeDto {
   /** ID of the user being swiped */

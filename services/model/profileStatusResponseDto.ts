@@ -5,8 +5,8 @@
  * Exclusive dating platform for KBU students
  * OpenAPI spec version: 1.0
  */
-import type { PrivateProfileResponseDto } from './privateProfileResponseDto';
-import type { ProfileStatus } from './profileStatus';
+import type { PrivateProfileResponseDto } from "./privateProfileResponseDto";
+import type { ProfileStatus } from "./profileStatus";
 
 export interface ProfileStatusResponseDto {
   /** Success message */

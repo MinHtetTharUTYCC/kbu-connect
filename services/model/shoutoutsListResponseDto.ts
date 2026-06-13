@@ -5,15 +5,14 @@
  * Exclusive dating platform for KBU students
  * OpenAPI spec version: 1.0
  */
-import type { ShoutoutItemDto } from './shoutoutItemDto';
-import type { ShoutoutsListResponseDtoNextCursor } from './shoutoutsListResponseDtoNextCursor';
+import type { ShoutoutItemDto } from "./shoutoutItemDto";
 
 export interface ShoutoutsListResponseDto {
   /** List of shoutouts */
   shoutouts: ShoutoutItemDto[];
   /**
-     * Cursor for pagination (null if no more shoutouts)
-     * @nullable
-     */
-  nextCursor: ShoutoutsListResponseDtoNextCursor;
+   * Cursor for pagination (null if no more shoutouts)
+   * @nullable
+   */
+  nextCursor: string | null;
 }

@@ -89,7 +89,12 @@ export function GalleryUploadStep({
       imageUrl: item.url,
       order: gallery.length + index,
     }));
-    onGalleryChange([...gallery, ...uploadedGallery].map((item, order) => ({ ...item, order })));
+    onGalleryChange(
+      [...gallery, ...uploadedGallery].map((item, order) => ({
+        ...item,
+        order,
+      })),
+    );
     if (galleryInputRef.current) {
       galleryInputRef.current.value = "";
     }

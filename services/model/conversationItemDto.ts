@@ -5,17 +5,16 @@
  * Exclusive dating platform for KBU students
  * OpenAPI spec version: 1.0
  */
-import type { ConversationItemDtoLastOnline } from './conversationItemDtoLastOnline';
-import type { MessageItemDto } from './messageItemDto';
-import type { UserPreviewDto } from './userPreviewDto';
+import type { MessageItemDto } from "./messageItemDto";
+import type { UserPreviewDto } from "./userPreviewDto";
 
 export interface ConversationItemDto {
   id: string;
   otherUser: UserPreviewDto;
   isOnline: boolean;
   /** @nullable */
-  lastOnline?: ConversationItemDtoLastOnline;
-  lastMessage?: MessageItemDto | null;
+  lastOnline: string | null;
+  lastMessage: MessageItemDto | null;
   /** Whether there is a new message from the other user that I haven't seen */
   isRead: boolean;
   updatedAt: string;

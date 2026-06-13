@@ -5,7 +5,7 @@
  * Exclusive dating platform for KBU students
  * OpenAPI spec version: 1.0
  */
-import type { SwipeMatchDto } from './swipeMatchDto';
+import type { SwipeMatchDto } from "./swipeMatchDto";
 
 export interface SwipeResponseDto {
   /** Whether this swipe resulted in a match */

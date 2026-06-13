@@ -5,18 +5,14 @@
  * Exclusive dating platform for KBU students
  * OpenAPI spec version: 1.0
  */
-import type { GalleryItemResponseDto } from './galleryItemResponseDto';
-import type { PrivateProfileResponseDtoAvatarUrl } from './privateProfileResponseDtoAvatarUrl';
-import type { PrivateProfileResponseDtoBio } from './privateProfileResponseDtoBio';
-import type { PrivateProfileResponseDtoBirthYear } from './privateProfileResponseDtoBirthYear';
-import type { PrivateProfileResponseDtoFaculty } from './privateProfileResponseDtoFaculty';
-import type { PrivateProfileResponseDtoInterestsItem } from './privateProfileResponseDtoInterestsItem';
-import type { PrivateProfileResponseDtoMaxPreferredAge } from './privateProfileResponseDtoMaxPreferredAge';
-import type { PrivateProfileResponseDtoMinPreferredAge } from './privateProfileResponseDtoMinPreferredAge';
-import type { PrivateProfileResponseDtoNationality } from './privateProfileResponseDtoNationality';
-import type { PrivateProfileResponseDtoPreferredFacultiesItem } from './privateProfileResponseDtoPreferredFacultiesItem';
-import type { PrivateProfileResponseDtoPreferredGender } from './privateProfileResponseDtoPreferredGender';
-import type { PrivateProfileResponseDtoPreferredNationalitiesItem } from './privateProfileResponseDtoPreferredNationalitiesItem';
+import type { GalleryItemResponseDto } from "./galleryItemResponseDto";
+import type { PrivateProfileResponseDtoFaculty } from "./privateProfileResponseDtoFaculty";
+import type { PrivateProfileResponseDtoGender } from "./privateProfileResponseDtoGender";
+import type { PrivateProfileResponseDtoInterestsItem } from "./privateProfileResponseDtoInterestsItem";
+import type { PrivateProfileResponseDtoNationality } from "./privateProfileResponseDtoNationality";
+import type { PrivateProfileResponseDtoPreferredFacultiesItem } from "./privateProfileResponseDtoPreferredFacultiesItem";
+import type { PrivateProfileResponseDtoPreferredGender } from "./privateProfileResponseDtoPreferredGender";
+import type { PrivateProfileResponseDtoPreferredNationalitiesItem } from "./privateProfileResponseDtoPreferredNationalitiesItem";
 
 export interface PrivateProfileResponseDto {
   /** User ID */
@@ -26,44 +22,44 @@ export interface PrivateProfileResponseDto {
   /** Name */
   name: string;
   /**
-     * Avatar URL
-     * @nullable
-     */
-  avatarUrl: PrivateProfileResponseDtoAvatarUrl;
+   * Avatar URL
+   * @nullable
+   */
+  avatarUrl: string | null;
   /**
-     * Bio
-     * @nullable
-     */
-  bio?: PrivateProfileResponseDtoBio;
+   * Bio
+   * @nullable
+   */
+  bio: string | null;
   /** Gender */
-  gender: string;
+  gender: PrivateProfileResponseDtoGender;
   /**
-     * Faculty
-     * @nullable
-     */
-  faculty?: PrivateProfileResponseDtoFaculty;
+   * Faculty
+   * @nullable
+   */
+  faculty: PrivateProfileResponseDtoFaculty;
   /**
-     * Nationality
-     * @nullable
-     */
-  nationality?: PrivateProfileResponseDtoNationality;
+   * Nationality
+   * @nullable
+   */
+  nationality: PrivateProfileResponseDtoNationality;
   /** Interests */
   interests: PrivateProfileResponseDtoInterestsItem[];
   /**
-     * Birth year
-     * @nullable
-     */
-  birthYear?: PrivateProfileResponseDtoBirthYear;
+   * Birth year
+   * @nullable
+   */
+  birthYear: number | null;
   /**
-     * Minimum preferred age
-     * @nullable
-     */
-  minPreferredAge?: PrivateProfileResponseDtoMinPreferredAge;
+   * Minimum preferred age
+   * @nullable
+   */
+  minPreferredAge: number | null;
   /**
-     * Maximum preferred age
-     * @nullable
-     */
-  maxPreferredAge?: PrivateProfileResponseDtoMaxPreferredAge;
+   * Maximum preferred age
+   * @nullable
+   */
+  maxPreferredAge: number | null;
   /** Preferred gender */
   preferredGender: PrivateProfileResponseDtoPreferredGender;
   /** Preferred nationalities */

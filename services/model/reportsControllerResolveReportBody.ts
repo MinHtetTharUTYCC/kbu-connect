@@ -5,7 +5,7 @@
  * Exclusive dating platform for KBU students
  * OpenAPI spec version: 1.0
  */
-import type { ReportsControllerResolveReportBodyAction } from './reportsControllerResolveReportBodyAction';
+import type { ReportsControllerResolveReportBodyAction } from "./reportsControllerResolveReportBodyAction";
 
 export type ReportsControllerResolveReportBody = {
   action?: ReportsControllerResolveReportBodyAction;

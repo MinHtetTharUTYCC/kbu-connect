@@ -5,21 +5,21 @@
  * Exclusive dating platform for KBU students
  * OpenAPI spec version: 1.0
  */
-import type { ChatControllerGetShoutoutsType } from './chatControllerGetShoutoutsType';
+import type { ChatControllerGetShoutoutsType } from "./chatControllerGetShoutoutsType";
 
 export type ChatControllerGetShoutoutsParams = {
-/**
- * Filter shoutouts by type: 'sent' for sent shoutouts, 'received' for received shoutouts (default: 'received')
- */
-type?: ChatControllerGetShoutoutsType;
-/**
- * Cursor for pagination (optional)
- */
-cursor?: string;
-/**
- * Number of shoutouts to return (default: 20)
- * @minimum 1
- * @maximum 50
- */
-limit?: number;
+  /**
+   * Filter shoutouts by type: 'sent' for sent shoutouts, 'received' for received shoutouts (default: 'received')
+   */
+  type?: ChatControllerGetShoutoutsType;
+  /**
+   * Cursor for pagination (optional)
+   */
+  cursor?: string;
+  /**
+   * Number of shoutouts to return (default: 20)
+   * @minimum 1
+   * @maximum 50
+   */
+  limit?: number;
 };

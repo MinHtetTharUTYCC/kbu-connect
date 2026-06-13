@@ -3,15 +3,7 @@
 import { useMutation, useQueryClient } from "@tanstack/react-query";
 import axiosInstanceFn from "@/lib/axios/axios-instance";
 import { handleBackendError } from "@/lib/error/error-util";
-
-type UploadedGalleryImage = {
-  url: string;
-  key: string;
-};
-
-type UploadGalleryImagesResponse = {
-  images: UploadedGalleryImage[];
-};
+import { UploadGalleryImagesResponseDto } from "../../../services/model";
 
 const validImageTypes = [
   "image/jpeg",
@@ -46,7 +38,7 @@ export function useUploadGalleryImages() {
         formData.append("files", file);
       });
 
-      return axiosInstanceFn<UploadGalleryImagesResponse>({
+      return axiosInstanceFn<UploadGalleryImagesResponseDto>({
         url: "/gallery/upload",
         method: "POST",
         data: formData,

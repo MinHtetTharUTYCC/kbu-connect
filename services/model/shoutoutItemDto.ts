@@ -5,8 +5,8 @@
  * Exclusive dating platform for KBU students
  * OpenAPI spec version: 1.0
  */
-import type { ShoutoutItemDtoType } from './shoutoutItemDtoType';
-import type { ShoutoutOtherUserDto } from './shoutoutOtherUserDto';
+import type { ShoutoutItemDtoType } from "./shoutoutItemDtoType";
+import type { ShoutoutOtherUserDto } from "./shoutoutOtherUserDto";
 
 export interface ShoutoutItemDto {
   /** Shoutout ID */

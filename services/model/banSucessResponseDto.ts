@@ -5,7 +5,7 @@
  * Exclusive dating platform for KBU students
  * OpenAPI spec version: 1.0
  */
-import type { BannedUserItemDto } from './bannedUserItemDto';
+import type { BannedUserItemDto } from "./bannedUserItemDto";
 
 export interface BanSucessResponseDto {
   /** User banned successfully */

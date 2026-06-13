@@ -7,14 +7,14 @@
  */
 
 export type NotificationsControllerGetNotificationsParams = {
-/**
- * Cursor for pagination (notification ID)
- */
-cursor?: string;
-/**
- * Number of notifications to return
- * @minimum 1
- * @maximum 50
- */
-limit?: number;
+  /**
+   * Cursor for pagination (notification ID)
+   */
+  cursor?: string;
+  /**
+   * Number of notifications to return
+   * @minimum 1
+   * @maximum 50
+   */
+  limit?: number;
 };

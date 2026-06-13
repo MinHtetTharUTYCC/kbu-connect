@@ -5,11 +5,10 @@
  * Exclusive dating platform for KBU students
  * OpenAPI spec version: 1.0
  */
-import type { UserPreviewDtoAvatarUrl } from './userPreviewDtoAvatarUrl';
 
 export interface UserPreviewDto {
   id: string;
   name: string;
   /** @nullable */
-  avatarUrl: UserPreviewDtoAvatarUrl;
+  avatarUrl: string | null;
 }

@@ -7,15 +7,15 @@
  */
 
 export type ChatControllerGetConversationsParams = {
-/**
- * Cursor for pagination (optional)
- * @nullable
- */
-cursor: string | null;
-/**
- * Number of conversations to return (optional, default: 20)
- * @minimum 1
- * @maximum 50
- */
-limit: number;
+  /**
+   * Cursor for pagination (optional)
+   * @nullable
+   */
+  cursor: string | null;
+  /**
+   * Number of conversations to return (optional, default: 20)
+   * @minimum 1
+   * @maximum 50
+   */
+  limit: number;
 };

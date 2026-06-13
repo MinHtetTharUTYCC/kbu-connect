@@ -6,8 +6,11 @@
  * OpenAPI spec version: 1.0
  */
 
-/**
- * Cursor for pagination (null if no more shoutouts)
- * @nullable
- */
-export type ShoutoutsListResponseDtoNextCursor = { [key: string]: unknown } | null;
+export interface AuditLogProfileDto {
+  /** Profile ID */
+  id: string;
+  /** Profile name */
+  name: string;
+  /** Profile email */
+  email: string;
+}

@@ -5,7 +5,7 @@
  * Exclusive dating platform for KBU students
  * OpenAPI spec version: 1.0
  */
-import type { CreateReportDtoReason } from './createReportDtoReason';
+import type { CreateReportDtoReason } from "./createReportDtoReason";
 
 export interface CreateReportDto {
   /** ID of the user being reported */
@@ -13,8 +13,8 @@ export interface CreateReportDto {
   /** Reason for reporting the user */
   reason: CreateReportDtoReason;
   /**
-     * Additional details about the report
-     * @maxLength 1000
-     */
+   * Additional details about the report
+   * @maxLength 1000
+   */
   description?: string;
 }

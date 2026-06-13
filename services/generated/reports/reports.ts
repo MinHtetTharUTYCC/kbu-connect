@@ -5,10 +5,7 @@
  * Exclusive dating platform for KBU students
  * OpenAPI spec version: 1.0
  */
-import {
-  useMutation,
-  useQuery
-} from '@tanstack/react-query';
+import { useMutation, useQuery } from "@tanstack/react-query";
 import type {
   DataTag,
   DefinedInitialDataOptions,
@@ -21,391 +18,590 @@ import type {
   UseMutationOptions,
   UseMutationResult,
   UseQueryOptions,
-  UseQueryResult
-} from '@tanstack/react-query';
+  UseQueryResult,
+} from "@tanstack/react-query";
 
 import type {
+  BatchDismissReportsResponseDto,
   CreateReportDto,
+  CreateReportResponseDto,
+  ReportDetailsResponseDto,
+  ReportItemDto,
   ReportsControllerBatchDismissReportsBody,
-  ReportsControllerResolveReportBody
-} from '../../model';
+  ReportsControllerResolveReportBody,
+} from "../../model";
 
-import { axiosInstanceFn } from '../../../src/lib/axios/axios-instance';
-
-
-
+import { axiosInstanceFn } from "../../../src/lib/axios/axios-instance";
 
 /**
  * @summary Submit a report against another user
  */
 export const reportsControllerCreateReport = (
-    createReportDto: CreateReportDto,
- signal?: AbortSignal
+  createReportDto: CreateReportDto,
+  signal?: AbortSignal,
 ) => {
+  return axiosInstanceFn<CreateReportResponseDto>({
+    url: `/reports`,
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    data: createReportDto,
+    signal,
+  });
+};
 
+export const getReportsControllerCreateReportMutationOptions = <
+  TError = void,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof reportsControllerCreateReport>>,
+    TError,
+    { data: CreateReportDto },
+    TContext
+  >;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof reportsControllerCreateReport>>,
+  TError,
+  { data: CreateReportDto },
+  TContext
+> => {
+  const mutationKey = ["reportsControllerCreateReport"];
+  const { mutation: mutationOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey } };
 
-      return axiosInstanceFn<void>(
-      {url: `/reports`, method: 'POST',
-      headers: {'Content-Type': 'application/json', },
-      data: createReportDto, signal
-    },
-      );
-    }
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof reportsControllerCreateReport>>,
+    { data: CreateReportDto }
+  > = (props) => {
+    const { data } = props ?? {};
 
+    return reportsControllerCreateReport(data);
+  };
 
+  return { mutationFn, ...mutationOptions };
+};
 
-export const getReportsControllerCreateReportMutationOptions = <TError = void,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof reportsControllerCreateReport>>, TError,{data: CreateReportDto}, TContext>, }
-): UseMutationOptions<Awaited<ReturnType<typeof reportsControllerCreateReport>>, TError,{data: CreateReportDto}, TContext> => {
+export type ReportsControllerCreateReportMutationResult = NonNullable<
+  Awaited<ReturnType<typeof reportsControllerCreateReport>>
+>;
+export type ReportsControllerCreateReportMutationBody = CreateReportDto;
+export type ReportsControllerCreateReportMutationError = void;
 
-const mutationKey = ['reportsControllerCreateReport'];
-const {mutation: mutationOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }};
-
-
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof reportsControllerCreateReport>>, {data: CreateReportDto}> = (props) => {
-          const {data} = props ?? {};
-
-          return  reportsControllerCreateReport(data,)
-        }
-
-
-
-
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type ReportsControllerCreateReportMutationResult = NonNullable<Awaited<ReturnType<typeof reportsControllerCreateReport>>>
-    export type ReportsControllerCreateReportMutationBody = CreateReportDto
-    export type ReportsControllerCreateReportMutationError = void
-
-    /**
+/**
  * @summary Submit a report against another user
  */
-export const useReportsControllerCreateReport = <TError = void,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof reportsControllerCreateReport>>, TError,{data: CreateReportDto}, TContext>, }
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof reportsControllerCreateReport>>,
-        TError,
-        {data: CreateReportDto},
-        TContext
-      > => {
-      return useMutation(getReportsControllerCreateReportMutationOptions(options), queryClient);
-    }
-    /**
+export const useReportsControllerCreateReport = <
+  TError = void,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof reportsControllerCreateReport>>,
+      TError,
+      { data: CreateReportDto },
+      TContext
+    >;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof reportsControllerCreateReport>>,
+  TError,
+  { data: CreateReportDto },
+  TContext
+> => {
+  return useMutation(
+    getReportsControllerCreateReportMutationOptions(options),
+    queryClient,
+  );
+};
+/**
  * @summary Admin: Get all pending reports
  */
-export const reportsControllerGetPendingReports = (
-
- signal?: AbortSignal
-) => {
-
-
-      return axiosInstanceFn<void>(
-      {url: `/reports/pending`, method: 'GET', signal
-    },
-      );
-    }
-
-
-
+export const reportsControllerGetPendingReports = (signal?: AbortSignal) => {
+  return axiosInstanceFn<ReportItemDto[]>({
+    url: `/reports/pending`,
+    method: "GET",
+    signal,
+  });
+};
 
 export const getReportsControllerGetPendingReportsQueryKey = () => {
-    return [
-    `/reports/pending`
-    ] as const;
-    }
+  return [`/reports/pending`] as const;
+};
 
+export const getReportsControllerGetPendingReportsQueryOptions = <
+  TData = Awaited<ReturnType<typeof reportsControllerGetPendingReports>>,
+  TError = unknown,
+>(options?: {
+  query?: Partial<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof reportsControllerGetPendingReports>>,
+      TError,
+      TData
+    >
+  >;
+}) => {
+  const { query: queryOptions } = options ?? {};
 
-export const getReportsControllerGetPendingReportsQueryOptions = <TData = Awaited<ReturnType<typeof reportsControllerGetPendingReports>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof reportsControllerGetPendingReports>>, TError, TData>>, }
-) => {
+  const queryKey =
+    queryOptions?.queryKey ?? getReportsControllerGetPendingReportsQueryKey();
 
-const {query: queryOptions} = options ?? {};
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof reportsControllerGetPendingReports>>
+  > = ({ signal }) => reportsControllerGetPendingReports(signal);
 
-  const queryKey =  queryOptions?.queryKey ?? getReportsControllerGetPendingReportsQueryKey();
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof reportsControllerGetPendingReports>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
 
+export type ReportsControllerGetPendingReportsQueryResult = NonNullable<
+  Awaited<ReturnType<typeof reportsControllerGetPendingReports>>
+>;
+export type ReportsControllerGetPendingReportsQueryError = unknown;
 
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof reportsControllerGetPendingReports>>> = ({ signal }) => reportsControllerGetPendingReports(signal);
-
-
-
-
-
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof reportsControllerGetPendingReports>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type ReportsControllerGetPendingReportsQueryResult = NonNullable<Awaited<ReturnType<typeof reportsControllerGetPendingReports>>>
-export type ReportsControllerGetPendingReportsQueryError = unknown
-
-
-export function useReportsControllerGetPendingReports<TData = Awaited<ReturnType<typeof reportsControllerGetPendingReports>>, TError = unknown>(
-  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof reportsControllerGetPendingReports>>, TError, TData>> & Pick<
+export function useReportsControllerGetPendingReports<
+  TData = Awaited<ReturnType<typeof reportsControllerGetPendingReports>>,
+  TError = unknown,
+>(
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof reportsControllerGetPendingReports>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof reportsControllerGetPendingReports>>,
           TError,
           Awaited<ReturnType<typeof reportsControllerGetPendingReports>>
-        > , 'initialData'
-      >, }
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useReportsControllerGetPendingReports<TData = Awaited<ReturnType<typeof reportsControllerGetPendingReports>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof reportsControllerGetPendingReports>>, TError, TData>> & Pick<
+        >,
+        "initialData"
+      >;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useReportsControllerGetPendingReports<
+  TData = Awaited<ReturnType<typeof reportsControllerGetPendingReports>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof reportsControllerGetPendingReports>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof reportsControllerGetPendingReports>>,
           TError,
           Awaited<ReturnType<typeof reportsControllerGetPendingReports>>
-        > , 'initialData'
-      >, }
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useReportsControllerGetPendingReports<TData = Awaited<ReturnType<typeof reportsControllerGetPendingReports>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof reportsControllerGetPendingReports>>, TError, TData>>, }
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        "initialData"
+      >;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useReportsControllerGetPendingReports<
+  TData = Awaited<ReturnType<typeof reportsControllerGetPendingReports>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof reportsControllerGetPendingReports>>,
+        TError,
+        TData
+      >
+    >;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
 /**
  * @summary Admin: Get all pending reports
  */
 
-export function useReportsControllerGetPendingReports<TData = Awaited<ReturnType<typeof reportsControllerGetPendingReports>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof reportsControllerGetPendingReports>>, TError, TData>>, }
- , queryClient?: QueryClient
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useReportsControllerGetPendingReports<
+  TData = Awaited<ReturnType<typeof reportsControllerGetPendingReports>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof reportsControllerGetPendingReports>>,
+        TError,
+        TData
+      >
+    >;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions =
+    getReportsControllerGetPendingReportsQueryOptions(options);
 
-  const queryOptions = getReportsControllerGetPendingReportsQueryOptions(options)
-
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
 
   return { ...query, queryKey: queryOptions.queryKey };
 }
-
-
-
-
-
 
 /**
  * @summary Admin: Get specific report details with context
  */
 export const reportsControllerGetReportDetails = (
-    id: string,
- signal?: AbortSignal
+  id: string,
+  signal?: AbortSignal,
 ) => {
+  return axiosInstanceFn<ReportDetailsResponseDto>({
+    url: `/reports/${id}`,
+    method: "GET",
+    signal,
+  });
+};
 
+export const getReportsControllerGetReportDetailsQueryKey = (id: string) => {
+  return [`/reports/${id}`] as const;
+};
 
-      return axiosInstanceFn<void>(
-      {url: `/reports/${id}`, method: 'GET', signal
-    },
-      );
-    }
-
-
-
-
-export const getReportsControllerGetReportDetailsQueryKey = (id: string,) => {
-    return [
-    `/reports/${id}`
-    ] as const;
-    }
-
-
-export const getReportsControllerGetReportDetailsQueryOptions = <TData = Awaited<ReturnType<typeof reportsControllerGetReportDetails>>, TError = unknown>(id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof reportsControllerGetReportDetails>>, TError, TData>>, }
+export const getReportsControllerGetReportDetailsQueryOptions = <
+  TData = Awaited<ReturnType<typeof reportsControllerGetReportDetails>>,
+  TError = unknown,
+>(
+  id: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof reportsControllerGetReportDetails>>,
+        TError,
+        TData
+      >
+    >;
+  },
 ) => {
+  const { query: queryOptions } = options ?? {};
 
-const {query: queryOptions} = options ?? {};
+  const queryKey =
+    queryOptions?.queryKey ?? getReportsControllerGetReportDetailsQueryKey(id);
 
-  const queryKey =  queryOptions?.queryKey ?? getReportsControllerGetReportDetailsQueryKey(id);
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof reportsControllerGetReportDetails>>
+  > = ({ signal }) => reportsControllerGetReportDetails(id, signal);
 
+  return {
+    queryKey,
+    queryFn,
+    enabled: id !== null && id !== undefined,
+    ...queryOptions,
+  } as UseQueryOptions<
+    Awaited<ReturnType<typeof reportsControllerGetReportDetails>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
 
+export type ReportsControllerGetReportDetailsQueryResult = NonNullable<
+  Awaited<ReturnType<typeof reportsControllerGetReportDetails>>
+>;
+export type ReportsControllerGetReportDetailsQueryError = unknown;
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof reportsControllerGetReportDetails>>> = ({ signal }) => reportsControllerGetReportDetails(id, signal);
-
-
-
-
-
-   return  { queryKey, queryFn, enabled: id !== null && id !== undefined, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof reportsControllerGetReportDetails>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type ReportsControllerGetReportDetailsQueryResult = NonNullable<Awaited<ReturnType<typeof reportsControllerGetReportDetails>>>
-export type ReportsControllerGetReportDetailsQueryError = unknown
-
-
-export function useReportsControllerGetReportDetails<TData = Awaited<ReturnType<typeof reportsControllerGetReportDetails>>, TError = unknown>(
- id: string, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof reportsControllerGetReportDetails>>, TError, TData>> & Pick<
+export function useReportsControllerGetReportDetails<
+  TData = Awaited<ReturnType<typeof reportsControllerGetReportDetails>>,
+  TError = unknown,
+>(
+  id: string,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof reportsControllerGetReportDetails>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof reportsControllerGetReportDetails>>,
           TError,
           Awaited<ReturnType<typeof reportsControllerGetReportDetails>>
-        > , 'initialData'
-      >, }
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useReportsControllerGetReportDetails<TData = Awaited<ReturnType<typeof reportsControllerGetReportDetails>>, TError = unknown>(
- id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof reportsControllerGetReportDetails>>, TError, TData>> & Pick<
+        >,
+        "initialData"
+      >;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useReportsControllerGetReportDetails<
+  TData = Awaited<ReturnType<typeof reportsControllerGetReportDetails>>,
+  TError = unknown,
+>(
+  id: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof reportsControllerGetReportDetails>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof reportsControllerGetReportDetails>>,
           TError,
           Awaited<ReturnType<typeof reportsControllerGetReportDetails>>
-        > , 'initialData'
-      >, }
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useReportsControllerGetReportDetails<TData = Awaited<ReturnType<typeof reportsControllerGetReportDetails>>, TError = unknown>(
- id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof reportsControllerGetReportDetails>>, TError, TData>>, }
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        "initialData"
+      >;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useReportsControllerGetReportDetails<
+  TData = Awaited<ReturnType<typeof reportsControllerGetReportDetails>>,
+  TError = unknown,
+>(
+  id: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof reportsControllerGetReportDetails>>,
+        TError,
+        TData
+      >
+    >;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
 /**
  * @summary Admin: Get specific report details with context
  */
 
-export function useReportsControllerGetReportDetails<TData = Awaited<ReturnType<typeof reportsControllerGetReportDetails>>, TError = unknown>(
- id: string, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof reportsControllerGetReportDetails>>, TError, TData>>, }
- , queryClient?: QueryClient
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useReportsControllerGetReportDetails<
+  TData = Awaited<ReturnType<typeof reportsControllerGetReportDetails>>,
+  TError = unknown,
+>(
+  id: string,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof reportsControllerGetReportDetails>>,
+        TError,
+        TData
+      >
+    >;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getReportsControllerGetReportDetailsQueryOptions(
+    id,
+    options,
+  );
 
-  const queryOptions = getReportsControllerGetReportDetailsQueryOptions(id,options)
-
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
 
   return { ...query, queryKey: queryOptions.queryKey };
 }
-
-
-
-
-
 
 /**
  * @summary Admin: Batch dismiss multiple reports
  */
 export const reportsControllerBatchDismissReports = (
-    reportsControllerBatchDismissReportsBody: ReportsControllerBatchDismissReportsBody,
- signal?: AbortSignal
+  reportsControllerBatchDismissReportsBody: ReportsControllerBatchDismissReportsBody,
+  signal?: AbortSignal,
 ) => {
+  return axiosInstanceFn<BatchDismissReportsResponseDto>({
+    url: `/reports/batch-dismiss`,
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    data: reportsControllerBatchDismissReportsBody,
+    signal,
+  });
+};
 
+export const getReportsControllerBatchDismissReportsMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof reportsControllerBatchDismissReports>>,
+    TError,
+    { data: ReportsControllerBatchDismissReportsBody },
+    TContext
+  >;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof reportsControllerBatchDismissReports>>,
+  TError,
+  { data: ReportsControllerBatchDismissReportsBody },
+  TContext
+> => {
+  const mutationKey = ["reportsControllerBatchDismissReports"];
+  const { mutation: mutationOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey } };
 
-      return axiosInstanceFn<void>(
-      {url: `/reports/batch-dismiss`, method: 'PATCH',
-      headers: {'Content-Type': 'application/json', },
-      data: reportsControllerBatchDismissReportsBody, signal
-    },
-      );
-    }
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof reportsControllerBatchDismissReports>>,
+    { data: ReportsControllerBatchDismissReportsBody }
+  > = (props) => {
+    const { data } = props ?? {};
 
+    return reportsControllerBatchDismissReports(data);
+  };
 
+  return { mutationFn, ...mutationOptions };
+};
 
-export const getReportsControllerBatchDismissReportsMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof reportsControllerBatchDismissReports>>, TError,{data: ReportsControllerBatchDismissReportsBody}, TContext>, }
-): UseMutationOptions<Awaited<ReturnType<typeof reportsControllerBatchDismissReports>>, TError,{data: ReportsControllerBatchDismissReportsBody}, TContext> => {
+export type ReportsControllerBatchDismissReportsMutationResult = NonNullable<
+  Awaited<ReturnType<typeof reportsControllerBatchDismissReports>>
+>;
+export type ReportsControllerBatchDismissReportsMutationBody =
+  ReportsControllerBatchDismissReportsBody;
+export type ReportsControllerBatchDismissReportsMutationError = unknown;
 
-const mutationKey = ['reportsControllerBatchDismissReports'];
-const {mutation: mutationOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }};
-
-
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof reportsControllerBatchDismissReports>>, {data: ReportsControllerBatchDismissReportsBody}> = (props) => {
-          const {data} = props ?? {};
-
-          return  reportsControllerBatchDismissReports(data,)
-        }
-
-
-
-
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type ReportsControllerBatchDismissReportsMutationResult = NonNullable<Awaited<ReturnType<typeof reportsControllerBatchDismissReports>>>
-    export type ReportsControllerBatchDismissReportsMutationBody = ReportsControllerBatchDismissReportsBody
-    export type ReportsControllerBatchDismissReportsMutationError = unknown
-
-    /**
+/**
  * @summary Admin: Batch dismiss multiple reports
  */
-export const useReportsControllerBatchDismissReports = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof reportsControllerBatchDismissReports>>, TError,{data: ReportsControllerBatchDismissReportsBody}, TContext>, }
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof reportsControllerBatchDismissReports>>,
-        TError,
-        {data: ReportsControllerBatchDismissReportsBody},
-        TContext
-      > => {
-      return useMutation(getReportsControllerBatchDismissReportsMutationOptions(options), queryClient);
-    }
-    /**
+export const useReportsControllerBatchDismissReports = <
+  TError = unknown,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof reportsControllerBatchDismissReports>>,
+      TError,
+      { data: ReportsControllerBatchDismissReportsBody },
+      TContext
+    >;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof reportsControllerBatchDismissReports>>,
+  TError,
+  { data: ReportsControllerBatchDismissReportsBody },
+  TContext
+> => {
+  return useMutation(
+    getReportsControllerBatchDismissReportsMutationOptions(options),
+    queryClient,
+  );
+};
+/**
  * @summary Admin: Resolve or dismiss a report
  */
 export const reportsControllerResolveReport = (
-    id: string,
-    reportsControllerResolveReportBody: ReportsControllerResolveReportBody,
- signal?: AbortSignal
+  id: string,
+  reportsControllerResolveReportBody: ReportsControllerResolveReportBody,
+  signal?: AbortSignal,
 ) => {
+  return axiosInstanceFn<ReportItemDto>({
+    url: `/reports/${id}/resolve`,
+    method: "PATCH",
+    headers: { "Content-Type": "application/json" },
+    data: reportsControllerResolveReportBody,
+    signal,
+  });
+};
 
+export const getReportsControllerResolveReportMutationOptions = <
+  TError = unknown,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof reportsControllerResolveReport>>,
+    TError,
+    { id: string; data: ReportsControllerResolveReportBody },
+    TContext
+  >;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof reportsControllerResolveReport>>,
+  TError,
+  { id: string; data: ReportsControllerResolveReportBody },
+  TContext
+> => {
+  const mutationKey = ["reportsControllerResolveReport"];
+  const { mutation: mutationOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey } };
 
-      return axiosInstanceFn<void>(
-      {url: `/reports/${id}/resolve`, method: 'PATCH',
-      headers: {'Content-Type': 'application/json', },
-      data: reportsControllerResolveReportBody, signal
-    },
-      );
-    }
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof reportsControllerResolveReport>>,
+    { id: string; data: ReportsControllerResolveReportBody }
+  > = (props) => {
+    const { id, data } = props ?? {};
 
+    return reportsControllerResolveReport(id, data);
+  };
 
+  return { mutationFn, ...mutationOptions };
+};
 
-export const getReportsControllerResolveReportMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof reportsControllerResolveReport>>, TError,{id: string;data: ReportsControllerResolveReportBody}, TContext>, }
-): UseMutationOptions<Awaited<ReturnType<typeof reportsControllerResolveReport>>, TError,{id: string;data: ReportsControllerResolveReportBody}, TContext> => {
+export type ReportsControllerResolveReportMutationResult = NonNullable<
+  Awaited<ReturnType<typeof reportsControllerResolveReport>>
+>;
+export type ReportsControllerResolveReportMutationBody =
+  ReportsControllerResolveReportBody;
+export type ReportsControllerResolveReportMutationError = unknown;
 
-const mutationKey = ['reportsControllerResolveReport'];
-const {mutation: mutationOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }};
-
-
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof reportsControllerResolveReport>>, {id: string;data: ReportsControllerResolveReportBody}> = (props) => {
-          const {id,data} = props ?? {};
-
-          return  reportsControllerResolveReport(id,data,)
-        }
-
-
-
-
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type ReportsControllerResolveReportMutationResult = NonNullable<Awaited<ReturnType<typeof reportsControllerResolveReport>>>
-    export type ReportsControllerResolveReportMutationBody = ReportsControllerResolveReportBody
-    export type ReportsControllerResolveReportMutationError = unknown
-
-    /**
+/**
  * @summary Admin: Resolve or dismiss a report
  */
-export const useReportsControllerResolveReport = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof reportsControllerResolveReport>>, TError,{id: string;data: ReportsControllerResolveReportBody}, TContext>, }
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof reportsControllerResolveReport>>,
-        TError,
-        {id: string;data: ReportsControllerResolveReportBody},
-        TContext
-      > => {
-      return useMutation(getReportsControllerResolveReportMutationOptions(options), queryClient);
-    }
+export const useReportsControllerResolveReport = <
+  TError = unknown,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof reportsControllerResolveReport>>,
+      TError,
+      { id: string; data: ReportsControllerResolveReportBody },
+      TContext
+    >;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof reportsControllerResolveReport>>,
+  TError,
+  { id: string; data: ReportsControllerResolveReportBody },
+  TContext
+> => {
+  return useMutation(
+    getReportsControllerResolveReportMutationOptions(options),
+    queryClient,
+  );
+};

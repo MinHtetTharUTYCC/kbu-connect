@@ -5,7 +5,7 @@
  * Exclusive dating platform for KBU students
  * OpenAPI spec version: 1.0
  */
-import type { UploadedImageItemDto } from './uploadedImageItemDto';
+import type { UploadedImageItemDto } from "./uploadedImageItemDto";
 
 export interface UploadGalleryImagesResponseDto {
   /** List of uploaded images with their URLs and unique keys */

@@ -5,10 +5,7 @@
  * Exclusive dating platform for KBU students
  * OpenAPI spec version: 1.0
  */
-import {
-  useMutation,
-  useQuery
-} from '@tanstack/react-query';
+import { useMutation, useQuery } from "@tanstack/react-query";
 import type {
   DataTag,
   DefinedInitialDataOptions,
@@ -21,237 +18,330 @@ import type {
   UseMutationOptions,
   UseMutationResult,
   UseQueryOptions,
-  UseQueryResult
-} from '@tanstack/react-query';
+  UseQueryResult,
+} from "@tanstack/react-query";
 
 import type {
   BlockResponseDto,
   BlockUserDto,
   BlocksListResponseDto,
   UnblockResponseDto,
-  UnblockUserDto
-} from '../../model';
+  UnblockUserDto,
+} from "../../model";
 
-import { axiosInstanceFn } from '../../../src/lib/axios/axios-instance';
-
-
-
+import { axiosInstanceFn } from "../../../src/lib/axios/axios-instance";
 
 /**
  * @summary Block a user
  */
 export const blockControllerBlockUser = (
-    blockUserDto: BlockUserDto,
- signal?: AbortSignal
+  blockUserDto: BlockUserDto,
+  signal?: AbortSignal,
 ) => {
+  return axiosInstanceFn<BlockResponseDto>({
+    url: `/blocks`,
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    data: blockUserDto,
+    signal,
+  });
+};
 
+export const getBlockControllerBlockUserMutationOptions = <
+  TError = void,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof blockControllerBlockUser>>,
+    TError,
+    { data: BlockUserDto },
+    TContext
+  >;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof blockControllerBlockUser>>,
+  TError,
+  { data: BlockUserDto },
+  TContext
+> => {
+  const mutationKey = ["blockControllerBlockUser"];
+  const { mutation: mutationOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey } };
 
-      return axiosInstanceFn<BlockResponseDto>(
-      {url: `/blocks`, method: 'POST',
-      headers: {'Content-Type': 'application/json', },
-      data: blockUserDto, signal
-    },
-      );
-    }
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof blockControllerBlockUser>>,
+    { data: BlockUserDto }
+  > = (props) => {
+    const { data } = props ?? {};
 
+    return blockControllerBlockUser(data);
+  };
 
+  return { mutationFn, ...mutationOptions };
+};
 
-export const getBlockControllerBlockUserMutationOptions = <TError = void,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof blockControllerBlockUser>>, TError,{data: BlockUserDto}, TContext>, }
-): UseMutationOptions<Awaited<ReturnType<typeof blockControllerBlockUser>>, TError,{data: BlockUserDto}, TContext> => {
+export type BlockControllerBlockUserMutationResult = NonNullable<
+  Awaited<ReturnType<typeof blockControllerBlockUser>>
+>;
+export type BlockControllerBlockUserMutationBody = BlockUserDto;
+export type BlockControllerBlockUserMutationError = void;
 
-const mutationKey = ['blockControllerBlockUser'];
-const {mutation: mutationOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }};
-
-
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof blockControllerBlockUser>>, {data: BlockUserDto}> = (props) => {
-          const {data} = props ?? {};
-
-          return  blockControllerBlockUser(data,)
-        }
-
-
-
-
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type BlockControllerBlockUserMutationResult = NonNullable<Awaited<ReturnType<typeof blockControllerBlockUser>>>
-    export type BlockControllerBlockUserMutationBody = BlockUserDto
-    export type BlockControllerBlockUserMutationError = void
-
-    /**
+/**
  * @summary Block a user
  */
-export const useBlockControllerBlockUser = <TError = void,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof blockControllerBlockUser>>, TError,{data: BlockUserDto}, TContext>, }
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof blockControllerBlockUser>>,
-        TError,
-        {data: BlockUserDto},
-        TContext
-      > => {
-      return useMutation(getBlockControllerBlockUserMutationOptions(options), queryClient);
-    }
-    /**
+export const useBlockControllerBlockUser = <TError = void, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof blockControllerBlockUser>>,
+      TError,
+      { data: BlockUserDto },
+      TContext
+    >;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof blockControllerBlockUser>>,
+  TError,
+  { data: BlockUserDto },
+  TContext
+> => {
+  return useMutation(
+    getBlockControllerBlockUserMutationOptions(options),
+    queryClient,
+  );
+};
+/**
  * @summary Unblock a user
  */
 export const blockControllerUnblockUser = (
-    unblockUserDto: UnblockUserDto,
- signal?: AbortSignal
+  unblockUserDto: UnblockUserDto,
+  signal?: AbortSignal,
 ) => {
+  return axiosInstanceFn<UnblockResponseDto>({
+    url: `/blocks`,
+    method: "DELETE",
+    headers: { "Content-Type": "application/json" },
+    data: unblockUserDto,
+    signal,
+  });
+};
 
+export const getBlockControllerUnblockUserMutationOptions = <
+  TError = void,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof blockControllerUnblockUser>>,
+    TError,
+    { data: UnblockUserDto },
+    TContext
+  >;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof blockControllerUnblockUser>>,
+  TError,
+  { data: UnblockUserDto },
+  TContext
+> => {
+  const mutationKey = ["blockControllerUnblockUser"];
+  const { mutation: mutationOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey } };
 
-      return axiosInstanceFn<UnblockResponseDto>(
-      {url: `/blocks`, method: 'DELETE',
-      headers: {'Content-Type': 'application/json', },
-      data: unblockUserDto, signal
-    },
-      );
-    }
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof blockControllerUnblockUser>>,
+    { data: UnblockUserDto }
+  > = (props) => {
+    const { data } = props ?? {};
 
+    return blockControllerUnblockUser(data);
+  };
 
+  return { mutationFn, ...mutationOptions };
+};
 
-export const getBlockControllerUnblockUserMutationOptions = <TError = void,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof blockControllerUnblockUser>>, TError,{data: UnblockUserDto}, TContext>, }
-): UseMutationOptions<Awaited<ReturnType<typeof blockControllerUnblockUser>>, TError,{data: UnblockUserDto}, TContext> => {
+export type BlockControllerUnblockUserMutationResult = NonNullable<
+  Awaited<ReturnType<typeof blockControllerUnblockUser>>
+>;
+export type BlockControllerUnblockUserMutationBody = UnblockUserDto;
+export type BlockControllerUnblockUserMutationError = void;
 
-const mutationKey = ['blockControllerUnblockUser'];
-const {mutation: mutationOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }};
-
-
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof blockControllerUnblockUser>>, {data: UnblockUserDto}> = (props) => {
-          const {data} = props ?? {};
-
-          return  blockControllerUnblockUser(data,)
-        }
-
-
-
-
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type BlockControllerUnblockUserMutationResult = NonNullable<Awaited<ReturnType<typeof blockControllerUnblockUser>>>
-    export type BlockControllerUnblockUserMutationBody = UnblockUserDto
-    export type BlockControllerUnblockUserMutationError = void
-
-    /**
+/**
  * @summary Unblock a user
  */
-export const useBlockControllerUnblockUser = <TError = void,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof blockControllerUnblockUser>>, TError,{data: UnblockUserDto}, TContext>, }
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof blockControllerUnblockUser>>,
-        TError,
-        {data: UnblockUserDto},
-        TContext
-      > => {
-      return useMutation(getBlockControllerUnblockUserMutationOptions(options), queryClient);
-    }
-    /**
+export const useBlockControllerUnblockUser = <
+  TError = void,
+  TContext = unknown,
+>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof blockControllerUnblockUser>>,
+      TError,
+      { data: UnblockUserDto },
+      TContext
+    >;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof blockControllerUnblockUser>>,
+  TError,
+  { data: UnblockUserDto },
+  TContext
+> => {
+  return useMutation(
+    getBlockControllerUnblockUserMutationOptions(options),
+    queryClient,
+  );
+};
+/**
  * @summary Get list of blocked users
  */
-export const blockControllerGetBlockedUsers = (
-
- signal?: AbortSignal
-) => {
-
-
-      return axiosInstanceFn<BlocksListResponseDto>(
-      {url: `/blocks`, method: 'GET', signal
-    },
-      );
-    }
-
-
-
+export const blockControllerGetBlockedUsers = (signal?: AbortSignal) => {
+  return axiosInstanceFn<BlocksListResponseDto>({
+    url: `/blocks`,
+    method: "GET",
+    signal,
+  });
+};
 
 export const getBlockControllerGetBlockedUsersQueryKey = () => {
-    return [
-    `/blocks`
-    ] as const;
-    }
+  return [`/blocks`] as const;
+};
 
+export const getBlockControllerGetBlockedUsersQueryOptions = <
+  TData = Awaited<ReturnType<typeof blockControllerGetBlockedUsers>>,
+  TError = unknown,
+>(options?: {
+  query?: Partial<
+    UseQueryOptions<
+      Awaited<ReturnType<typeof blockControllerGetBlockedUsers>>,
+      TError,
+      TData
+    >
+  >;
+}) => {
+  const { query: queryOptions } = options ?? {};
 
-export const getBlockControllerGetBlockedUsersQueryOptions = <TData = Awaited<ReturnType<typeof blockControllerGetBlockedUsers>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof blockControllerGetBlockedUsers>>, TError, TData>>, }
-) => {
+  const queryKey =
+    queryOptions?.queryKey ?? getBlockControllerGetBlockedUsersQueryKey();
 
-const {query: queryOptions} = options ?? {};
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof blockControllerGetBlockedUsers>>
+  > = ({ signal }) => blockControllerGetBlockedUsers(signal);
 
-  const queryKey =  queryOptions?.queryKey ?? getBlockControllerGetBlockedUsersQueryKey();
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof blockControllerGetBlockedUsers>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
 
+export type BlockControllerGetBlockedUsersQueryResult = NonNullable<
+  Awaited<ReturnType<typeof blockControllerGetBlockedUsers>>
+>;
+export type BlockControllerGetBlockedUsersQueryError = unknown;
 
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof blockControllerGetBlockedUsers>>> = ({ signal }) => blockControllerGetBlockedUsers(signal);
-
-
-
-
-
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof blockControllerGetBlockedUsers>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type BlockControllerGetBlockedUsersQueryResult = NonNullable<Awaited<ReturnType<typeof blockControllerGetBlockedUsers>>>
-export type BlockControllerGetBlockedUsersQueryError = unknown
-
-
-export function useBlockControllerGetBlockedUsers<TData = Awaited<ReturnType<typeof blockControllerGetBlockedUsers>>, TError = unknown>(
-  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof blockControllerGetBlockedUsers>>, TError, TData>> & Pick<
+export function useBlockControllerGetBlockedUsers<
+  TData = Awaited<ReturnType<typeof blockControllerGetBlockedUsers>>,
+  TError = unknown,
+>(
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof blockControllerGetBlockedUsers>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof blockControllerGetBlockedUsers>>,
           TError,
           Awaited<ReturnType<typeof blockControllerGetBlockedUsers>>
-        > , 'initialData'
-      >, }
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useBlockControllerGetBlockedUsers<TData = Awaited<ReturnType<typeof blockControllerGetBlockedUsers>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof blockControllerGetBlockedUsers>>, TError, TData>> & Pick<
+        >,
+        "initialData"
+      >;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useBlockControllerGetBlockedUsers<
+  TData = Awaited<ReturnType<typeof blockControllerGetBlockedUsers>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof blockControllerGetBlockedUsers>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof blockControllerGetBlockedUsers>>,
           TError,
           Awaited<ReturnType<typeof blockControllerGetBlockedUsers>>
-        > , 'initialData'
-      >, }
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useBlockControllerGetBlockedUsers<TData = Awaited<ReturnType<typeof blockControllerGetBlockedUsers>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof blockControllerGetBlockedUsers>>, TError, TData>>, }
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        "initialData"
+      >;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useBlockControllerGetBlockedUsers<
+  TData = Awaited<ReturnType<typeof blockControllerGetBlockedUsers>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof blockControllerGetBlockedUsers>>,
+        TError,
+        TData
+      >
+    >;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
 /**
  * @summary Get list of blocked users
  */
 
-export function useBlockControllerGetBlockedUsers<TData = Awaited<ReturnType<typeof blockControllerGetBlockedUsers>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof blockControllerGetBlockedUsers>>, TError, TData>>, }
- , queryClient?: QueryClient
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useBlockControllerGetBlockedUsers<
+  TData = Awaited<ReturnType<typeof blockControllerGetBlockedUsers>>,
+  TError = unknown,
+>(
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof blockControllerGetBlockedUsers>>,
+        TError,
+        TData
+      >
+    >;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getBlockControllerGetBlockedUsersQueryOptions(options);
 
-  const queryOptions = getBlockControllerGetBlockedUsersQueryOptions(options)
-
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
 
   return { ...query, queryKey: queryOptions.queryKey };
 }
-
-
-
-
-
-

@@ -5,15 +5,13 @@
  * Exclusive dating platform for KBU students
  * OpenAPI spec version: 1.0
  */
-import {
-  useMutation
-} from '@tanstack/react-query';
+import { useMutation } from "@tanstack/react-query";
 import type {
   MutationFunction,
   QueryClient,
   UseMutationOptions,
-  UseMutationResult
-} from '@tanstack/react-query';
+  UseMutationResult,
+} from "@tanstack/react-query";
 
 import type {
   LoginDto,
@@ -22,261 +20,333 @@ import type {
   SignupDto,
   SignupResponseDto,
   VerifyCodeResponseDto,
-  VerifyDto
-} from '../../model';
+  VerifyDto,
+} from "../../model";
 
-import { axiosInstanceFn } from '../../../src/lib/axios/axios-instance';
-
-
-
+import { axiosInstanceFn } from "../../../src/lib/axios/axios-instance";
 
 /**
  * @summary Request signup with verification code
  */
 export const authControllerSignup = (
-    signupDto: SignupDto,
- signal?: AbortSignal
+  signupDto: SignupDto,
+  signal?: AbortSignal,
 ) => {
+  return axiosInstanceFn<SignupResponseDto>({
+    url: `/auth/signup`,
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    data: signupDto,
+    signal,
+  });
+};
 
+export const getAuthControllerSignupMutationOptions = <
+  TError = void,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof authControllerSignup>>,
+    TError,
+    { data: SignupDto },
+    TContext
+  >;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof authControllerSignup>>,
+  TError,
+  { data: SignupDto },
+  TContext
+> => {
+  const mutationKey = ["authControllerSignup"];
+  const { mutation: mutationOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey } };
 
-      return axiosInstanceFn<SignupResponseDto>(
-      {url: `/auth/signup`, method: 'POST',
-      headers: {'Content-Type': 'application/json', },
-      data: signupDto, signal
-    },
-      );
-    }
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof authControllerSignup>>,
+    { data: SignupDto }
+  > = (props) => {
+    const { data } = props ?? {};
 
+    return authControllerSignup(data);
+  };
 
+  return { mutationFn, ...mutationOptions };
+};
 
-export const getAuthControllerSignupMutationOptions = <TError = void,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof authControllerSignup>>, TError,{data: SignupDto}, TContext>, }
-): UseMutationOptions<Awaited<ReturnType<typeof authControllerSignup>>, TError,{data: SignupDto}, TContext> => {
+export type AuthControllerSignupMutationResult = NonNullable<
+  Awaited<ReturnType<typeof authControllerSignup>>
+>;
+export type AuthControllerSignupMutationBody = SignupDto;
+export type AuthControllerSignupMutationError = void;
 
-const mutationKey = ['authControllerSignup'];
-const {mutation: mutationOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }};
-
-
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof authControllerSignup>>, {data: SignupDto}> = (props) => {
-          const {data} = props ?? {};
-
-          return  authControllerSignup(data,)
-        }
-
-
-
-
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type AuthControllerSignupMutationResult = NonNullable<Awaited<ReturnType<typeof authControllerSignup>>>
-    export type AuthControllerSignupMutationBody = SignupDto
-    export type AuthControllerSignupMutationError = void
-
-    /**
+/**
  * @summary Request signup with verification code
  */
-export const useAuthControllerSignup = <TError = void,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof authControllerSignup>>, TError,{data: SignupDto}, TContext>, }
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof authControllerSignup>>,
-        TError,
-        {data: SignupDto},
-        TContext
-      > => {
-      return useMutation(getAuthControllerSignupMutationOptions(options), queryClient);
-    }
-    /**
+export const useAuthControllerSignup = <TError = void, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof authControllerSignup>>,
+      TError,
+      { data: SignupDto },
+      TContext
+    >;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof authControllerSignup>>,
+  TError,
+  { data: SignupDto },
+  TContext
+> => {
+  return useMutation(
+    getAuthControllerSignupMutationOptions(options),
+    queryClient,
+  );
+};
+/**
  * @summary Request login with verification code
  */
 export const authControllerLogin = (
-    loginDto: LoginDto,
- signal?: AbortSignal
+  loginDto: LoginDto,
+  signal?: AbortSignal,
 ) => {
+  return axiosInstanceFn<LoginResponseDto>({
+    url: `/auth/login`,
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    data: loginDto,
+    signal,
+  });
+};
 
+export const getAuthControllerLoginMutationOptions = <
+  TError = void,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof authControllerLogin>>,
+    TError,
+    { data: LoginDto },
+    TContext
+  >;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof authControllerLogin>>,
+  TError,
+  { data: LoginDto },
+  TContext
+> => {
+  const mutationKey = ["authControllerLogin"];
+  const { mutation: mutationOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey } };
 
-      return axiosInstanceFn<LoginResponseDto>(
-      {url: `/auth/login`, method: 'POST',
-      headers: {'Content-Type': 'application/json', },
-      data: loginDto, signal
-    },
-      );
-    }
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof authControllerLogin>>,
+    { data: LoginDto }
+  > = (props) => {
+    const { data } = props ?? {};
 
+    return authControllerLogin(data);
+  };
 
+  return { mutationFn, ...mutationOptions };
+};
 
-export const getAuthControllerLoginMutationOptions = <TError = void,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof authControllerLogin>>, TError,{data: LoginDto}, TContext>, }
-): UseMutationOptions<Awaited<ReturnType<typeof authControllerLogin>>, TError,{data: LoginDto}, TContext> => {
+export type AuthControllerLoginMutationResult = NonNullable<
+  Awaited<ReturnType<typeof authControllerLogin>>
+>;
+export type AuthControllerLoginMutationBody = LoginDto;
+export type AuthControllerLoginMutationError = void;
 
-const mutationKey = ['authControllerLogin'];
-const {mutation: mutationOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }};
-
-
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof authControllerLogin>>, {data: LoginDto}> = (props) => {
-          const {data} = props ?? {};
-
-          return  authControllerLogin(data,)
-        }
-
-
-
-
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type AuthControllerLoginMutationResult = NonNullable<Awaited<ReturnType<typeof authControllerLogin>>>
-    export type AuthControllerLoginMutationBody = LoginDto
-    export type AuthControllerLoginMutationError = void
-
-    /**
+/**
  * @summary Request login with verification code
  */
-export const useAuthControllerLogin = <TError = void,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof authControllerLogin>>, TError,{data: LoginDto}, TContext>, }
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof authControllerLogin>>,
-        TError,
-        {data: LoginDto},
-        TContext
-      > => {
-      return useMutation(getAuthControllerLoginMutationOptions(options), queryClient);
-    }
-    /**
+export const useAuthControllerLogin = <TError = void, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof authControllerLogin>>,
+      TError,
+      { data: LoginDto },
+      TContext
+    >;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof authControllerLogin>>,
+  TError,
+  { data: LoginDto },
+  TContext
+> => {
+  return useMutation(
+    getAuthControllerLoginMutationOptions(options),
+    queryClient,
+  );
+};
+/**
  * @summary Verify code and get access token
  */
 export const authControllerVerify = (
-    verifyDto: VerifyDto,
- signal?: AbortSignal
+  verifyDto: VerifyDto,
+  signal?: AbortSignal,
 ) => {
+  return axiosInstanceFn<VerifyCodeResponseDto>({
+    url: `/auth/verify`,
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    data: verifyDto,
+    signal,
+  });
+};
 
+export const getAuthControllerVerifyMutationOptions = <
+  TError = void,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof authControllerVerify>>,
+    TError,
+    { data: VerifyDto },
+    TContext
+  >;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof authControllerVerify>>,
+  TError,
+  { data: VerifyDto },
+  TContext
+> => {
+  const mutationKey = ["authControllerVerify"];
+  const { mutation: mutationOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey } };
 
-      return axiosInstanceFn<VerifyCodeResponseDto>(
-      {url: `/auth/verify`, method: 'POST',
-      headers: {'Content-Type': 'application/json', },
-      data: verifyDto, signal
-    },
-      );
-    }
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof authControllerVerify>>,
+    { data: VerifyDto }
+  > = (props) => {
+    const { data } = props ?? {};
 
+    return authControllerVerify(data);
+  };
 
+  return { mutationFn, ...mutationOptions };
+};
 
-export const getAuthControllerVerifyMutationOptions = <TError = void,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof authControllerVerify>>, TError,{data: VerifyDto}, TContext>, }
-): UseMutationOptions<Awaited<ReturnType<typeof authControllerVerify>>, TError,{data: VerifyDto}, TContext> => {
+export type AuthControllerVerifyMutationResult = NonNullable<
+  Awaited<ReturnType<typeof authControllerVerify>>
+>;
+export type AuthControllerVerifyMutationBody = VerifyDto;
+export type AuthControllerVerifyMutationError = void;
 
-const mutationKey = ['authControllerVerify'];
-const {mutation: mutationOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }};
-
-
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof authControllerVerify>>, {data: VerifyDto}> = (props) => {
-          const {data} = props ?? {};
-
-          return  authControllerVerify(data,)
-        }
-
-
-
-
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type AuthControllerVerifyMutationResult = NonNullable<Awaited<ReturnType<typeof authControllerVerify>>>
-    export type AuthControllerVerifyMutationBody = VerifyDto
-    export type AuthControllerVerifyMutationError = void
-
-    /**
+/**
  * @summary Verify code and get access token
  */
-export const useAuthControllerVerify = <TError = void,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof authControllerVerify>>, TError,{data: VerifyDto}, TContext>, }
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof authControllerVerify>>,
-        TError,
-        {data: VerifyDto},
-        TContext
-      > => {
-      return useMutation(getAuthControllerVerifyMutationOptions(options), queryClient);
-    }
-    /**
+export const useAuthControllerVerify = <TError = void, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof authControllerVerify>>,
+      TError,
+      { data: VerifyDto },
+      TContext
+    >;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof authControllerVerify>>,
+  TError,
+  { data: VerifyDto },
+  TContext
+> => {
+  return useMutation(
+    getAuthControllerVerifyMutationOptions(options),
+    queryClient,
+  );
+};
+/**
  * @summary Refresh access token using refresh token
  */
-export const authControllerRefresh = (
+export const authControllerRefresh = (signal?: AbortSignal) => {
+  return axiosInstanceFn<RefreshTokenResponseDto>({
+    url: `/auth/refresh`,
+    method: "POST",
+    signal,
+  });
+};
 
- signal?: AbortSignal
-) => {
+export const getAuthControllerRefreshMutationOptions = <
+  TError = void,
+  TContext = unknown,
+>(options?: {
+  mutation?: UseMutationOptions<
+    Awaited<ReturnType<typeof authControllerRefresh>>,
+    TError,
+    void,
+    TContext
+  >;
+}): UseMutationOptions<
+  Awaited<ReturnType<typeof authControllerRefresh>>,
+  TError,
+  void,
+  TContext
+> => {
+  const mutationKey = ["authControllerRefresh"];
+  const { mutation: mutationOptions } = options
+    ? options.mutation &&
+      "mutationKey" in options.mutation &&
+      options.mutation.mutationKey
+      ? options
+      : { ...options, mutation: { ...options.mutation, mutationKey } }
+    : { mutation: { mutationKey } };
 
+  const mutationFn: MutationFunction<
+    Awaited<ReturnType<typeof authControllerRefresh>>,
+    void
+  > = () => {
+    return authControllerRefresh();
+  };
 
-      return axiosInstanceFn<RefreshTokenResponseDto>(
-      {url: `/auth/refresh`, method: 'POST', signal
-    },
-      );
-    }
+  return { mutationFn, ...mutationOptions };
+};
 
+export type AuthControllerRefreshMutationResult = NonNullable<
+  Awaited<ReturnType<typeof authControllerRefresh>>
+>;
 
+export type AuthControllerRefreshMutationError = void;
 
-export const getAuthControllerRefreshMutationOptions = <TError = void,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof authControllerRefresh>>, TError,void, TContext>, }
-): UseMutationOptions<Awaited<ReturnType<typeof authControllerRefresh>>, TError,void, TContext> => {
-
-const mutationKey = ['authControllerRefresh'];
-const {mutation: mutationOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }};
-
-
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof authControllerRefresh>>, void> = () => {
-
-
-          return  authControllerRefresh()
-        }
-
-
-
-
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type AuthControllerRefreshMutationResult = NonNullable<Awaited<ReturnType<typeof authControllerRefresh>>>
-
-    export type AuthControllerRefreshMutationError = void
-
-    /**
+/**
  * @summary Refresh access token using refresh token
  */
-export const useAuthControllerRefresh = <TError = void,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof authControllerRefresh>>, TError,void, TContext>, }
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof authControllerRefresh>>,
-        TError,
-        void,
-        TContext
-      > => {
-      return useMutation(getAuthControllerRefreshMutationOptions(options), queryClient);
-    }
+export const useAuthControllerRefresh = <TError = void, TContext = unknown>(
+  options?: {
+    mutation?: UseMutationOptions<
+      Awaited<ReturnType<typeof authControllerRefresh>>,
+      TError,
+      void,
+      TContext
+    >;
+  },
+  queryClient?: QueryClient,
+): UseMutationResult<
+  Awaited<ReturnType<typeof authControllerRefresh>>,
+  TError,
+  void,
+  TContext
+> => {
+  return useMutation(
+    getAuthControllerRefreshMutationOptions(options),
+    queryClient,
+  );
+};

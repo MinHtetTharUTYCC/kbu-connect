@@ -5,7 +5,6 @@
  * Exclusive dating platform for KBU students
  * OpenAPI spec version: 1.0
  */
-import type { ShoutoutOtherUserDtoAvatarUrl } from './shoutoutOtherUserDtoAvatarUrl';
 
 export interface ShoutoutOtherUserDto {
   /** User ID */
@@ -13,8 +12,8 @@ export interface ShoutoutOtherUserDto {
   /** User name */
   name: string;
   /**
-     * Avatar URL
-     * @nullable
-     */
-  avatarUrl: ShoutoutOtherUserDtoAvatarUrl;
+   * Avatar URL
+   * @nullable
+   */
+  avatarUrl: string | null;
 }

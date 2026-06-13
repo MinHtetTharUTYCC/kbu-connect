@@ -5,14 +5,13 @@
  * Exclusive dating platform for KBU students
  * OpenAPI spec version: 1.0
  */
-import type { ConversationItemDto } from './conversationItemDto';
-import type { ConversationsListResponseDtoNextCursor } from './conversationsListResponseDtoNextCursor';
+import type { ConversationItemDto } from "./conversationItemDto";
 
 export interface ConversationsListResponseDto {
   conversations: ConversationItemDto[];
   /**
-     * Cursor for pagination (null if no more conversations)
-     * @nullable
-     */
-  nextCursor: ConversationsListResponseDtoNextCursor;
+   * Cursor for pagination (null if no more conversations)
+   * @nullable
+   */
+  nextCursor: string | null;
 }

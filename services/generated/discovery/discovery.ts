@@ -5,10 +5,7 @@
  * Exclusive dating platform for KBU students
  * OpenAPI spec version: 1.0
  */
-import {
-  useInfiniteQuery,
-  useQuery
-} from '@tanstack/react-query';
+import { useInfiniteQuery, useQuery } from "@tanstack/react-query";
 import type {
   DataTag,
   DefinedInitialDataOptions,
@@ -22,182 +19,360 @@ import type {
   UseInfiniteQueryOptions,
   UseInfiniteQueryResult,
   UseQueryOptions,
-  UseQueryResult
-} from '@tanstack/react-query';
+  UseQueryResult,
+} from "@tanstack/react-query";
 
 import type {
   DiscoveryControllerGetDiscoveryParams,
-  DiscoveryListResponseDto
-} from '../../model';
+  DiscoveryListResponseDto,
+} from "../../model";
 
-import { axiosInstanceFn } from '../../../src/lib/axios/axios-instance';
-
-
-
+import { axiosInstanceFn } from "../../../src/lib/axios/axios-instance";
 
 /**
  * @summary Get a list of potential matches with weighting
  */
 export const discoveryControllerGetDiscovery = (
-    params?: DiscoveryControllerGetDiscoveryParams,
- signal?: AbortSignal
+  params?: DiscoveryControllerGetDiscoveryParams,
+  signal?: AbortSignal,
 ) => {
+  return axiosInstanceFn<DiscoveryListResponseDto>({
+    url: `/discovery`,
+    method: "GET",
+    params,
+    signal,
+  });
+};
 
-
-      return axiosInstanceFn<DiscoveryListResponseDto>(
-      {url: `/discovery`, method: 'GET',
-        params, signal
-    },
-      );
-    }
-
-
-
-
-export const getDiscoveryControllerGetDiscoveryInfiniteQueryKey = (params?: DiscoveryControllerGetDiscoveryParams,) => {
-    return [
-    'infinite', `/discovery`, ...(params ? [params] : [])
-    ] as const;
-    }
-
-export const getDiscoveryControllerGetDiscoveryQueryKey = (params?: DiscoveryControllerGetDiscoveryParams,) => {
-    return [
-    `/discovery`, ...(params ? [params] : [])
-    ] as const;
-    }
-
-
-export const getDiscoveryControllerGetDiscoveryInfiniteQueryOptions = <TData = InfiniteData<Awaited<ReturnType<typeof discoveryControllerGetDiscovery>>, DiscoveryControllerGetDiscoveryParams['cursor']>, TError = unknown>(params?: DiscoveryControllerGetDiscoveryParams, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof discoveryControllerGetDiscovery>>, TError, TData, QueryKey, DiscoveryControllerGetDiscoveryParams['cursor']>>, }
+export const getDiscoveryControllerGetDiscoveryInfiniteQueryKey = (
+  params?: DiscoveryControllerGetDiscoveryParams,
 ) => {
+  return ["infinite", `/discovery`, ...(params ? [params] : [])] as const;
+};
 
-const {query: queryOptions} = options ?? {};
+export const getDiscoveryControllerGetDiscoveryQueryKey = (
+  params?: DiscoveryControllerGetDiscoveryParams,
+) => {
+  return [`/discovery`, ...(params ? [params] : [])] as const;
+};
 
-  const queryKey =  queryOptions?.queryKey ?? getDiscoveryControllerGetDiscoveryInfiniteQueryKey(params);
+export const getDiscoveryControllerGetDiscoveryInfiniteQueryOptions = <
+  TData = InfiniteData<
+    Awaited<ReturnType<typeof discoveryControllerGetDiscovery>>,
+    DiscoveryControllerGetDiscoveryParams["cursor"]
+  >,
+  TError = unknown,
+>(
+  params?: DiscoveryControllerGetDiscoveryParams,
+  options?: {
+    query?: Partial<
+      UseInfiniteQueryOptions<
+        Awaited<ReturnType<typeof discoveryControllerGetDiscovery>>,
+        TError,
+        TData,
+        QueryKey,
+        DiscoveryControllerGetDiscoveryParams["cursor"]
+      >
+    >;
+  },
+) => {
+  const { query: queryOptions } = options ?? {};
 
+  const queryKey =
+    queryOptions?.queryKey ??
+    getDiscoveryControllerGetDiscoveryInfiniteQueryKey(params);
 
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof discoveryControllerGetDiscovery>>,
+    QueryKey,
+    DiscoveryControllerGetDiscoveryParams["cursor"]
+  > = ({ signal, pageParam }) =>
+    discoveryControllerGetDiscovery(
+      { ...params, cursor: pageParam ?? params?.["cursor"] },
+      signal,
+    );
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof discoveryControllerGetDiscovery>>, QueryKey, DiscoveryControllerGetDiscoveryParams['cursor']> = ({ signal, pageParam }) => discoveryControllerGetDiscovery({...params, 'cursor': pageParam ?? params?.['cursor']}, signal);
+  return { queryKey, queryFn, ...queryOptions } as UseInfiniteQueryOptions<
+    Awaited<ReturnType<typeof discoveryControllerGetDiscovery>>,
+    TError,
+    TData,
+    QueryKey,
+    DiscoveryControllerGetDiscoveryParams["cursor"]
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
 
+export type DiscoveryControllerGetDiscoveryInfiniteQueryResult = NonNullable<
+  Awaited<ReturnType<typeof discoveryControllerGetDiscovery>>
+>;
+export type DiscoveryControllerGetDiscoveryInfiniteQueryError = unknown;
 
-
-
-
-   return  { queryKey, queryFn, ...queryOptions} as UseInfiniteQueryOptions<Awaited<ReturnType<typeof discoveryControllerGetDiscovery>>, TError, TData, QueryKey, DiscoveryControllerGetDiscoveryParams['cursor']> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type DiscoveryControllerGetDiscoveryInfiniteQueryResult = NonNullable<Awaited<ReturnType<typeof discoveryControllerGetDiscovery>>>
-export type DiscoveryControllerGetDiscoveryInfiniteQueryError = unknown
-
-
-export function useDiscoveryControllerGetDiscoveryInfinite<TData = InfiniteData<Awaited<ReturnType<typeof discoveryControllerGetDiscovery>>, DiscoveryControllerGetDiscoveryParams['cursor']>, TError = unknown>(
- params: undefined |  DiscoveryControllerGetDiscoveryParams, options: { query:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof discoveryControllerGetDiscovery>>, TError, TData, QueryKey, DiscoveryControllerGetDiscoveryParams['cursor']>> & Pick<
+export function useDiscoveryControllerGetDiscoveryInfinite<
+  TData = InfiniteData<
+    Awaited<ReturnType<typeof discoveryControllerGetDiscovery>>,
+    DiscoveryControllerGetDiscoveryParams["cursor"]
+  >,
+  TError = unknown,
+>(
+  params: undefined | DiscoveryControllerGetDiscoveryParams,
+  options: {
+    query: Partial<
+      UseInfiniteQueryOptions<
+        Awaited<ReturnType<typeof discoveryControllerGetDiscovery>>,
+        TError,
+        TData,
+        QueryKey,
+        DiscoveryControllerGetDiscoveryParams["cursor"]
+      >
+    > &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof discoveryControllerGetDiscovery>>,
           TError,
-          Awaited<ReturnType<typeof discoveryControllerGetDiscovery>>, QueryKey
-        > , 'initialData'
-      >, }
- , queryClient?: QueryClient
-  ):  DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useDiscoveryControllerGetDiscoveryInfinite<TData = InfiniteData<Awaited<ReturnType<typeof discoveryControllerGetDiscovery>>, DiscoveryControllerGetDiscoveryParams['cursor']>, TError = unknown>(
- params?: DiscoveryControllerGetDiscoveryParams, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof discoveryControllerGetDiscovery>>, TError, TData, QueryKey, DiscoveryControllerGetDiscoveryParams['cursor']>> & Pick<
+          Awaited<ReturnType<typeof discoveryControllerGetDiscovery>>,
+          QueryKey
+        >,
+        "initialData"
+      >;
+  },
+  queryClient?: QueryClient,
+): DefinedUseInfiniteQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useDiscoveryControllerGetDiscoveryInfinite<
+  TData = InfiniteData<
+    Awaited<ReturnType<typeof discoveryControllerGetDiscovery>>,
+    DiscoveryControllerGetDiscoveryParams["cursor"]
+  >,
+  TError = unknown,
+>(
+  params?: DiscoveryControllerGetDiscoveryParams,
+  options?: {
+    query?: Partial<
+      UseInfiniteQueryOptions<
+        Awaited<ReturnType<typeof discoveryControllerGetDiscovery>>,
+        TError,
+        TData,
+        QueryKey,
+        DiscoveryControllerGetDiscoveryParams["cursor"]
+      >
+    > &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof discoveryControllerGetDiscovery>>,
           TError,
-          Awaited<ReturnType<typeof discoveryControllerGetDiscovery>>, QueryKey
-        > , 'initialData'
-      >, }
- , queryClient?: QueryClient
-  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useDiscoveryControllerGetDiscoveryInfinite<TData = InfiniteData<Awaited<ReturnType<typeof discoveryControllerGetDiscovery>>, DiscoveryControllerGetDiscoveryParams['cursor']>, TError = unknown>(
- params?: DiscoveryControllerGetDiscoveryParams, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof discoveryControllerGetDiscovery>>, TError, TData, QueryKey, DiscoveryControllerGetDiscoveryParams['cursor']>>, }
- , queryClient?: QueryClient
-  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+          Awaited<ReturnType<typeof discoveryControllerGetDiscovery>>,
+          QueryKey
+        >,
+        "initialData"
+      >;
+  },
+  queryClient?: QueryClient,
+): UseInfiniteQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useDiscoveryControllerGetDiscoveryInfinite<
+  TData = InfiniteData<
+    Awaited<ReturnType<typeof discoveryControllerGetDiscovery>>,
+    DiscoveryControllerGetDiscoveryParams["cursor"]
+  >,
+  TError = unknown,
+>(
+  params?: DiscoveryControllerGetDiscoveryParams,
+  options?: {
+    query?: Partial<
+      UseInfiniteQueryOptions<
+        Awaited<ReturnType<typeof discoveryControllerGetDiscovery>>,
+        TError,
+        TData,
+        QueryKey,
+        DiscoveryControllerGetDiscoveryParams["cursor"]
+      >
+    >;
+  },
+  queryClient?: QueryClient,
+): UseInfiniteQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
 /**
  * @summary Get a list of potential matches with weighting
  */
 
-export function useDiscoveryControllerGetDiscoveryInfinite<TData = InfiniteData<Awaited<ReturnType<typeof discoveryControllerGetDiscovery>>, DiscoveryControllerGetDiscoveryParams['cursor']>, TError = unknown>(
- params?: DiscoveryControllerGetDiscoveryParams, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof discoveryControllerGetDiscovery>>, TError, TData, QueryKey, DiscoveryControllerGetDiscoveryParams['cursor']>>, }
- , queryClient?: QueryClient
- ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useDiscoveryControllerGetDiscoveryInfinite<
+  TData = InfiniteData<
+    Awaited<ReturnType<typeof discoveryControllerGetDiscovery>>,
+    DiscoveryControllerGetDiscoveryParams["cursor"]
+  >,
+  TError = unknown,
+>(
+  params?: DiscoveryControllerGetDiscoveryParams,
+  options?: {
+    query?: Partial<
+      UseInfiniteQueryOptions<
+        Awaited<ReturnType<typeof discoveryControllerGetDiscovery>>,
+        TError,
+        TData,
+        QueryKey,
+        DiscoveryControllerGetDiscoveryParams["cursor"]
+      >
+    >;
+  },
+  queryClient?: QueryClient,
+): UseInfiniteQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getDiscoveryControllerGetDiscoveryInfiniteQueryOptions(
+    params,
+    options,
+  );
 
-  const queryOptions = getDiscoveryControllerGetDiscoveryInfiniteQueryOptions(params,options)
-
-  const query = useInfiniteQuery(queryOptions, queryClient) as  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+  const query = useInfiniteQuery(
+    queryOptions,
+    queryClient,
+  ) as UseInfiniteQueryResult<TData, TError> & {
+    queryKey: DataTag<QueryKey, TData, TError>;
+  };
 
   return { ...query, queryKey: queryOptions.queryKey };
 }
 
-
-
-
-
-
-export const getDiscoveryControllerGetDiscoveryQueryOptions = <TData = Awaited<ReturnType<typeof discoveryControllerGetDiscovery>>, TError = unknown>(params?: DiscoveryControllerGetDiscoveryParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof discoveryControllerGetDiscovery>>, TError, TData>>, }
+export const getDiscoveryControllerGetDiscoveryQueryOptions = <
+  TData = Awaited<ReturnType<typeof discoveryControllerGetDiscovery>>,
+  TError = unknown,
+>(
+  params?: DiscoveryControllerGetDiscoveryParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof discoveryControllerGetDiscovery>>,
+        TError,
+        TData
+      >
+    >;
+  },
 ) => {
+  const { query: queryOptions } = options ?? {};
 
-const {query: queryOptions} = options ?? {};
+  const queryKey =
+    queryOptions?.queryKey ??
+    getDiscoveryControllerGetDiscoveryQueryKey(params);
 
-  const queryKey =  queryOptions?.queryKey ?? getDiscoveryControllerGetDiscoveryQueryKey(params);
+  const queryFn: QueryFunction<
+    Awaited<ReturnType<typeof discoveryControllerGetDiscovery>>
+  > = ({ signal }) => discoveryControllerGetDiscovery(params, signal);
 
+  return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+    Awaited<ReturnType<typeof discoveryControllerGetDiscovery>>,
+    TError,
+    TData
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
 
+export type DiscoveryControllerGetDiscoveryQueryResult = NonNullable<
+  Awaited<ReturnType<typeof discoveryControllerGetDiscovery>>
+>;
+export type DiscoveryControllerGetDiscoveryQueryError = unknown;
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof discoveryControllerGetDiscovery>>> = ({ signal }) => discoveryControllerGetDiscovery(params, signal);
-
-
-
-
-
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof discoveryControllerGetDiscovery>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type DiscoveryControllerGetDiscoveryQueryResult = NonNullable<Awaited<ReturnType<typeof discoveryControllerGetDiscovery>>>
-export type DiscoveryControllerGetDiscoveryQueryError = unknown
-
-
-export function useDiscoveryControllerGetDiscovery<TData = Awaited<ReturnType<typeof discoveryControllerGetDiscovery>>, TError = unknown>(
- params: undefined |  DiscoveryControllerGetDiscoveryParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof discoveryControllerGetDiscovery>>, TError, TData>> & Pick<
+export function useDiscoveryControllerGetDiscovery<
+  TData = Awaited<ReturnType<typeof discoveryControllerGetDiscovery>>,
+  TError = unknown,
+>(
+  params: undefined | DiscoveryControllerGetDiscoveryParams,
+  options: {
+    query: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof discoveryControllerGetDiscovery>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
         DefinedInitialDataOptions<
           Awaited<ReturnType<typeof discoveryControllerGetDiscovery>>,
           TError,
           Awaited<ReturnType<typeof discoveryControllerGetDiscovery>>
-        > , 'initialData'
-      >, }
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useDiscoveryControllerGetDiscovery<TData = Awaited<ReturnType<typeof discoveryControllerGetDiscovery>>, TError = unknown>(
- params?: DiscoveryControllerGetDiscoveryParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof discoveryControllerGetDiscovery>>, TError, TData>> & Pick<
+        >,
+        "initialData"
+      >;
+  },
+  queryClient?: QueryClient,
+): DefinedUseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useDiscoveryControllerGetDiscovery<
+  TData = Awaited<ReturnType<typeof discoveryControllerGetDiscovery>>,
+  TError = unknown,
+>(
+  params?: DiscoveryControllerGetDiscoveryParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof discoveryControllerGetDiscovery>>,
+        TError,
+        TData
+      >
+    > &
+      Pick<
         UndefinedInitialDataOptions<
           Awaited<ReturnType<typeof discoveryControllerGetDiscovery>>,
           TError,
           Awaited<ReturnType<typeof discoveryControllerGetDiscovery>>
-        > , 'initialData'
-      >, }
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useDiscoveryControllerGetDiscovery<TData = Awaited<ReturnType<typeof discoveryControllerGetDiscovery>>, TError = unknown>(
- params?: DiscoveryControllerGetDiscoveryParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof discoveryControllerGetDiscovery>>, TError, TData>>, }
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+        >,
+        "initialData"
+      >;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
+export function useDiscoveryControllerGetDiscovery<
+  TData = Awaited<ReturnType<typeof discoveryControllerGetDiscovery>>,
+  TError = unknown,
+>(
+  params?: DiscoveryControllerGetDiscoveryParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof discoveryControllerGetDiscovery>>,
+        TError,
+        TData
+      >
+    >;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+};
 /**
  * @summary Get a list of potential matches with weighting
  */
 
-export function useDiscoveryControllerGetDiscovery<TData = Awaited<ReturnType<typeof discoveryControllerGetDiscovery>>, TError = unknown>(
- params?: DiscoveryControllerGetDiscoveryParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof discoveryControllerGetDiscovery>>, TError, TData>>, }
- , queryClient?: QueryClient
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useDiscoveryControllerGetDiscovery<
+  TData = Awaited<ReturnType<typeof discoveryControllerGetDiscovery>>,
+  TError = unknown,
+>(
+  params?: DiscoveryControllerGetDiscoveryParams,
+  options?: {
+    query?: Partial<
+      UseQueryOptions<
+        Awaited<ReturnType<typeof discoveryControllerGetDiscovery>>,
+        TError,
+        TData
+      >
+    >;
+  },
+  queryClient?: QueryClient,
+): UseQueryResult<TData, TError> & {
+  queryKey: DataTag<QueryKey, TData, TError>;
+} {
+  const queryOptions = getDiscoveryControllerGetDiscoveryQueryOptions(
+    params,
+    options,
+  );
 
-  const queryOptions = getDiscoveryControllerGetDiscoveryQueryOptions(params,options)
-
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+  const query = useQuery(queryOptions, queryClient) as UseQueryResult<
+    TData,
+    TError
+  > & { queryKey: DataTag<QueryKey, TData, TError> };
 
   return { ...query, queryKey: queryOptions.queryKey };
 }
-
-
-
-
-
-

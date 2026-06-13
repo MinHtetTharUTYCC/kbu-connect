@@ -306,9 +306,11 @@ export function ChatClient({ chatId }: { chatId: string }) {
   const { user } = useAuthContext();
   const messagesQuery = useConversationMessages(chatId, 20);
   const loadMoreMessagesRef = useRef<HTMLDivElement | null>(null);
+
   const { conversations, isLoading: conversationsLoading } =
     useConversationsList(30);
-  const markSeen = useMarkConversationSeen();
+  const { mutate: markSeen } = useMarkConversationSeen();
+
   const [draft, setDraft] = useState("");
   const [localMessages, setLocalMessages] = useState<MessageItemDto[]>([]);
   const conversation = conversations.find((item) => item.id === chatId);
@@ -321,9 +323,9 @@ export function ChatClient({ chatId }: { chatId: string }) {
 
   useEffect(() => {
     if (chatId && conversation && !conversation.isRead) {
-      markSeen.mutate({ conversationId: chatId });
+      markSeen({ conversationId: chatId });
     }
-  }, [chatId, conversation, markSeen.mutate]);
+  }, [chatId, conversation, markSeen]);
 
   useEffect(() => {
     const target = loadMoreMessagesRef.current;

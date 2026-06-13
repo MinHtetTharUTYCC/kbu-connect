@@ -58,10 +58,12 @@ const steps: Array<{ id: SetupStep; eyebrow: string; title: string }> = [
 export function ProfileSetupClient() {
   const { user } = useAuthContext();
   const current = user?.user;
+
   const isEditMode = Boolean(user?.isComplete);
-  const updateProfile = useUpdateMyProfile(
-    isEditMode ? "/profile/me" : "/discover",
-  );
+
+  const { mutate: updateProfile, isPending: isProfileUpdating } =
+    useUpdateMyProfile(isEditMode ? "/profile/me" : "/discover");
+
   const [stepIndex, setStepIndex] = useState(0);
   const [name, setName] = useState(current?.name ?? "");
   const [bio, setBio] = useState(current?.bio ? String(current.bio) : "");
@@ -151,7 +153,7 @@ export function ProfileSetupClient() {
 
   function handleFinish() {
     if (!canGoNext) return;
-    updateProfile.mutate({
+    updateProfile({
       data: {
         name: name.trim() || current?.name || "KBU Student",
         avatarUrl,
@@ -372,7 +374,7 @@ export function ProfileSetupClient() {
           variant="outline"
           className="h-12 flex-1 rounded-xl text-base font-semibold"
           onClick={handlePrevious}
-          disabled={stepIndex === 0 || updateProfile.isPending}
+          disabled={stepIndex === 0 || isProfileUpdating}
         >
           <ArrowLeft className="size-5" /> Prev
         </Button>
@@ -380,10 +382,10 @@ export function ProfileSetupClient() {
           type="button"
           className="h-12 flex-1 rounded-xl text-base font-semibold"
           onClick={isLastStep ? handleFinish : handleNext}
-          disabled={!canGoNext || updateProfile.isPending}
+          disabled={!canGoNext || isProfileUpdating}
         >
           {isLastStep
-            ? updateProfile.isPending
+            ? isProfileUpdating
               ? "Saving..."
               : isEditMode
                 ? "Save"

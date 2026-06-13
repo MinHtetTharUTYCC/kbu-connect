@@ -5,8 +5,8 @@
  * Exclusive dating platform for KBU students
  * OpenAPI spec version: 1.0
  */
-import type { NotificationItemDtoData } from './notificationItemDtoData';
-import type { NotificationItemDtoType } from './notificationItemDtoType';
+import type { NotificationItemDtoData } from "./notificationItemDtoData";
+import type { NotificationItemDtoType } from "./notificationItemDtoType";
 
 export interface NotificationItemDto {
   /** Unique identifier of the notification */
@@ -22,9 +22,9 @@ export interface NotificationItemDto {
   /** Body content of the notification */
   body: string;
   /**
-     * Additional metadata associated with the notification
-     * @nullable
-     */
+   * Additional metadata associated with the notification
+   * @nullable
+   */
   data: NotificationItemDtoData;
   /** Whether the notification has been read */
   isRead: boolean;

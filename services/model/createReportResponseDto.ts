@@ -6,8 +6,8 @@
  * OpenAPI spec version: 1.0
  */
 
-/**
- * Cursor for pagination (null if no more messages)
- * @nullable
- */
-export type MessagesListResponseDtoNextCursor = { [key: string]: unknown } | null;
+export interface CreateReportResponseDto {
+  message: string;
+  /** Created report ID */
+  reportId: string;
+}

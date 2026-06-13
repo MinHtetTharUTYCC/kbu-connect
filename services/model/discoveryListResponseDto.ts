@@ -5,15 +5,14 @@
  * Exclusive dating platform for KBU students
  * OpenAPI spec version: 1.0
  */
-import type { DiscoveryListResponseDtoNextCursor } from './discoveryListResponseDtoNextCursor';
-import type { DiscoveryUserItemDto } from './discoveryUserItemDto';
+import type { DiscoveryUserItemDto } from "./discoveryUserItemDto";
 
 export interface DiscoveryListResponseDto {
   /** List of discovered users */
   users: DiscoveryUserItemDto[];
   /**
-     * Cursor for pagination (null if no more users)
-     * @nullable
-     */
-  nextCursor: DiscoveryListResponseDtoNextCursor;
+   * Cursor for pagination (null if no more users)
+   * @nullable
+   */
+  nextCursor: string | null;
 }

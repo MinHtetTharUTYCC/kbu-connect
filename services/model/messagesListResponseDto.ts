@@ -5,15 +5,14 @@
  * Exclusive dating platform for KBU students
  * OpenAPI spec version: 1.0
  */
-import type { MessageItemDto } from './messageItemDto';
-import type { MessagesListResponseDtoNextCursor } from './messagesListResponseDtoNextCursor';
+import type { MessageItemDto } from "./messageItemDto";
 
 export interface MessagesListResponseDto {
   /** List of messages in the conversation */
   messages: MessageItemDto[];
   /**
-     * Cursor for pagination (null if no more messages)
-     * @nullable
-     */
-  nextCursor: MessagesListResponseDtoNextCursor;
+   * Cursor for pagination (null if no more messages)
+   * @nullable
+   */
+  nextCursor: string | null;
 }

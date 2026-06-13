@@ -1,27 +1,27 @@
-import { handleBackendError } from '@/lib/error/error-util';
-import { useAuthControllerVerify } from '../../../services/generated/auth/auth';
-import { useRouter } from 'next/navigation';
-import { useAuthStore } from '@/stores/auth-store';
+import { handleBackendError } from "@/lib/error/error-util";
+import { useAuthControllerVerify } from "../../../services/generated/auth/auth";
+import { useRouter } from "next/navigation";
+import { useAuthStore } from "@/stores/auth-store";
 
 export function useVerify() {
-    const router = useRouter();
+  const router = useRouter();
 
-    const { setToken } = useAuthStore();
+  const { setToken } = useAuthStore();
 
-    return useAuthControllerVerify({
-        mutation: {
-            onSuccess: (data) => {
-                setToken(data.access_token);
+  return useAuthControllerVerify({
+    mutation: {
+      onSuccess: (data) => {
+        setToken(data.access_token);
 
-                if (data.profileCompleted) {
-                    router.replace('/discover');
-                } else {
-                    router.replace('/profile-setup');
-                }
-            },
-            onError: (error) => {
-                handleBackendError(error);
-            },
-        },
-    });
+        if (data.profileCompleted) {
+          router.replace("/discover");
+        } else {
+          router.replace("/profile-setup");
+        }
+      },
+      onError: (error) => {
+        handleBackendError(error);
+      },
+    },
+  });
 }

@@ -7,7 +7,7 @@
  */
 
 /**
- * Cursor for pagination (null if no more conversations)
+ * Additional audit metadata
  * @nullable
  */
-export type ConversationsListResponseDtoNextCursor = { [key: string]: unknown } | null;
+export type AuditLogItemDtoMetadata = { [key: string]: unknown } | null;

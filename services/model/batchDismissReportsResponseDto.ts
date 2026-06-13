@@ -6,8 +6,9 @@
  * OpenAPI spec version: 1.0
  */
 
-/**
- * Birth year
- * @nullable
- */
-export type PrivateProfileResponseDtoBirthYear = { [key: string]: unknown } | null;
+export interface BatchDismissReportsResponseDto {
+  /** Dismissal result message */
+  message: string;
+  /** Number of dismissed reports */
+  count: number;
+}

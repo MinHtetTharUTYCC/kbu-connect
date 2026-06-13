@@ -5,8 +5,7 @@
  * Exclusive dating platform for KBU students
  * OpenAPI spec version: 1.0
  */
-import type { SwipeMatchDtoConversationId } from './swipeMatchDtoConversationId';
-import type { UserSummaryDto } from './userSummaryDto';
+import type { UserSummaryDto } from "./userSummaryDto";
 
 export interface SwipeMatchDto {
   /** Match ID */
@@ -16,8 +15,8 @@ export interface SwipeMatchDto {
   /** Summary of the matched user */
   matcher: UserSummaryDto;
   /**
-     * Conversation ID (null if not yet created)
-     * @nullable
-     */
-  conversationId: SwipeMatchDtoConversationId;
+   * Conversation ID (null if not yet created)
+   * @nullable
+   */
+  conversationId: string | null;
 }

@@ -5,14 +5,14 @@
  * Exclusive dating platform for KBU students
  * OpenAPI spec version: 1.0
  */
-import type { NewGalleryImageDto } from './newGalleryImageDto';
-import type { UpdateProfileDtoFaculty } from './updateProfileDtoFaculty';
-import type { UpdateProfileDtoGender } from './updateProfileDtoGender';
-import type { UpdateProfileDtoInterestsItem } from './updateProfileDtoInterestsItem';
-import type { UpdateProfileDtoNationality } from './updateProfileDtoNationality';
-import type { UpdateProfileDtoPreferredFacultiesItem } from './updateProfileDtoPreferredFacultiesItem';
-import type { UpdateProfileDtoPreferredGender } from './updateProfileDtoPreferredGender';
-import type { UpdateProfileDtoPreferredNationalitiesItem } from './updateProfileDtoPreferredNationalitiesItem';
+import type { NewGalleryImageDto } from "./newGalleryImageDto";
+import type { UpdateProfileDtoFaculty } from "./updateProfileDtoFaculty";
+import type { UpdateProfileDtoGender } from "./updateProfileDtoGender";
+import type { UpdateProfileDtoInterestsItem } from "./updateProfileDtoInterestsItem";
+import type { UpdateProfileDtoNationality } from "./updateProfileDtoNationality";
+import type { UpdateProfileDtoPreferredFacultiesItem } from "./updateProfileDtoPreferredFacultiesItem";
+import type { UpdateProfileDtoPreferredGender } from "./updateProfileDtoPreferredGender";
+import type { UpdateProfileDtoPreferredNationalitiesItem } from "./updateProfileDtoPreferredNationalitiesItem";
 
 export interface UpdateProfileDto {
   /** User full name */

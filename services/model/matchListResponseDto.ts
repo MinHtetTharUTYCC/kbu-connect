@@ -5,15 +5,14 @@
  * Exclusive dating platform for KBU students
  * OpenAPI spec version: 1.0
  */
-import type { MatchItemDto } from './matchItemDto';
-import type { MatchListResponseDtoNextCursor } from './matchListResponseDtoNextCursor';
+import type { MatchItemDto } from "./matchItemDto";
 
 export interface MatchListResponseDto {
   /** List of matches */
   matches: MatchItemDto[];
   /**
-     * Cursor for pagination (null if no more matches)
-     * @nullable
-     */
-  nextCursor: MatchListResponseDtoNextCursor;
+   * Cursor for pagination (null if no more matches)
+   * @nullable
+   */
+  nextCursor: string | null;
 }

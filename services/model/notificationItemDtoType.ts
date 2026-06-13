@@ -9,13 +9,13 @@
 /**
  * Type of the notification
  */
-export type NotificationItemDtoType = typeof NotificationItemDtoType[keyof typeof NotificationItemDtoType];
-
+export type NotificationItemDtoType =
+  (typeof NotificationItemDtoType)[keyof typeof NotificationItemDtoType];
 
 export const NotificationItemDtoType = {
-  NEW_MATCH: 'NEW_MATCH',
-  NEW_MESSAGE: 'NEW_MESSAGE',
-  SHOUTOUT_RECEIVED: 'SHOUTOUT_RECEIVED',
-  SHOUTOUT_REPLIED: 'SHOUTOUT_REPLIED',
-  SYSTEM: 'SYSTEM',
+  NEW_MATCH: "NEW_MATCH",
+  NEW_MESSAGE: "NEW_MESSAGE",
+  SHOUTOUT_RECEIVED: "SHOUTOUT_RECEIVED",
+  SHOUTOUT_REPLIED: "SHOUTOUT_REPLIED",
+  SYSTEM: "SYSTEM",
 } as const;
