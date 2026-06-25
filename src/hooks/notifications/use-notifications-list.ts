@@ -1,29 +1,28 @@
-"use client";
+'use client';
 
-import type { InfiniteData } from "@tanstack/react-query";
-import { useNotificationsControllerGetNotificationsInfinite } from "../../../services/generated/notifications/notifications";
-import type { NotificationsListResponseDto } from "../../../services/model";
+import type { InfiniteData } from '@tanstack/react-query';
+import { useNotificationsControllerGetNotificationsInfinite } from '../../../services/generated/notifications/notifications';
+import type {
+    NotificationsControllerGetNotificationsParams,
+    NotificationsListResponseDto,
+} from '../../../services/model';
 
-export function useNotificationsList(limit = 30) {
-  const query = useNotificationsControllerGetNotificationsInfinite<
-    InfiniteData<NotificationsListResponseDto>
-  >(
-    { limit },
-    {
-      query: {
-        initialPageParam: undefined,
-        getNextPageParam: (lastPage) => getNextCursor(lastPage.nextCursor),
-      },
-    },
-  );
-  const notifications =
-    query.data?.pages.flatMap((page) => page.notifications) ?? [];
+export function useNotificationsList(
+    params: NotificationsControllerGetNotificationsParams = { limit: 20 },
+) {
+    const query = useNotificationsControllerGetNotificationsInfinite<
+        InfiniteData<NotificationsListResponseDto>
+    >(
+        { cursor: params.cursor, limit: params.limit },
+        {
+            query: {
+                initialPageParam: undefined,
+                getNextPageParam: (lastPage) => lastPage.nextCursor,
+            },
+        },
+    );
 
-  return { ...query, notifications };
-}
+    const notifications = query.data?.pages.flatMap((page) => page.notifications) ?? [];
 
-function getNextCursor(nextCursor: unknown) {
-  return typeof nextCursor === "string" && nextCursor.length > 0
-    ? nextCursor
-    : undefined;
+    return { ...query, notifications };
 }

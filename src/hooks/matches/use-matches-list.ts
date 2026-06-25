@@ -1,10 +1,23 @@
-"use client";
+'use client';
 
-import { useMatchesControllerGetMatches } from "../../../services/generated/matches/matches";
+import { InfiniteData } from '@tanstack/react-query';
+import { useMatchesControllerGetMatchesInfinite } from '../../../services/generated/matches/matches';
+import { MatchesControllerGetMatchesParams, MatchListResponseDto } from '../../../services/model';
 
-export function useMatchesList(limit = 20) {
-  const query = useMatchesControllerGetMatches({ limit });
-  const matches = query.data?.matches ?? [];
+export function useMatchesList(params: MatchesControllerGetMatchesParams = { limit: 20 }) {
+    const query = useMatchesControllerGetMatchesInfinite<
+        InfiniteData<MatchListResponseDto, string | undefined>
+    >(
+        { cursor: params.cursor, limit: params.limit },
+        {
+            query: {
+                initialPageParam: undefined,
+                getNextPageParam: (lastPage) => lastPage.nextCursor,
+            },
+        },
+    );
 
-  return { ...query, matches };
+    const matches = query.data?.pages.flatMap((page) => page.matches) ?? [];
+
+    return { ...query, matches };
 }

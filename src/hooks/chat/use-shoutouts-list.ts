@@ -1,35 +1,31 @@
-"use client";
+'use client';
 
-import type { InfiniteData } from "@tanstack/react-query";
-import { useChatControllerGetShoutoutsInfinite } from "../../../services/generated/chat/chat";
+import type { InfiniteData } from '@tanstack/react-query';
+import { useChatControllerGetShoutoutsInfinite } from '../../../services/generated/chat/chat';
 import type {
-  ChatControllerGetShoutoutsType,
-  ShoutoutItemDto,
-  ShoutoutsListResponseDto,
-} from "../../../services/model";
+    ChatControllerGetShoutoutsParams,
+    ChatControllerGetShoutoutsType,
+    ShoutoutItemDto,
+    ShoutoutsListResponseDto,
+} from '../../../services/model';
 
 export type ShoutoutType = ChatControllerGetShoutoutsType;
 export type ShoutoutItem = ShoutoutItemDto;
 
-export function useShoutoutsList(type: ShoutoutType = "received", limit = 20) {
-  const query = useChatControllerGetShoutoutsInfinite<
-    InfiniteData<ShoutoutsListResponseDto, string | undefined>
-  >(
-    { type, limit },
-    {
-      query: {
-        initialPageParam: undefined,
-        getNextPageParam: (lastPage) => getNextCursor(lastPage.nextCursor),
-      },
-    },
-  );
-  const shoutouts = query.data?.pages.flatMap((page) => page.shoutouts) ?? [];
+export function useShoutoutsList(params: ChatControllerGetShoutoutsParams = { limit: 20 }) {
+    const query = useChatControllerGetShoutoutsInfinite<
+        InfiniteData<ShoutoutsListResponseDto, string | undefined>
+    >(
+        { type: params.type, cursor: params.cursor, limit: params.limit },
+        {
+            query: {
+                initialPageParam: undefined,
+                getNextPageParam: (lastPage) => lastPage.nextCursor,
+            },
+        },
+    );
 
-  return { ...query, shoutouts };
-}
+    const shoutouts = query.data?.pages.flatMap((page) => page.shoutouts) ?? [];
 
-function getNextCursor(nextCursor: unknown) {
-  return typeof nextCursor === "string" && nextCursor.length > 0
-    ? nextCursor
-    : undefined;
+    return { ...query, shoutouts };
 }
