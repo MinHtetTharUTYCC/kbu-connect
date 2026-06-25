@@ -6,94 +6,94 @@ import { toast } from "sonner";
  */
 
 type BackendErrorLike = {
-  code?: unknown;
-  message?: unknown;
-  response?: {
-    status?: unknown;
-    data?: {
-      message?: unknown;
+    code?: unknown;
+    message?: unknown;
+    response?: {
+        status?: unknown;
+        data?: {
+            message?: unknown;
+        };
     };
-  };
 };
 
 export const getBackendErrorMessage = (
-  err: unknown,
-  fallback = "An unexpected error occurred",
+    err: unknown,
+    fallback = "An unexpected error occurred",
 ): string => {
-  const error =
-    typeof err === "object" && err !== null
-      ? (err as BackendErrorLike)
-      : undefined;
+    const error =
+        typeof err === "object" && err !== null
+            ? (err as BackendErrorLike)
+            : undefined;
 
-  if (!error) {
-    return fallback;
-  }
+    if (!error) {
+        return fallback;
+    }
 
-  const code = typeof error.code === "string" ? error.code : undefined;
-  const status =
-    typeof error.response?.status === "number"
-      ? error.response.status
-      : undefined;
-  const rawErrorMessage =
-    typeof error.message === "string" ? error.message.toLowerCase() : "";
+    const code = typeof error.code === "string" ? error.code : undefined;
+    const status =
+        typeof error.response?.status === "number"
+            ? error.response.status
+            : undefined;
+    const rawErrorMessage =
+        typeof error.message === "string" ? error.message.toLowerCase() : "";
 
-  if (
-    code === "ECONNREFUSED" ||
-    code === "ECONNRESET" ||
-    code === "ETIMEDOUT" ||
-    code === "ENOTFOUND" ||
-    code === "EAI_AGAIN" ||
-    rawErrorMessage.includes("econnrefused") ||
-    rawErrorMessage.includes("network error") ||
-    rawErrorMessage.includes("fetch failed")
-  ) {
-    return "Server is temporarily unavailable.";
-  }
-
-  if (status && status >= 500) {
-    return "Server is having trouble right now.";
-  }
-
-  // Client: interceptor already unwrapped to backend object { statusCode, message }
-  // Server: raw AxiosError, need to dig into err.response.data
-  const rawMessage = error.response?.data?.message ?? error.message;
-
-  // Validation errors array
-  if (Array.isArray(rawMessage)) {
-    const firstError = rawMessage[0];
-
-    // class-validator format
     if (
-      firstError &&
-      typeof firstError === "object" &&
-      firstError.constraints
+        code === "ECONNREFUSED" ||
+        code === "ECONNRESET" ||
+        code === "ETIMEDOUT" ||
+        code === "ENOTFOUND" ||
+        code === "EAI_AGAIN" ||
+        rawErrorMessage.includes("econnrefused") ||
+        rawErrorMessage.includes("network error") ||
+        rawErrorMessage.includes("fetch failed")
     ) {
-      const firstConstraint = Object.values(firstError.constraints)[0];
-
-      if (typeof firstConstraint === "string") {
-        return firstConstraint;
-      }
+        return "Server is temporarily unavailable.";
     }
 
-    // array of strings
-    if (typeof firstError === "string") {
-      return firstError;
+    if (status && status >= 500) {
+        return "Server is having trouble right now.";
     }
-  }
 
-  // normal string message
-  if (typeof rawMessage === "string") {
-    return rawMessage;
-  }
+    // Client: interceptor already unwrapped to backend object { statusCode, message }
+    // Server: raw AxiosError, need to dig into err.response.data
+    const rawMessage = error.response?.data?.message ?? error.message;
 
-  return fallback;
+    // Validation errors array
+    if (Array.isArray(rawMessage)) {
+        const firstError = rawMessage[0];
+
+        // class-validator format
+        if (
+            firstError &&
+            typeof firstError === "object" &&
+            firstError.constraints
+        ) {
+            const firstConstraint = Object.values(firstError.constraints)[0];
+
+            if (typeof firstConstraint === "string") {
+                return firstConstraint;
+            }
+        }
+
+        // array of strings
+        if (typeof firstError === "string") {
+            return firstError;
+        }
+    }
+
+    // normal string message
+    if (typeof rawMessage === "string") {
+        return rawMessage;
+    }
+
+    return fallback;
 };
 
 export const handleBackendError = (
-  err: unknown,
-  fallback = "An unexpected error occurred",
+    err: unknown,
+    fallback = "An unexpected error occurred",
 ) => {
-  const displayMessage = getBackendErrorMessage(err, fallback);
+    const displayMessage = getBackendErrorMessage(err, fallback);
 
-  toast.error(displayMessage);
+    toast.error(displayMessage);
 };
