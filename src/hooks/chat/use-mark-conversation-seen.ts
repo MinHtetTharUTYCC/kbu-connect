@@ -1,12 +1,12 @@
-"use client";
+'use client';
 
 import {
     getChatControllerGetConversationsInfiniteQueryKey,
     useChatControllerMarkNewestConversationMessageAsSeen,
-} from "@services/generated/chat/chat";
-import type { ConversationsListResponseDto } from "@services/model";
-import type { InfiniteData } from "@tanstack/react-query";
-import { useQueryClient } from "@tanstack/react-query";
+} from '@services/generated/chat/chat';
+import type { ConversationsListResponseDto } from '@services/model';
+import type { InfiniteData } from '@tanstack/react-query';
+import { useQueryClient } from '@tanstack/react-query';
 
 export function useMarkConversationSeen() {
     const queryClient = useQueryClient();
@@ -14,7 +14,7 @@ export function useMarkConversationSeen() {
     return useChatControllerMarkNewestConversationMessageAsSeen({
         mutation: {
             onError: (error) => {
-                console.error("Error marking conversation as seen:", error);
+                console.error('Error marking conversation as seen:', error);
             },
             onSuccess: (_data, variables) => {
                 queryClient.setQueriesData<

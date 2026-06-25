@@ -1,11 +1,11 @@
-"use client";
+'use client';
 
-import { useMatchesControllerGetMatchesInfinite } from "@services/generated/matches/matches";
+import { useMatchesControllerGetMatchesInfinite } from '@services/generated/matches/matches';
 import type {
     MatchesControllerGetMatchesParams,
     MatchListResponseDto,
-} from "@services/model";
-import type { InfiniteData } from "@tanstack/react-query";
+} from '@services/model';
+import type { InfiniteData } from '@tanstack/react-query';
 
 export function useMatchesList(
     params: MatchesControllerGetMatchesParams = { limit: 20 },

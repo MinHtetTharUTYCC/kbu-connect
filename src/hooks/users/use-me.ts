@@ -1,4 +1,4 @@
-import { useUsersControllerGetMyProfile } from "@services/generated/users/users";
+import { useUsersControllerGetMyProfile } from '@services/generated/users/users';
 
 export function useMe(skip = false) {
     return useUsersControllerGetMyProfile({

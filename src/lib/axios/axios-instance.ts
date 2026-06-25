@@ -1,7 +1,7 @@
-import axios, { type AxiosError, type AxiosRequestConfig } from "axios";
-import { useAuthStore } from "@/stores/auth-store";
+import axios, { type AxiosError, type AxiosRequestConfig } from 'axios';
+import { useAuthStore } from '@/stores/auth-store';
 
-const RETRY_SKIP_ROUTES = ["/login"];
+const RETRY_SKIP_ROUTES = ['/login'];
 
 let isRefreshing = false;
 let refreshSubscribers: (() => void)[] = [];
@@ -19,7 +19,7 @@ const axiosInstance = axios.create({
     baseURL: process.env.NEXT_PUBLIC_API_URL!,
     withCredentials: true, // handles auth via httpOnly cookie automatically
     headers: {
-        "Content-Type": "application/json",
+        'Content-Type': 'application/json',
     },
 });
 
@@ -28,14 +28,14 @@ axiosInstance.interceptors.request.use(
     (config) => {
         // For FormData, remove Content-Type to let axios auto-set multipart/form-data with boundary
         if (config.data instanceof FormData) {
-            delete config.headers["Content-Type"];
+            delete config.headers['Content-Type'];
         }
 
         // Pull the token directly from your Zustand store state
         const accessToken = useAuthStore.getState().accessToken;
 
         if (accessToken) {
-            config.headers["Authorization"] = `Bearer ${accessToken}`;
+            config.headers['Authorization'] = `Bearer ${accessToken}`;
         }
 
         return config;
@@ -67,7 +67,7 @@ axiosInstance.interceptors.response.use(
             return Promise.reject(err ?? error);
         } else if (error.response) {
             // Only log actual API errors, not network errors
-            console.error("API error:", {
+            console.error('API error:', {
                 url: originalRequest.url,
                 method: originalRequest.method,
                 status: error.response?.status,
@@ -95,9 +95,9 @@ axiosInstance.interceptors.response.use(
                     const data = await axiosInstance.post<
                         any,
                         { access_token: string }
-                    >("/auth/refresh");
+                    >('/auth/refresh');
 
-                    console.log("Token refreshed successfully", data);
+                    console.log('Token refreshed successfully', data);
 
                     onRefreshed();
 
@@ -109,8 +109,8 @@ axiosInstance.interceptors.response.use(
                     return axiosInstance(originalRequest);
                 } catch {
                     // refresh failed — session truly expired
-                    if (typeof window !== "undefined") {
-                        window.location.href = "/login";
+                    if (typeof window !== 'undefined') {
+                        window.location.href = '/login';
                     }
                 } finally {
                     isRefreshing = false;

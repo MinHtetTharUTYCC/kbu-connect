@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import {
     type NewGalleryImageDto,
@@ -7,50 +7,50 @@ import {
     UpdateProfileDtoInterestsItem,
     UpdateProfileDtoNationality,
     UpdateProfileDtoPreferredGender,
-} from "@services/model";
-import { ArrowLeft, ArrowRight, Check } from "lucide-react";
-import { useMemo, useState } from "react";
-import { useAuthContext } from "@/components/auth-provider";
-import { Chip, EmptyState } from "@/components/mobile/app-chrome";
-import { FullScreenImageViewer } from "@/components/mobile/full-screen-image-viewer";
+} from '@services/model';
+import { ArrowLeft, ArrowRight, Check } from 'lucide-react';
+import { useMemo, useState } from 'react';
+import { useAuthContext } from '@/components/auth-provider';
+import { Chip, EmptyState } from '@/components/mobile/app-chrome';
+import { FullScreenImageViewer } from '@/components/mobile/full-screen-image-viewer';
 import {
     AvatarUploadStep,
     GalleryUploadStep,
-} from "@/components/mobile/profile-media-upload";
-import { useTopBar } from "@/components/mobile/top-bar-provider";
-import { Button } from "@/components/ui/button";
-import { useUpdateMyProfile } from "@/hooks/profile/use-update-my-profile";
+} from '@/components/mobile/profile-media-upload';
+import { useTopBar } from '@/components/mobile/top-bar-provider';
+import { Button } from '@/components/ui/button';
+import { useUpdateMyProfile } from '@/hooks/profile/use-update-my-profile';
 
 const faculties = Object.values(UpdateProfileDtoFaculty);
 const interests = Object.values(UpdateProfileDtoInterestsItem);
 const nationalities = Object.values(UpdateProfileDtoNationality);
 
 type SetupStep =
-    | "basic"
-    | "academic"
-    | "preferences"
-    | "avatar"
-    | "gallery"
-    | "review";
+    | 'basic'
+    | 'academic'
+    | 'preferences'
+    | 'avatar'
+    | 'gallery'
+    | 'review';
 
 const steps: Array<{ id: SetupStep; eyebrow: string; title: string }> = [
-    { id: "basic", eyebrow: "STEP 1 OF 6", title: "Start with the essentials" },
+    { id: 'basic', eyebrow: 'STEP 1 OF 6', title: 'Start with the essentials' },
     {
-        id: "academic",
-        eyebrow: "STEP 2 OF 6",
-        title: "Tell us about your campus life",
+        id: 'academic',
+        eyebrow: 'STEP 2 OF 6',
+        title: 'Tell us about your campus life',
     },
     {
-        id: "preferences",
-        eyebrow: "STEP 3 OF 6",
-        title: "Set your matching preferences",
+        id: 'preferences',
+        eyebrow: 'STEP 3 OF 6',
+        title: 'Set your matching preferences',
     },
-    { id: "avatar", eyebrow: "STEP 4 OF 6", title: "Add your avatar" },
-    { id: "gallery", eyebrow: "STEP 5 OF 6", title: "Add your gallery" },
+    { id: 'avatar', eyebrow: 'STEP 4 OF 6', title: 'Add your avatar' },
+    { id: 'gallery', eyebrow: 'STEP 5 OF 6', title: 'Add your gallery' },
     {
-        id: "review",
-        eyebrow: "STEP 6 OF 6",
-        title: "Review your profile setup",
+        id: 'review',
+        eyebrow: 'STEP 6 OF 6',
+        title: 'Review your profile setup',
     },
 ];
 
@@ -61,15 +61,15 @@ export function ProfileSetupClient() {
     const isEditMode = Boolean(user?.isComplete);
 
     const { mutate: updateProfile, isPending: isProfileUpdating } =
-        useUpdateMyProfile(isEditMode ? "/profile/me" : "/discover");
+        useUpdateMyProfile(isEditMode ? '/profile/me' : '/discover');
 
     const [stepIndex, setStepIndex] = useState(0);
-    const [name, setName] = useState(current?.name ?? "");
-    const [bio, setBio] = useState(current?.bio ?? "");
+    const [name, setName] = useState(current?.name ?? '');
+    const [bio, setBio] = useState(current?.bio ?? '');
     const [birthYear, setBirthYear] = useState(
         current?.birthYear ? Number(current.birthYear) : 2003,
     );
-    const [avatarUrl, setAvatarUrl] = useState(current?.avatarUrl ?? "");
+    const [avatarUrl, setAvatarUrl] = useState(current?.avatarUrl ?? '');
     const [gallery, setGallery] = useState<NewGalleryImageDto[]>(() =>
         (current?.gallery ?? []).map((item, index) => ({
             key: item.id,
@@ -120,13 +120,13 @@ export function ProfileSetupClient() {
     const activeStep = steps[stepIndex];
     const isLastStep = stepIndex === steps.length - 1;
     const canGoNext = useMemo(() => {
-        if (activeStep.id === "basic")
+        if (activeStep.id === 'basic')
             return Boolean(name.trim()) && birthYear >= 1900;
-        if (activeStep.id === "academic") return selectedInterests.length > 0;
-        if (activeStep.id === "preferences")
+        if (activeStep.id === 'academic') return selectedInterests.length > 0;
+        if (activeStep.id === 'preferences')
             return minPreferredAge <= maxPreferredAge;
-        if (activeStep.id === "avatar") return Boolean(avatarUrl);
-        if (activeStep.id === "gallery") return gallery.length > 0;
+        if (activeStep.id === 'avatar') return Boolean(avatarUrl);
+        if (activeStep.id === 'gallery') return gallery.length > 0;
         return true;
     }, [
         activeStep.id,
@@ -140,8 +140,8 @@ export function ProfileSetupClient() {
     ]);
 
     useTopBar({
-        title: isEditMode ? "Edit Profile" : "UniMatch",
-        backHref: isEditMode ? "/profile/me" : "/login",
+        title: isEditMode ? 'Edit Profile' : 'UniMatch',
+        backHref: isEditMode ? '/profile/me' : '/login',
         action: <div className="w-10" />,
     });
 
@@ -166,11 +166,11 @@ export function ProfileSetupClient() {
         if (!canGoNext) return;
         updateProfile({
             data: {
-                name: name.trim() || current!.name || "KBU Student",
+                name: name.trim() || current!.name || 'KBU Student',
                 avatarUrl,
                 bio:
                     bio.trim() ||
-                    "KBU student looking to meet people on campus.",
+                    'KBU student looking to meet people on campus.',
                 faculty,
                 interests: selectedInterests,
                 gender,
@@ -200,7 +200,7 @@ export function ProfileSetupClient() {
                 <section className="mb-8">
                     <p className="mb-1 text-xs font-semibold text-primary">
                         {isEditMode
-                            ? activeStep.eyebrow.replace("STEP", "EDIT")
+                            ? activeStep.eyebrow.replace('STEP', 'EDIT')
                             : activeStep.eyebrow}
                     </p>
                     <h1 className="text-xl font-medium leading-7">
@@ -208,7 +208,7 @@ export function ProfileSetupClient() {
                     </h1>
                 </section>
 
-                {activeStep.id === "basic" && (
+                {activeStep.id === 'basic' && (
                     <section className="grid gap-5">
                         <Field label="Display name">
                             <input
@@ -243,7 +243,7 @@ export function ProfileSetupClient() {
                     </section>
                 )}
 
-                {activeStep.id === "academic" && (
+                {activeStep.id === 'academic' && (
                     <section className="grid gap-8">
                         <div>
                             <div className="mb-4 text-xs font-semibold uppercase tracking-wide text-[#6b6b6b]">
@@ -257,8 +257,8 @@ export function ProfileSetupClient() {
                                         onClick={() => setFaculty(item)}
                                         className={
                                             faculty === item
-                                                ? "h-8 rounded-full border border-primary bg-primary px-2 text-[10px] font-semibold text-white"
-                                                : "h-8 rounded-full border border-black/10 bg-white px-2 text-[10px] font-semibold text-[#6b6b6b]"
+                                                ? 'h-8 rounded-full border border-primary bg-primary px-2 text-[10px] font-semibold text-white'
+                                                : 'h-8 rounded-full border border-black/10 bg-white px-2 text-[10px] font-semibold text-[#6b6b6b]'
                                         }
                                     >
                                         {item}
@@ -291,7 +291,7 @@ export function ProfileSetupClient() {
                     </section>
                 )}
 
-                {activeStep.id === "preferences" && (
+                {activeStep.id === 'preferences' && (
                     <section className="grid gap-5">
                         <Select
                             label="Your identity"
@@ -354,15 +354,15 @@ export function ProfileSetupClient() {
                     </section>
                 )}
 
-                {activeStep.id === "avatar" && (
+                {activeStep.id === 'avatar' && (
                     <AvatarUploadStep
-                        name={name || "KBU Student"}
+                        name={name || 'KBU Student'}
                         avatarUrl={avatarUrl}
                         onAvatarChange={setAvatarUrl}
                     />
                 )}
 
-                {activeStep.id === "gallery" && (
+                {activeStep.id === 'gallery' && (
                     <GalleryUploadStep
                         gallery={gallery}
                         onGalleryChange={setGallery}
@@ -370,9 +370,9 @@ export function ProfileSetupClient() {
                     />
                 )}
 
-                {activeStep.id === "review" && (
+                {activeStep.id === 'review' && (
                     <section className="space-y-4">
-                        <ReviewRow label="Name" value={name || "KBU Student"} />
+                        <ReviewRow label="Name" value={name || 'KBU Student'} />
                         <ReviewRow label="Faculty" value={faculty} />
                         <ReviewRow label="Identity" value={gender} />
                         <ReviewRow
@@ -385,11 +385,11 @@ export function ProfileSetupClient() {
                         />
                         <ReviewRow
                             label="Avatar"
-                            value={avatarUrl ? "Uploaded" : "Missing"}
+                            value={avatarUrl ? 'Uploaded' : 'Missing'}
                         />
                         <ReviewRow
                             label="Gallery"
-                            value={`${gallery.length} photo${gallery.length === 1 ? "" : "s"}`}
+                            value={`${gallery.length} photo${gallery.length === 1 ? '' : 's'}`}
                         />
                         <div className="rounded-xl border border-black/10 bg-[#f9f9f8] p-4">
                             <div className="mb-3 text-xs font-semibold uppercase tracking-wide text-[#6b6b6b]">
@@ -425,11 +425,11 @@ export function ProfileSetupClient() {
                 >
                     {isLastStep
                         ? isProfileUpdating
-                            ? "Saving..."
+                            ? 'Saving...'
                             : isEditMode
-                              ? "Save"
-                              : "Finish"
-                        : "Next"}
+                              ? 'Save'
+                              : 'Finish'
+                        : 'Next'}
                     {isLastStep ? (
                         <Check className="size-5" />
                     ) : (

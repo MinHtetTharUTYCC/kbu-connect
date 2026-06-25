@@ -1,13 +1,13 @@
-"use client";
+'use client';
 
-import { useChatControllerGetShoutoutsInfinite } from "@services/generated/chat/chat";
+import { useChatControllerGetShoutoutsInfinite } from '@services/generated/chat/chat';
 import type {
     ChatControllerGetShoutoutsParams,
     ChatControllerGetShoutoutsType,
     ShoutoutItemDto,
     ShoutoutsListResponseDto,
-} from "@services/model";
-import type { InfiniteData } from "@tanstack/react-query";
+} from '@services/model';
+import type { InfiniteData } from '@tanstack/react-query';
 
 export type ShoutoutType = ChatControllerGetShoutoutsType;
 export type ShoutoutItem = ShoutoutItemDto;

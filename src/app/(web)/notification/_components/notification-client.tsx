@@ -1,16 +1,16 @@
-"use client";
+'use client';
 
 import {
     type NotificationItemDto,
     NotificationItemDtoType,
-} from "@services/model";
-import { Bell, Heart, Megaphone, MessageCircle } from "lucide-react";
-import { useEffect, useRef } from "react";
-import { EmptyState } from "@/components/mobile/app-chrome";
-import { useTopBar } from "@/components/mobile/top-bar-provider";
-import { useMarkAllNotificationsRead } from "@/hooks/notifications/use-mark-all-notifications-read";
-import { useNotificationsList } from "@/hooks/notifications/use-notifications-list";
-import { relativeTime } from "@/lib/profile-utils";
+} from '@services/model';
+import { Bell, Heart, Megaphone, MessageCircle } from 'lucide-react';
+import { useEffect, useRef } from 'react';
+import { EmptyState } from '@/components/mobile/app-chrome';
+import { useTopBar } from '@/components/mobile/top-bar-provider';
+import { useMarkAllNotificationsRead } from '@/hooks/notifications/use-mark-all-notifications-read';
+import { useNotificationsList } from '@/hooks/notifications/use-notifications-list';
+import { relativeTime } from '@/lib/profile-utils';
 
 export function NotificationClient() {
     const {
@@ -33,10 +33,10 @@ export function NotificationClient() {
                 onClick={() => markAllRead.mutate()}
             >
                 {markAllRead.isPending
-                    ? "Marking..."
+                    ? 'Marking...'
                     : hasUnread
-                      ? "Mark all as read"
-                      : "All read"}
+                      ? 'Mark all as read'
+                      : 'All read'}
             </button>
         ),
     });
@@ -51,7 +51,7 @@ export function NotificationClient() {
                     fetchNextPage();
                 }
             },
-            { rootMargin: "160px 0px" },
+            { rootMargin: '160px 0px' },
         );
 
         observer.observe(target);
@@ -75,10 +75,10 @@ export function NotificationClient() {
                         className="px-5 py-4 text-center text-xs text-[#6b6b6b]"
                     >
                         {isFetchingNextPage
-                            ? "Loading more..."
+                            ? 'Loading more...'
                             : hasNextPage
-                              ? ""
-                              : "No more notifications"}
+                              ? ''
+                              : 'No more notifications'}
                     </div>
                 </Section>
             ) : (
@@ -119,8 +119,8 @@ function NotificationRow({
         <div
             className={
                 notification.isRead
-                    ? "border-b border-black/10 bg-white"
-                    : "border-b border-black/10 bg-[#fff1ed]"
+                    ? 'border-b border-black/10 bg-white'
+                    : 'border-b border-black/10 bg-[#fff1ed]'
             }
         >
             <div className="flex gap-4 px-5 py-4">
@@ -145,7 +145,7 @@ function NotificationRow({
     );
 }
 
-function getNotificationIcon(type: NotificationItemDto["type"]) {
+function getNotificationIcon(type: NotificationItemDto['type']) {
     if (type === NotificationItemDtoType.NEW_MATCH) return Heart;
     if (type === NotificationItemDtoType.NEW_MESSAGE) return MessageCircle;
     if (

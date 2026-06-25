@@ -1,8 +1,8 @@
-"use client";
+'use client';
 
-import { ChevronLeft, ChevronRight, X } from "lucide-react";
-import Image from "next/image";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { ChevronLeft, ChevronRight, X } from 'lucide-react';
+import Image from 'next/image';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 export function FullScreenImageViewer({
     images,
@@ -35,12 +35,12 @@ export function FullScreenImageViewer({
 
     useEffect(() => {
         function handleKey(e: KeyboardEvent) {
-            if (e.key === "Escape") onClose();
-            if (e.key === "ArrowLeft") goPrev();
-            if (e.key === "ArrowRight") goNext();
+            if (e.key === 'Escape') onClose();
+            if (e.key === 'ArrowLeft') goPrev();
+            if (e.key === 'ArrowRight') goNext();
         }
-        window.addEventListener("keydown", handleKey);
-        return () => window.removeEventListener("keydown", handleKey);
+        window.addEventListener('keydown', handleKey);
+        return () => window.removeEventListener('keydown', handleKey);
     }, [onClose, goPrev, goNext]);
 
     function handleTouchStart(e: React.TouchEvent) {
@@ -122,8 +122,8 @@ export function FullScreenImageViewer({
                             onClick={() => goTo(index)}
                             className={`size-2 rounded-full transition-colors ${
                                 index === currentIndex
-                                    ? "bg-white"
-                                    : "bg-white/40"
+                                    ? 'bg-white'
+                                    : 'bg-white/40'
                             }`}
                             aria-label={`Go to image ${index + 1}`}
                         />

@@ -1,22 +1,22 @@
-"use client";
+'use client';
 
-import { Heart, MessageCircle, X } from "lucide-react";
-import Image from "next/image";
-import { useCallback, useEffect, useRef, useState } from "react";
-import { Chip, EmptyState } from "@/components/mobile/app-chrome";
-import { useTopBar } from "@/components/mobile/top-bar-provider";
-import { useSendShoutout } from "@/hooks/chat/use-send-shoutout";
-import { useDiscoveryProfiles } from "@/hooks/discovery/use-discovery-profiles";
-import { useSwipeProfile } from "@/hooks/swipes/use-swipe-profile";
-import { cn } from "@/lib/utils";
+import { Heart, MessageCircle, X } from 'lucide-react';
+import Image from 'next/image';
+import { useCallback, useEffect, useRef, useState } from 'react';
+import { Chip, EmptyState } from '@/components/mobile/app-chrome';
+import { useTopBar } from '@/components/mobile/top-bar-provider';
+import { useSendShoutout } from '@/hooks/chat/use-send-shoutout';
+import { useDiscoveryProfiles } from '@/hooks/discovery/use-discovery-profiles';
+import { useSwipeProfile } from '@/hooks/swipes/use-swipe-profile';
+import { cn } from '@/lib/utils';
 
 const SWIPE_THRESHOLD = 80;
 
 export function DiscoverClient() {
     const [index, setIndex] = useState(0);
-    const [direction, setDirection] = useState<"left" | "right" | null>(null);
+    const [direction, setDirection] = useState<'left' | 'right' | null>(null);
     const [isShoutoutOpen, setIsShoutoutOpen] = useState(false);
-    const [shoutoutMessage, setShoutoutMessage] = useState("");
+    const [shoutoutMessage, setShoutoutMessage] = useState('');
     const [dragX, setDragX] = useState(0);
     const touchStartX = useRef(0);
     const touchStartY = useRef(0);
@@ -28,7 +28,7 @@ export function DiscoverClient() {
         fetchNextPage,
         hasNextPage,
         isFetchingNextPage,
-    } = useDiscoveryProfiles({ limit: 10 });
+    } = useDiscoveryProfiles({});
     const { like, dislike, isPending: isSwipePending } = useSwipeProfile();
     const { mutateAsync: sendShoutout, isPending: isSendingShoutout } =
         useSendShoutout();
@@ -44,11 +44,13 @@ export function DiscoverClient() {
     }, [fetchNextPage, hasNextPage, isFetchingNextPage, remainingProfiles]);
 
     const handleSwipe = useCallback(
-        (type: "LIKE" | "DISLIKE") => {
+        (type: 'LIKE' | 'DISLIKE') => {
             if (!profile || direction) return;
-            setDirection(type === "LIKE" ? "right" : "left");
+            setDirection(type === 'LIKE' ? 'right' : 'left');
             setDragX(0);
-            if (type === "LIKE") {
+            setShoutoutMessage('');
+            setIsShoutoutOpen(false);
+            if (type === 'LIKE') {
                 like(profile.id);
             } else {
                 dislike(profile.id);
@@ -80,9 +82,9 @@ export function DiscoverClient() {
     function handleTouchEnd() {
         if (isDragging.current) {
             if (dragX > SWIPE_THRESHOLD) {
-                handleSwipe("LIKE");
+                handleSwipe('LIKE');
             } else if (dragX < -SWIPE_THRESHOLD) {
-                handleSwipe("DISLIKE");
+                handleSwipe('DISLIKE');
             } else {
                 setDragX(0);
             }
@@ -100,7 +102,7 @@ export function DiscoverClient() {
                 message: shoutoutMessage.trim(),
             },
         });
-        setShoutoutMessage("");
+        setShoutoutMessage('');
         setIsShoutoutOpen(false);
     }
 
@@ -134,9 +136,9 @@ export function DiscoverClient() {
     const dragRotation = dragX * 0.06;
     const dragOpacity = Math.max(0, 1 - Math.abs(dragX) / 300);
     const showLikeStamp =
-        direction === "right" || (!direction && dragX > SWIPE_THRESHOLD * 0.5);
+        direction === 'right' || (!direction && dragX > SWIPE_THRESHOLD * 0.5);
     const showPassStamp =
-        direction === "left" || (!direction && dragX < -SWIPE_THRESHOLD * 0.5);
+        direction === 'left' || (!direction && dragX < -SWIPE_THRESHOLD * 0.5);
 
     return (
         <div className="flex flex-1 flex-col overflow-hidden bg-[#fcf8f8]">
@@ -145,12 +147,12 @@ export function DiscoverClient() {
                     <div
                         ref={cardRef}
                         className={cn(
-                            "relative flex h-full min-h-[400px] w-full max-w-full flex-col overflow-hidden rounded-xl border border-black/10 bg-white shadow-sm",
-                            !dragX && "transition duration-300",
-                            direction === "left" &&
-                                "-translate-x-24 -rotate-6 opacity-0",
-                            direction === "right" &&
-                                "translate-x-24 rotate-6 opacity-0",
+                            'relative flex h-full min-h-[400px] w-full max-w-full flex-col overflow-hidden rounded-xl border border-black/10 bg-white shadow-sm',
+                            !dragX && 'transition duration-300',
+                            direction === 'left' &&
+                                '-translate-x-24 -rotate-6 opacity-0',
+                            direction === 'right' &&
+                                'translate-x-24 rotate-6 opacity-0',
                         )}
                         style={{
                             transform: direction
@@ -194,12 +196,12 @@ export function DiscoverClient() {
                             <div className="flex items-end gap-2">
                                 <h1 className="text-xl font-semibold">
                                     {profile?.name}
-                                    {profile?.age ? `, ${profile.age}` : ""}
+                                    {profile?.age ? `, ${profile.age}` : ''}
                                 </h1>
                                 <span className="pb-0.5 text-sm text-[#6b6b6b]">
                                     {profile?.nationality
                                         ? profile.nationality.slice(0, 2)
-                                        : "KBU"}
+                                        : 'KBU'}
                                 </span>
                             </div>
                             {profile?.faculty && <Chip>{profile.faculty}</Chip>}
@@ -219,7 +221,7 @@ export function DiscoverClient() {
                 <section className="mt-4 flex shrink-0 items-center justify-center gap-8 pb-2">
                     <ActionButton
                         label="Pass"
-                        onClick={() => handleSwipe("DISLIKE")}
+                        onClick={() => handleSwipe('DISLIKE')}
                         disabled={isSwipePending}
                     >
                         <X className="size-7" />
@@ -234,7 +236,7 @@ export function DiscoverClient() {
                     </ActionButton>
                     <ActionButton
                         label="Like"
-                        onClick={() => handleSwipe("LIKE")}
+                        onClick={() => handleSwipe('LIKE')}
                         disabled={isSwipePending}
                     >
                         <Heart className="size-7 fill-primary" />
@@ -247,7 +249,10 @@ export function DiscoverClient() {
                     name={profile.name}
                     isSending={isSendingShoutout}
                     onChange={setShoutoutMessage}
-                    onClose={() => setIsShoutoutOpen(false)}
+                    onClose={() => {
+                        setIsShoutoutOpen(false);
+                        setShoutoutMessage('');
+                    }}
                     onSubmit={handleSendShoutout}
                 />
             )}
@@ -278,12 +283,11 @@ function ShoutoutSheet({
             >
                 <div className="mb-4 flex items-start justify-between gap-4">
                     <div>
-                        <h2 className="text-lg font-semibold">Send shoutout</h2>
-                        <p className="mt-1 text-sm text-[#6b6b6b]">
+                        <h2 className="text-lg font-semibold">
+                            Send shoutout (Max 5 per day)
+                        </h2>
+                        <p className="mt-1 text-xs text-muted-foreground">
                             Write to {name}.
-                        </p>
-                        <p className="mt-1 text-xs text-[#a1a1a1]">
-                            You can send 5 shoutouts a day.
                         </p>
                     </div>
                     <button
@@ -307,7 +311,7 @@ function ShoutoutSheet({
                     disabled={!message.trim() || isSending}
                     className="mt-4 h-11 w-full rounded-xl bg-primary text-sm font-semibold text-white transition active:scale-[0.99] disabled:opacity-50"
                 >
-                    {isSending ? "Sending..." : "Send"}
+                    {isSending ? 'Sending...' : 'Send'}
                 </button>
             </form>
         </div>
@@ -324,7 +328,7 @@ function SwipeStamp({
     return (
         <div
             className={cn(
-                "absolute top-8 z-10 rounded-xl border-4 px-4 py-1 text-xl font-bold",
+                'absolute top-8 z-10 rounded-xl border-4 px-4 py-1 text-xl font-bold',
                 className,
             )}
         >
@@ -353,8 +357,8 @@ function ActionButton({
             onClick={onClick}
             disabled={disabled}
             className={cn(
-                "grid place-items-center rounded-full border border-black/10 bg-white text-primary shadow-sm transition active:scale-90 disabled:opacity-50",
-                compact ? "size-12" : "size-14",
+                'grid place-items-center rounded-full border border-black/10 bg-white text-primary shadow-sm transition active:scale-90 disabled:opacity-50',
+                compact ? 'size-12' : 'size-14',
             )}
         >
             {children}

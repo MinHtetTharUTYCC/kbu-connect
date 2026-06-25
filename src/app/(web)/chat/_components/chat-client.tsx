@@ -1,32 +1,32 @@
-"use client";
+'use client';
 
-import type { MessageItemDto } from "@services/model";
-import { Lock, PlusCircle, Send } from "lucide-react";
-import Link from "next/link";
-import { useSearchParams } from "next/navigation";
-import { useEffect, useMemo, useRef, useState } from "react";
-import { useAuthContext } from "@/components/auth-provider";
-import { Avatar, Chip, EmptyState } from "@/components/mobile/app-chrome";
-import { useTopBar } from "@/components/mobile/top-bar-provider";
-import { useConversationMessages } from "@/hooks/chat/use-conversation-messages";
-import { useConversationsList } from "@/hooks/chat/use-conversations-list";
-import { useMarkConversationSeen } from "@/hooks/chat/use-mark-conversation-seen";
+import type { MessageItemDto } from '@services/model';
+import { Lock, PlusCircle, Send } from 'lucide-react';
+import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
+import { useEffect, useMemo, useRef, useState } from 'react';
+import { useAuthContext } from '@/components/auth-provider';
+import { Avatar, Chip, EmptyState } from '@/components/mobile/app-chrome';
+import { useTopBar } from '@/components/mobile/top-bar-provider';
+import { useConversationMessages } from '@/hooks/chat/use-conversation-messages';
+import { useConversationsList } from '@/hooks/chat/use-conversations-list';
+import { useMarkConversationSeen } from '@/hooks/chat/use-mark-conversation-seen';
 import {
     type ShoutoutItem,
     type ShoutoutType,
     useShoutoutsList,
-} from "@/hooks/chat/use-shoutouts-list";
-import { relativeTime } from "@/lib/profile-utils";
-import { cn } from "@/lib/utils";
+} from '@/hooks/chat/use-shoutouts-list';
+import { relativeTime } from '@/lib/profile-utils';
+import { cn } from '@/lib/utils';
 
-type ChatTab = "chats" | "shoutouts";
+type ChatTab = 'chats' | 'shoutouts';
 
 export function ChatHomeClient() {
     const searchParams = useSearchParams();
     const activeTab: ChatTab =
-        searchParams.get("tab") === "shoutouts" ? "shoutouts" : "chats";
+        searchParams.get('tab') === 'shoutouts' ? 'shoutouts' : 'chats';
 
-    useTopBar({ title: "Chats" });
+    useTopBar({ title: 'Chats' });
 
     return (
         <main className="flex-1 overflow-y-auto pb-5">
@@ -35,10 +35,10 @@ export function ChatHomeClient() {
                     <Link
                         href="/chats"
                         className={cn(
-                            "flex-1 rounded-lg py-2 text-center text-xs font-semibold",
-                            activeTab === "chats"
-                                ? "border border-primary bg-white text-primary shadow-sm"
-                                : "text-[#6b6b6b]",
+                            'flex-1 rounded-lg py-2 text-center text-xs font-semibold',
+                            activeTab === 'chats'
+                                ? 'border border-primary bg-white text-primary shadow-sm'
+                                : 'text-[#6b6b6b]',
                         )}
                     >
                         Chats
@@ -46,17 +46,17 @@ export function ChatHomeClient() {
                     <Link
                         href="/chats?tab=shoutouts"
                         className={cn(
-                            "flex-1 rounded-lg py-2 text-center text-xs font-semibold",
-                            activeTab === "shoutouts"
-                                ? "border border-primary bg-white text-primary shadow-sm"
-                                : "text-[#6b6b6b]",
+                            'flex-1 rounded-lg py-2 text-center text-xs font-semibold',
+                            activeTab === 'shoutouts'
+                                ? 'border border-primary bg-white text-primary shadow-sm'
+                                : 'text-[#6b6b6b]',
                         )}
                     >
                         Shoutouts
                     </Link>
                 </div>
             </div>
-            {activeTab === "shoutouts" ? (
+            {activeTab === 'shoutouts' ? (
                 <ShoutoutsPanel />
             ) : (
                 <ChatListClient />
@@ -68,7 +68,7 @@ export function ChatHomeClient() {
 function ShoutoutsPanel() {
     const searchParams = useSearchParams();
     const activeSubTab: ShoutoutType =
-        searchParams.get("shoutouts") === "sent" ? "sent" : "received";
+        searchParams.get('shoutouts') === 'sent' ? 'sent' : 'received';
     const {
         shoutouts,
         isLoading,
@@ -88,7 +88,7 @@ function ShoutoutsPanel() {
                     fetchNextPage();
                 }
             },
-            { rootMargin: "180px 0px" },
+            { rootMargin: '180px 0px' },
         );
 
         observer.observe(target);
@@ -102,10 +102,10 @@ function ShoutoutsPanel() {
                     <Link
                         href="/chats?tab=shoutouts&shoutouts=received"
                         className={cn(
-                            "flex-1 border-b-2 pb-3 text-center text-sm font-medium",
-                            activeSubTab === "received"
-                                ? "border-primary text-primary"
-                                : "border-transparent text-[#6b6b6b]",
+                            'flex-1 border-b-2 pb-3 text-center text-sm font-medium',
+                            activeSubTab === 'received'
+                                ? 'border-primary text-primary'
+                                : 'border-transparent text-[#6b6b6b]',
                         )}
                     >
                         Received
@@ -113,10 +113,10 @@ function ShoutoutsPanel() {
                     <Link
                         href="/chats?tab=shoutouts&shoutouts=sent"
                         className={cn(
-                            "flex-1 border-b-2 pb-3 text-center text-sm font-medium",
-                            activeSubTab === "sent"
-                                ? "border-primary text-primary"
-                                : "border-transparent text-[#6b6b6b]",
+                            'flex-1 border-b-2 pb-3 text-center text-sm font-medium',
+                            activeSubTab === 'sent'
+                                ? 'border-primary text-primary'
+                                : 'border-transparent text-[#6b6b6b]',
                         )}
                     >
                         Sent
@@ -143,14 +143,14 @@ function ShoutoutsPanel() {
                 <div>
                     <EmptyState
                         title={
-                            activeSubTab === "received"
-                                ? "No received shoutouts"
-                                : "No sent shoutouts"
+                            activeSubTab === 'received'
+                                ? 'No received shoutouts'
+                                : 'No sent shoutouts'
                         }
                         body={
-                            activeSubTab === "received"
-                                ? "Shoutouts people send you will show here."
-                                : "Shoutouts you send will show here."
+                            activeSubTab === 'received'
+                                ? 'Shoutouts people send you will show here.'
+                                : 'Shoutouts you send will show here.'
                         }
                     />
                     <LoadMoreRow
@@ -168,7 +168,7 @@ const LoadMoreRow = ({
     ref,
     hasNextPage,
     isFetchingNextPage,
-    endLabel = "No more shoutouts",
+    endLabel = 'No more shoutouts',
 }: {
     ref: React.Ref<HTMLDivElement>;
     hasNextPage: boolean;
@@ -176,7 +176,7 @@ const LoadMoreRow = ({
     endLabel?: string;
 }) => (
     <div ref={ref} className="px-5 py-4 text-center text-xs text-[#6b6b6b]">
-        {isFetchingNextPage ? "Loading more..." : hasNextPage ? "" : endLabel}
+        {isFetchingNextPage ? 'Loading more...' : hasNextPage ? '' : endLabel}
     </div>
 );
 
@@ -190,7 +190,7 @@ function ShoutoutRow({ shoutout }: { shoutout: ShoutoutItem }) {
                         name={shoutout.otherUser.name}
                         className="size-12"
                     />
-                    {shoutout.type === "received" && (
+                    {shoutout.type === 'received' && (
                         <div className="absolute inset-0 grid place-items-center text-white">
                             <Lock className="size-5 fill-black/20 drop-shadow" />
                         </div>
@@ -210,9 +210,9 @@ function ShoutoutRow({ shoutout }: { shoutout: ShoutoutItem }) {
                     </p>
                     <div className="mt-4 flex items-center justify-between gap-3">
                         <Chip>
-                            {shoutout.type === "received" ? "Received" : "Sent"}
+                            {shoutout.type === 'received' ? 'Received' : 'Sent'}
                         </Chip>
-                        {shoutout.type === "received" && (
+                        {shoutout.type === 'received' && (
                             <Link
                                 href={`/profile/${shoutout.otherUser.id}`}
                                 className="rounded-lg bg-primary px-4 py-1.5 text-xs font-semibold text-white active:scale-95"
@@ -247,7 +247,7 @@ export function ChatListClient() {
                     fetchNextPage();
                 }
             },
-            { rootMargin: "180px 0px" },
+            { rootMargin: '180px 0px' },
         );
 
         observer.observe(target);
@@ -296,7 +296,7 @@ export function ChatListClient() {
                         </div>
                         <p className="truncate text-sm text-[#6b6b6b]">
                             {conversation.lastMessage?.content ??
-                                "No messages yet."}
+                                'No messages yet.'}
                         </p>
                     </div>
                 </Link>
@@ -323,7 +323,7 @@ export function ChatClient({ chatId }: { chatId: string }) {
         });
     const { mutate: markSeen } = useMarkConversationSeen();
 
-    const [draft, setDraft] = useState("");
+    const [draft, setDraft] = useState('');
     const [localMessages, setLocalMessages] = useState<MessageItemDto[]>([]);
     const conversation = conversations.find((item) => item.id === chatId);
     const apiMessages = messagesQuery.messages;
@@ -331,11 +331,11 @@ export function ChatClient({ chatId }: { chatId: string }) {
         () => [...apiMessages, ...localMessages],
         [apiMessages, localMessages],
     );
-    const myId = user?.user?.id ?? "me";
+    const myId = user?.user?.id ?? 'me';
 
     useTopBar({
-        title: conversation?.otherUser?.name ?? "Messages",
-        backHref: "/chats",
+        title: conversation?.otherUser?.name ?? 'Messages',
+        backHref: '/chats',
         action: conversation ? (
             <Avatar
                 src={conversation.otherUser.avatarUrl as string | null}
@@ -361,7 +361,7 @@ export function ChatClient({ chatId }: { chatId: string }) {
                     messagesQuery.fetchNextPage();
                 }
             },
-            { rootMargin: "180px 0px" },
+            { rootMargin: '180px 0px' },
         );
 
         observer.observe(target);
@@ -385,7 +385,7 @@ export function ChatClient({ chatId }: { chatId: string }) {
                 timestamp: new Date().toISOString(),
             },
         ]);
-        setDraft("");
+        setDraft('');
     }
 
     if (conversationsLoading) {
@@ -416,21 +416,21 @@ export function ChatClient({ chatId }: { chatId: string }) {
             ) : messages.length ? (
                 messages.map((message) => {
                     const mine =
-                        message.senderId === myId || message.senderId === "me";
+                        message.senderId === myId || message.senderId === 'me';
                     return (
                         <div
                             key={message.id}
                             className={cn(
-                                "flex max-w-[85%] flex-col",
-                                mine ? "self-end items-end" : "items-start",
+                                'flex max-w-[85%] flex-col',
+                                mine ? 'self-end items-end' : 'items-start',
                             )}
                         >
                             <div
                                 className={cn(
-                                    "rounded-xl p-3 text-sm leading-6",
+                                    'rounded-xl p-3 text-sm leading-6',
                                     mine
-                                        ? "rounded-tr-none bg-primary text-white"
-                                        : "rounded-tl-none border border-black/10 bg-[#f9f9f8]",
+                                        ? 'rounded-tr-none bg-primary text-white'
+                                        : 'rounded-tl-none border border-black/10 bg-[#f9f9f8]',
                                 )}
                             >
                                 {message.content}

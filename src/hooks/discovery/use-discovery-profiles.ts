@@ -1,12 +1,12 @@
-"use client";
+'use client';
 
-import { useDiscoveryControllerGetDiscoveryInfinite } from "@services/generated/discovery/discovery";
+import { useDiscoveryControllerGetDiscoveryInfinite } from '@services/generated/discovery/discovery';
 import type {
     DiscoveryControllerGetDiscoveryParams,
     DiscoveryListResponseDto,
-} from "@services/model";
-import type { InfiniteData } from "@tanstack/react-query";
-import { getDiscoveryProfiles } from "@/lib/profile-utils";
+} from '@services/model';
+import type { InfiniteData } from '@tanstack/react-query';
+import { getDiscoveryProfiles } from '@/lib/profile-utils';
 
 export function useDiscoveryProfiles(
     params: DiscoveryControllerGetDiscoveryParams,

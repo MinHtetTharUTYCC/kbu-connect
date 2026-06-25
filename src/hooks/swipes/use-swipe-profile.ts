@@ -1,7 +1,7 @@
-"use client";
+'use client';
 
-import { useSwipesControllerSwipe } from "@services/generated/swipes-matches/swipes-matches";
-import { CreateSwipeDtoType } from "@services/model";
+import { useSwipesControllerSwipe } from '@services/generated/swipes-matches/swipes-matches';
+import { CreateSwipeDtoType } from '@services/model';
 
 export function useSwipeProfile() {
     const swipe = useSwipesControllerSwipe();

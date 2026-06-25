@@ -1,4 +1,4 @@
-import { ChatClient } from "../../chat/_components/chat-client";
+import { ChatClient } from '../../chat/_components/chat-client';
 
 interface ChatPageProps {
     params: Promise<{ chatId: string }>;

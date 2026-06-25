@@ -1,13 +1,13 @@
-"use client";
+'use client';
 
-import type { NewGalleryImageDto } from "@services/model";
-import { Camera, GripVertical, LoaderCircle, Plus, X } from "lucide-react";
-import Image from "next/image";
-import { useMemo, useRef } from "react";
-import { type ItemInterface, ReactSortable } from "react-sortablejs";
-import { Avatar } from "@/components/mobile/app-chrome";
-import { useUploadAvatar } from "@/hooks/profile/use-upload-avatar";
-import { useUploadGalleryImages } from "@/hooks/profile/use-upload-gallery-images";
+import type { NewGalleryImageDto } from '@services/model';
+import { Camera, GripVertical, LoaderCircle, Plus, X } from 'lucide-react';
+import Image from 'next/image';
+import { useMemo, useRef } from 'react';
+import { type ItemInterface, ReactSortable } from 'react-sortablejs';
+import { Avatar } from '@/components/mobile/app-chrome';
+import { useUploadAvatar } from '@/hooks/profile/use-upload-avatar';
+import { useUploadGalleryImages } from '@/hooks/profile/use-upload-gallery-images';
 
 type GalleryItem = NewGalleryImageDto & { id: string };
 
@@ -21,14 +21,16 @@ export function AvatarUploadStep({
     onAvatarChange: (avatarUrl: string) => void;
 }) {
     const avatarInputRef = useRef<HTMLInputElement | null>(null);
-    const uploadAvatar = useUploadAvatar();
+    const { mutateAsync: uploadAvatar, isPending: isUploadingAvatar } =
+        useUploadAvatar();
 
     async function handleAvatarFile(file?: File) {
         if (!file) return;
-        const response = await uploadAvatar.mutateAsync(file);
+
+        const response = await uploadAvatar(file);
         onAvatarChange(response.avatarUrl);
         if (avatarInputRef.current) {
-            avatarInputRef.current.value = "";
+            avatarInputRef.current.value = '';
         }
     }
 
@@ -37,7 +39,7 @@ export function AvatarUploadStep({
             <div className="flex items-center gap-4">
                 <div className="relative">
                     <Avatar src={avatarUrl} name={name} className="size-24" />
-                    {uploadAvatar.isPending && (
+                    {isUploadingAvatar && (
                         <div className="absolute inset-0 grid place-items-center rounded-full bg-black/35 text-white">
                             <LoaderCircle className="size-6 animate-spin" />
                         </div>
@@ -47,7 +49,7 @@ export function AvatarUploadStep({
                     <button
                         type="button"
                         onClick={() => avatarInputRef.current?.click()}
-                        disabled={uploadAvatar.isPending}
+                        disabled={isUploadingAvatar}
                         className="inline-flex h-11 items-center gap-2 rounded-xl bg-primary px-4 text-sm font-semibold text-white disabled:opacity-60"
                     >
                         <Camera className="size-4" /> Upload avatar
@@ -100,7 +102,7 @@ export function GalleryUploadStep({
             })),
         );
         if (galleryInputRef.current) {
-            galleryInputRef.current.value = "";
+            galleryInputRef.current.value = '';
         }
     }
 
@@ -212,8 +214,8 @@ export function GalleryUploadStep({
                     className="grid min-h-36 w-full place-items-center rounded-xl border border-dashed border-black/20 bg-[#f9f9f8] px-6 text-center text-sm text-[#6b6b6b] disabled:opacity-50"
                 >
                     {uploadGallery.isPending
-                        ? "Uploading gallery..."
-                        : "Upload gallery photos"}
+                        ? 'Uploading gallery...'
+                        : 'Upload gallery photos'}
                 </button>
             )}
         </section>

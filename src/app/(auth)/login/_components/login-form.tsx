@@ -1,35 +1,35 @@
-"use client";
+'use client';
 
-import { useForm } from "@tanstack/react-form";
-import { GraduationCap } from "lucide-react";
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
+import { useForm } from '@tanstack/react-form';
+import { GraduationCap } from 'lucide-react';
+import { useState } from 'react';
+import { Button } from '@/components/ui/button';
 import {
     Field,
     FieldDescription,
     FieldError,
     FieldGroup,
     FieldLabel,
-} from "@/components/ui/field";
-import { Input } from "@/components/ui/input";
-import { useLogin } from "@/hooks/auth/use-login";
-import { useVerify } from "@/hooks/auth/use-verify";
-import { LoginSchema } from "@/schema/login.schama";
-import { VerifySchema } from "@/schema/verify.schema";
+} from '@/components/ui/field';
+import { Input } from '@/components/ui/input';
+import { useLogin } from '@/hooks/auth/use-login';
+import { useVerify } from '@/hooks/auth/use-verify';
+import { LoginSchema } from '@/schema/login.schama';
+import { VerifySchema } from '@/schema/verify.schema';
 
 export function LoginForm() {
-    const [emailInAction, setEmailInAction] = useState("");
+    const [emailInAction, setEmailInAction] = useState('');
     const login = useLogin((email) => setEmailInAction(email));
     const verify = useVerify();
 
     const emailForm = useForm({
-        defaultValues: { email: "" },
+        defaultValues: { email: '' },
         validators: { onSubmit: LoginSchema },
         onSubmit: async ({ value }) => login.mutateAsync({ data: value }),
     });
 
     const verifyForm = useForm({
-        defaultValues: { code: "" },
+        defaultValues: { code: '' },
         validators: { onSubmit: VerifySchema },
         onSubmit: async ({ value }) => {
             if (!emailInAction) return;
@@ -112,14 +112,14 @@ export function LoginForm() {
                                 !verifyForm.state.canSubmit || verify.isPending
                             }
                         >
-                            {verify.isPending ? "Verifying..." : "Continue"}
+                            {verify.isPending ? 'Verifying...' : 'Continue'}
                         </Button>
                         <FieldDescription className="text-center">
-                            Wrong email?{" "}
+                            Wrong email?{' '}
                             <button
                                 type="button"
                                 className="font-medium text-primary"
-                                onClick={() => setEmailInAction("")}
+                                onClick={() => setEmailInAction('')}
                             >
                                 Go back
                             </button>
@@ -176,7 +176,7 @@ export function LoginForm() {
                                 !emailForm.state.canSubmit || login.isPending
                             }
                         >
-                            {login.isPending ? "Sending..." : "Continue"}
+                            {login.isPending ? 'Sending...' : 'Continue'}
                         </Button>
                         <p className="text-center text-sm text-[#6b6b6b]">
                             OTP will be sent to your email
@@ -186,11 +186,11 @@ export function LoginForm() {
             )}
 
             <p className="mt-auto px-4 text-center text-xs leading-5 text-[#a1a1a1]">
-                By continuing, you agree to our{" "}
+                By continuing, you agree to our{' '}
                 <span className="font-medium text-primary">
                     Terms of Service
-                </span>{" "}
-                and{" "}
+                </span>{' '}
+                and{' '}
                 <span className="font-medium text-primary">Privacy Policy</span>
                 .
             </p>

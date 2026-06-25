@@ -1,10 +1,10 @@
-"use client";
+'use client';
 
-import Link from "next/link";
-import { Avatar } from "@/components/mobile/app-chrome";
-import { useTopBar } from "@/components/mobile/top-bar-provider";
-import { useMatchesList } from "@/hooks/matches/use-matches-list";
-import { getUserName } from "@/lib/profile-utils";
+import Link from 'next/link';
+import { Avatar } from '@/components/mobile/app-chrome';
+import { useTopBar } from '@/components/mobile/top-bar-provider';
+import { useMatchesList } from '@/hooks/matches/use-matches-list';
+import { getUserName } from '@/lib/profile-utils';
 
 export function MatchesClient() {
     const { matches, isLoading: matchesLoading } = useMatchesList({
@@ -50,7 +50,7 @@ export function MatchesClient() {
                                     )}
                                 </div>
                                 <span className="max-w-16 truncate text-xs font-medium">
-                                    {getUserName(match.matcher).split(" ")[0]}
+                                    {getUserName(match.matcher).split(' ')[0]}
                                 </span>
                             </Link>
                         ))

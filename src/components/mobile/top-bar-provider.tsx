@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import {
     createContext,
@@ -7,8 +7,8 @@ import {
     useLayoutEffect,
     useRef,
     useState,
-} from "react";
-import { TopBar } from "./app-chrome";
+} from 'react';
+import { TopBar } from './app-chrome';
 
 type TopBarConfig = {
     title?: string;
@@ -34,7 +34,7 @@ export function TopBarProvider({ children }: { children: ReactNode }) {
 export function useTopBar(config: TopBarConfig) {
     const setConfig = useContext(TopBarContext);
     if (!setConfig)
-        throw new Error("useTopBar must be used within TopBarProvider");
+        throw new Error('useTopBar must be used within TopBarProvider');
 
     const actionRef = useRef(config.action);
     actionRef.current = config.action;

@@ -2,7 +2,7 @@ import type {
     DiscoveryListResponseDto,
     DiscoveryUserItemDto,
     UserSummaryDto,
-} from "@services/model";
+} from '@services/model';
 
 export type DiscoveryProfile = {
     id: string;
@@ -21,12 +21,12 @@ export function ageFromBirthYear(birthYear?: number | null) {
 }
 
 export function formatEnum(value?: string | null) {
-    if (!value) return "";
+    if (!value) return '';
     return value
         .toLowerCase()
-        .split("_")
+        .split('_')
         .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
-        .join(" ");
+        .join(' ');
 }
 
 export function discoveryUserToProfile(
@@ -56,20 +56,20 @@ export function getDiscoveryProfiles(
 }
 
 export function getUserName(user?: UserSummaryDto | null) {
-    return user?.name || "KBU student";
+    return user?.name || 'KBU student';
 }
 
 export function initials(name?: string | null) {
-    return (name || "KBU")
-        .split(" ")
+    return (name || 'KBU')
+        .split(' ')
         .map((part) => part[0])
-        .join("")
+        .join('')
         .slice(0, 2)
         .toUpperCase();
 }
 
 export function relativeTime(value?: string | null) {
-    if (!value) return "Now";
+    if (!value) return 'Now';
     const diff = Date.now() - new Date(value).getTime();
     const minutes = Math.max(1, Math.round(diff / 60_000));
     if (minutes < 60) return `${minutes}m ago`;

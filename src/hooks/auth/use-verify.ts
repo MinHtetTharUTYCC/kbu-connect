@@ -1,7 +1,7 @@
-import { useAuthControllerVerify } from "@services/generated/auth/auth";
-import { useRouter } from "next/navigation";
-import { handleBackendError } from "@/lib/error/error-util";
-import { useAuthStore } from "@/stores/auth-store";
+import { useAuthControllerVerify } from '@services/generated/auth/auth';
+import { useRouter } from 'next/navigation';
+import { handleBackendError } from '@/lib/error/error-util';
+import { useAuthStore } from '@/stores/auth-store';
 
 export function useVerify() {
     const router = useRouter();
@@ -14,9 +14,9 @@ export function useVerify() {
                 setToken(data.access_token);
 
                 if (data.profileCompleted) {
-                    router.replace("/discover");
+                    router.replace('/discover');
                 } else {
-                    router.replace("/profile-setup");
+                    router.replace('/profile-setup');
                 }
             },
             onError: (error) => {

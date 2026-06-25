@@ -1,11 +1,11 @@
-"use client";
+'use client';
 
-import { useNotificationsControllerGetNotificationsInfinite } from "@services/generated/notifications/notifications";
+import { useNotificationsControllerGetNotificationsInfinite } from '@services/generated/notifications/notifications';
 import type {
     NotificationsControllerGetNotificationsParams,
     NotificationsListResponseDto,
-} from "@services/model";
-import type { InfiniteData } from "@tanstack/react-query";
+} from '@services/model';
+import type { InfiniteData } from '@tanstack/react-query';
 
 export function useNotificationsList(
     params: NotificationsControllerGetNotificationsParams = { limit: 20 },

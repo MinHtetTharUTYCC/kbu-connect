@@ -1,13 +1,13 @@
-"use client";
+'use client';
 
-import { useQuery } from "@tanstack/react-query";
+import { useQuery } from '@tanstack/react-query';
 
 export default function DemoPage() {
     const { data } = useQuery({
-        queryKey: ["demo"],
+        queryKey: ['demo'],
         queryFn: async () => {
             const response = await fetch(
-                "https://jsonplaceholder.typicode.com/posts",
+                'https://jsonplaceholder.typicode.com/posts',
             );
             return response.json();
         },

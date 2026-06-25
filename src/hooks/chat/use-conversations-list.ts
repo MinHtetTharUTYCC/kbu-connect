@@ -1,11 +1,11 @@
-"use client";
+'use client';
 
-import { useChatControllerGetConversationsInfinite } from "@services/generated/chat/chat";
+import { useChatControllerGetConversationsInfinite } from '@services/generated/chat/chat';
 import type {
     ChatControllerGetConversationsParams,
     ConversationsListResponseDto,
-} from "@services/model";
-import type { InfiniteData } from "@tanstack/react-query";
+} from '@services/model';
+import type { InfiniteData } from '@tanstack/react-query';
 
 export function useConversationsList(
     params: ChatControllerGetConversationsParams = {

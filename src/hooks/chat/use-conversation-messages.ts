@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import { useChatControllerGetConversationMessages } from "@services/generated/chat/chat";
+import { useChatControllerGetConversationMessages } from '@services/generated/chat/chat';
 
 // TODO: infinite scroll here, but the API doesn't support pagination yet, so we just return all messages for now(API coming soon)
 

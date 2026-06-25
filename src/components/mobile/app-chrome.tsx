@@ -1,11 +1,11 @@
-"use client";
+'use client';
 
-import { ArrowLeft, GraduationCap, SlidersHorizontal } from "lucide-react";
-import Image from "next/image";
-import Link from "next/link";
-import type { ReactNode } from "react";
-import { initials } from "@/lib/profile-utils";
-import { cn } from "@/lib/utils";
+import { ArrowLeft, GraduationCap, SlidersHorizontal } from 'lucide-react';
+import Image from 'next/image';
+import Link from 'next/link';
+import type { ReactNode } from 'react';
+import { initials } from '@/lib/profile-utils';
+import { cn } from '@/lib/utils';
 
 export function MobileScreen({
     children,
@@ -17,7 +17,7 @@ export function MobileScreen({
     return (
         <div
             className={cn(
-                "mx-auto flex min-h-svh w-full max-w-[430px] flex-col bg-white text-[#1c1b1b]",
+                'mx-auto flex min-h-svh w-full max-w-[430px] flex-col bg-white text-[#1c1b1b]',
                 className,
             )}
         >
@@ -27,7 +27,7 @@ export function MobileScreen({
 }
 
 export function TopBar({
-    title = "UniMatch",
+    title = 'UniMatch',
     action,
     backHref,
 }: {
@@ -78,14 +78,14 @@ export function Avatar({
     return (
         <div
             className={cn(
-                "relative grid shrink-0 place-items-center overflow-hidden rounded-full border border-black/10 bg-[#fff1ed] text-sm font-bold text-primary",
+                'relative grid shrink-0 place-items-center overflow-hidden rounded-full border border-black/10 bg-[#fff1ed] text-sm font-bold text-primary',
                 className,
             )}
         >
             {src ? (
                 <Image
                     src={src}
-                    alt={name || "Profile"}
+                    alt={name || 'Profile'}
                     fill
                     sizes="96px"
                     unoptimized
@@ -108,10 +108,10 @@ export function Chip({
     return (
         <span
             className={cn(
-                "inline-flex h-7 shrink-0 items-center rounded-full border px-3 text-xs font-medium",
+                'inline-flex h-7 shrink-0 items-center rounded-full border px-3 text-xs font-medium',
                 active
-                    ? "border-primary bg-primary text-white"
-                    : "border-black/10 bg-[#f9f9f8] text-[#6b6b6b]",
+                    ? 'border-primary bg-primary text-white'
+                    : 'border-black/10 bg-[#f9f9f8] text-[#6b6b6b]',
             )}
         >
             {children}

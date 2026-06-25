@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import {
     Cake,
@@ -6,15 +6,15 @@ import {
     GraduationCap,
     type LucideIcon,
     UserRound,
-} from "lucide-react";
-import Image from "next/image";
-import { useRouter } from "next/navigation";
-import { useEffect } from "react";
-import { Avatar, Chip, EmptyState } from "@/components/mobile/app-chrome";
-import { useTopBar } from "@/components/mobile/top-bar-provider";
-import { useMe } from "@/hooks/users/use-me";
-import { useVisitProfile } from "@/hooks/users/use-visit-profile";
-import { ageFromBirthYear, formatEnum } from "@/lib/profile-utils";
+} from 'lucide-react';
+import Image from 'next/image';
+import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
+import { Avatar, Chip, EmptyState } from '@/components/mobile/app-chrome';
+import { useTopBar } from '@/components/mobile/top-bar-provider';
+import { useMe } from '@/hooks/users/use-me';
+import { useVisitProfile } from '@/hooks/users/use-visit-profile';
+import { ageFromBirthYear, formatEnum } from '@/lib/profile-utils';
 
 export function ProfileClient({ userId }: { userId: string }) {
     const router = useRouter();
@@ -27,13 +27,13 @@ export function ProfileClient({ userId }: { userId: string }) {
     const { data: profile, isLoading } = useVisitProfile(userId);
 
     useTopBar({
-        title: profile?.name ?? "Profile",
-        backHref: "/matches",
+        title: profile?.name ?? 'Profile',
+        backHref: '/matches',
     });
 
     useEffect(() => {
         if (isOwnProfile) {
-            router.replace("/profile/me");
+            router.replace('/profile/me');
         }
     }, [isOwnProfile, router]);
 
@@ -118,8 +118,8 @@ export function ProfileClient({ userId }: { userId: string }) {
                                 key={item.id}
                                 className={
                                     index === 0
-                                        ? "relative col-span-2 aspect-square overflow-hidden rounded-lg bg-[#f0eeee]"
-                                        : "relative aspect-square overflow-hidden rounded-lg bg-[#f0eeee]"
+                                        ? 'relative col-span-2 aspect-square overflow-hidden rounded-lg bg-[#f0eeee]'
+                                        : 'relative aspect-square overflow-hidden rounded-lg bg-[#f0eeee]'
                                 }
                             >
                                 <Image

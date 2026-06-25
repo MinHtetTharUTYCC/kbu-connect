@@ -1,11 +1,11 @@
-"use client";
+'use client';
 
 import {
     getNotificationsControllerGetNotificationsInfiniteQueryKey,
     getNotificationsControllerGetUnreadCountQueryKey,
     useNotificationsControllerMarkAllAsRead,
-} from "@services/generated/notifications/notifications";
-import { useQueryClient } from "@tanstack/react-query";
+} from '@services/generated/notifications/notifications';
+import { useQueryClient } from '@tanstack/react-query';
 
 export function useMarkAllNotificationsRead() {
     const queryClient = useQueryClient();

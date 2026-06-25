@@ -1,4 +1,4 @@
-import { toast } from "sonner";
+import { toast } from 'sonner';
 
 /**
  * Extracts a readable message from the AllExceptionsFilter response structure.
@@ -18,10 +18,10 @@ type BackendErrorLike = {
 
 export const getBackendErrorMessage = (
     err: unknown,
-    fallback = "An unexpected error occurred",
+    fallback = 'An unexpected error occurred',
 ): string => {
     const error =
-        typeof err === "object" && err !== null
+        typeof err === 'object' && err !== null
             ? (err as BackendErrorLike)
             : undefined;
 
@@ -29,29 +29,29 @@ export const getBackendErrorMessage = (
         return fallback;
     }
 
-    const code = typeof error.code === "string" ? error.code : undefined;
+    const code = typeof error.code === 'string' ? error.code : undefined;
     const status =
-        typeof error.response?.status === "number"
+        typeof error.response?.status === 'number'
             ? error.response.status
             : undefined;
     const rawErrorMessage =
-        typeof error.message === "string" ? error.message.toLowerCase() : "";
+        typeof error.message === 'string' ? error.message.toLowerCase() : '';
 
     if (
-        code === "ECONNREFUSED" ||
-        code === "ECONNRESET" ||
-        code === "ETIMEDOUT" ||
-        code === "ENOTFOUND" ||
-        code === "EAI_AGAIN" ||
-        rawErrorMessage.includes("econnrefused") ||
-        rawErrorMessage.includes("network error") ||
-        rawErrorMessage.includes("fetch failed")
+        code === 'ECONNREFUSED' ||
+        code === 'ECONNRESET' ||
+        code === 'ETIMEDOUT' ||
+        code === 'ENOTFOUND' ||
+        code === 'EAI_AGAIN' ||
+        rawErrorMessage.includes('econnrefused') ||
+        rawErrorMessage.includes('network error') ||
+        rawErrorMessage.includes('fetch failed')
     ) {
-        return "Server is temporarily unavailable.";
+        return 'Server is temporarily unavailable.';
     }
 
     if (status && status >= 500) {
-        return "Server is having trouble right now.";
+        return 'Server is having trouble right now.';
     }
 
     // Client: interceptor already unwrapped to backend object { statusCode, message }
@@ -65,24 +65,24 @@ export const getBackendErrorMessage = (
         // class-validator format
         if (
             firstError &&
-            typeof firstError === "object" &&
+            typeof firstError === 'object' &&
             firstError.constraints
         ) {
             const firstConstraint = Object.values(firstError.constraints)[0];
 
-            if (typeof firstConstraint === "string") {
+            if (typeof firstConstraint === 'string') {
                 return firstConstraint;
             }
         }
 
         // array of strings
-        if (typeof firstError === "string") {
+        if (typeof firstError === 'string') {
             return firstError;
         }
     }
 
     // normal string message
-    if (typeof rawMessage === "string") {
+    if (typeof rawMessage === 'string') {
         return rawMessage;
     }
 
@@ -91,7 +91,7 @@ export const getBackendErrorMessage = (
 
 export const handleBackendError = (
     err: unknown,
-    fallback = "An unexpected error occurred",
+    fallback = 'An unexpected error occurred',
 ) => {
     const displayMessage = getBackendErrorMessage(err, fallback);
 
