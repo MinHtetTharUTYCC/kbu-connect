@@ -6,11 +6,8 @@ import type {
     DiscoveryListResponseDto,
 } from '@services/model';
 import type { InfiniteData } from '@tanstack/react-query';
-import { getDiscoveryProfiles } from '@/lib/profile-utils';
 
-export function useDiscoveryProfiles(
-    params: DiscoveryControllerGetDiscoveryParams,
-) {
+export function useDiscoveryProfiles(params: DiscoveryControllerGetDiscoveryParams) {
     const query = useDiscoveryControllerGetDiscoveryInfinite<
         InfiniteData<DiscoveryListResponseDto>
     >(params, {
@@ -20,8 +17,7 @@ export function useDiscoveryProfiles(
         },
     });
 
-    const profiles =
-        query.data?.pages.flatMap((page) => getDiscoveryProfiles(page)) ?? [];
+    const profiles = query.data?.pages.flatMap((page) => page.users) ?? [];
 
     return { ...query, profiles };
 }

@@ -23,8 +23,7 @@ type ChatTab = 'chats' | 'shoutouts';
 
 export function ChatHomeClient() {
     const searchParams = useSearchParams();
-    const activeTab: ChatTab =
-        searchParams.get('tab') === 'shoutouts' ? 'shoutouts' : 'chats';
+    const activeTab: ChatTab = searchParams.get('tab') === 'shoutouts' ? 'shoutouts' : 'chats';
 
     useTopBar({ title: 'Chats' });
 
@@ -56,11 +55,7 @@ export function ChatHomeClient() {
                     </Link>
                 </div>
             </div>
-            {activeTab === 'shoutouts' ? (
-                <ShoutoutsPanel />
-            ) : (
-                <ChatListClient />
-            )}
+            {activeTab === 'shoutouts' ? <ShoutoutsPanel /> : <ChatListClient />}
         </main>
     );
 }
@@ -69,13 +64,8 @@ function ShoutoutsPanel() {
     const searchParams = useSearchParams();
     const activeSubTab: ShoutoutType =
         searchParams.get('shoutouts') === 'sent' ? 'sent' : 'received';
-    const {
-        shoutouts,
-        isLoading,
-        fetchNextPage,
-        hasNextPage,
-        isFetchingNextPage,
-    } = useShoutoutsList({ type: activeSubTab, limit: 20 });
+    const { shoutouts, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } =
+        useShoutoutsList({ type: activeSubTab, limit: 20 });
     const loadMoreRef = useRef<HTMLDivElement | null>(null);
 
     useEffect(() => {
@@ -124,10 +114,7 @@ function ShoutoutsPanel() {
                 </div>
             </div>
             {isLoading ? (
-                <EmptyState
-                    title="Loading shoutouts"
-                    body="Checking your shoutouts."
-                />
+                <EmptyState title="Loading shoutouts" body="Checking your shoutouts." />
             ) : shoutouts.length ? (
                 <div>
                     {shoutouts.map((item) => (
@@ -186,7 +173,7 @@ function ShoutoutRow({ shoutout }: { shoutout: ShoutoutItem }) {
             <div className="flex items-start gap-3">
                 <div className="relative">
                     <Avatar
-                        src={shoutout.otherUser.avatarUrl as string | null}
+                        src={shoutout.otherUser.avatarUrl}
                         name={shoutout.otherUser.name}
                         className="size-12"
                     />
@@ -205,13 +192,9 @@ function ShoutoutRow({ shoutout }: { shoutout: ShoutoutItem }) {
                             {relativeTime(shoutout.createdAt)}
                         </span>
                     </div>
-                    <p className="line-clamp-2 text-sm leading-6">
-                        {shoutout.content}
-                    </p>
+                    <p className="line-clamp-2 text-sm leading-6">{shoutout.content}</p>
                     <div className="mt-4 flex items-center justify-between gap-3">
-                        <Chip>
-                            {shoutout.type === 'received' ? 'Received' : 'Sent'}
-                        </Chip>
+                        <Chip>{shoutout.type === 'received' ? 'Received' : 'Sent'}</Chip>
                         {shoutout.type === 'received' && (
                             <Link
                                 href={`/profile/${shoutout.otherUser.id}`}
@@ -228,13 +211,8 @@ function ShoutoutRow({ shoutout }: { shoutout: ShoutoutItem }) {
 }
 
 export function ChatListClient() {
-    const {
-        conversations,
-        isLoading,
-        fetchNextPage,
-        hasNextPage,
-        isFetchingNextPage,
-    } = useConversationsList({ cursor: null, limit: 20 });
+    const { conversations, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } =
+        useConversationsList({ cursor: null, limit: 20 });
     const loadMoreRef = useRef<HTMLDivElement | null>(null);
 
     useEffect(() => {
@@ -255,12 +233,7 @@ export function ChatListClient() {
     }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
 
     if (isLoading) {
-        return (
-            <EmptyState
-                title="Loading chats"
-                body="Checking your conversations."
-            />
-        );
+        return <EmptyState title="Loading chats" body="Checking your conversations." />;
     }
 
     if (!conversations.length) {
@@ -281,7 +254,7 @@ export function ChatListClient() {
                     className="flex items-center border-b border-black/10 px-5 py-4"
                 >
                     <Avatar
-                        src={conversation.otherUser.avatarUrl as string | null}
+                        src={conversation.otherUser.avatarUrl}
                         name={conversation.otherUser.name}
                         className="size-12"
                     />
@@ -295,8 +268,7 @@ export function ChatListClient() {
                             </span>
                         </div>
                         <p className="truncate text-sm text-[#6b6b6b]">
-                            {conversation.lastMessage?.content ??
-                                'No messages yet.'}
+                            {conversation.lastMessage?.content ?? 'No messages yet.'}
                         </p>
                     </div>
                 </Link>
@@ -316,11 +288,10 @@ export function ChatClient({ chatId }: { chatId: string }) {
     const messagesQuery = useConversationMessages(chatId, 20);
     const loadMoreMessagesRef = useRef<HTMLDivElement | null>(null);
 
-    const { conversations, isLoading: conversationsLoading } =
-        useConversationsList({
-            cursor: null,
-            limit: 20,
-        });
+    const { conversations, isLoading: conversationsLoading } = useConversationsList({
+        cursor: null,
+        limit: 20,
+    });
     const { mutate: markSeen } = useMarkConversationSeen();
 
     const [draft, setDraft] = useState('');
@@ -338,7 +309,7 @@ export function ChatClient({ chatId }: { chatId: string }) {
         backHref: '/chats',
         action: conversation ? (
             <Avatar
-                src={conversation.otherUser.avatarUrl as string | null}
+                src={conversation.otherUser.avatarUrl}
                 name={conversation.otherUser.name}
                 className="size-10"
             />
@@ -366,11 +337,7 @@ export function ChatClient({ chatId }: { chatId: string }) {
 
         observer.observe(target);
         return () => observer.disconnect();
-    }, [
-        messagesQuery.fetchNextPage,
-        messagesQuery.hasNextPage,
-        messagesQuery.isFetchingNextPage,
-    ]);
+    }, [messagesQuery.fetchNextPage, messagesQuery.hasNextPage, messagesQuery.isFetchingNextPage]);
 
     function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
@@ -389,12 +356,7 @@ export function ChatClient({ chatId }: { chatId: string }) {
     }
 
     if (conversationsLoading) {
-        return (
-            <EmptyState
-                title="Loading conversation"
-                body="Opening your conversation."
-            />
-        );
+        return <EmptyState title="Loading conversation" body="Opening your conversation." />;
     }
 
     if (!conversation) {
@@ -409,14 +371,10 @@ export function ChatClient({ chatId }: { chatId: string }) {
     return (
         <main className="flex flex-1 flex-col gap-3 overflow-y-auto bg-white px-5 py-6">
             {messagesQuery.isLoading ? (
-                <EmptyState
-                    title="Loading messages"
-                    body="Opening your messages."
-                />
+                <EmptyState title="Loading messages" body="Opening your messages." />
             ) : messages.length ? (
                 messages.map((message) => {
-                    const mine =
-                        message.senderId === myId || message.senderId === 'me';
+                    const mine = message.senderId === myId || message.senderId === 'me';
                     return (
                         <div
                             key={message.id}

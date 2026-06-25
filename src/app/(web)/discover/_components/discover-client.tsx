@@ -4,10 +4,12 @@ import { Heart, MessageCircle, X } from 'lucide-react';
 import Image from 'next/image';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Chip, EmptyState } from '@/components/mobile/app-chrome';
+import { ProfileSheet } from '@/components/mobile/profile-sheet';
 import { useTopBar } from '@/components/mobile/top-bar-provider';
 import { useSendShoutout } from '@/hooks/chat/use-send-shoutout';
 import { useDiscoveryProfiles } from '@/hooks/discovery/use-discovery-profiles';
 import { useSwipeProfile } from '@/hooks/swipes/use-swipe-profile';
+import { formatEnum } from '@/lib/profile-utils';
 import { cn } from '@/lib/utils';
 
 const SWIPE_THRESHOLD = 80;
@@ -17,21 +19,17 @@ export function DiscoverClient() {
     const [direction, setDirection] = useState<'left' | 'right' | null>(null);
     const [isShoutoutOpen, setIsShoutoutOpen] = useState(false);
     const [shoutoutMessage, setShoutoutMessage] = useState('');
+    const [selectedProfileId, setSelectedProfileId] = useState<string | null>(null);
+    const [imageIndex, setImageIndex] = useState(0);
     const [dragX, setDragX] = useState(0);
     const touchStartX = useRef(0);
     const touchStartY = useRef(0);
     const isDragging = useRef(false);
     const cardRef = useRef<HTMLDivElement>(null);
-    const {
-        profiles,
-        isLoading,
-        fetchNextPage,
-        hasNextPage,
-        isFetchingNextPage,
-    } = useDiscoveryProfiles({});
+    const { profiles, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } =
+        useDiscoveryProfiles({});
     const { like, dislike, isPending: isSwipePending } = useSwipeProfile();
-    const { mutateAsync: sendShoutout, isPending: isSendingShoutout } =
-        useSendShoutout();
+    const { mutateAsync: sendShoutout, isPending: isSendingShoutout } = useSendShoutout();
     const profile = profiles[index];
     const remainingProfiles = profiles.length - index;
 
@@ -50,6 +48,7 @@ export function DiscoverClient() {
             setDragX(0);
             setShoutoutMessage('');
             setIsShoutoutOpen(false);
+            setImageIndex(0);
             if (type === 'LIKE') {
                 like(profile.id);
             } else {
@@ -107,12 +106,7 @@ export function DiscoverClient() {
     }
 
     if (isLoading) {
-        return (
-            <EmptyState
-                title="Loading profiles"
-                body="Finding people you may want to meet."
-            />
-        );
+        return <EmptyState title="Loading profiles" body="Finding people you may want to meet." />;
     }
 
     if (!profile) {
@@ -135,10 +129,8 @@ export function DiscoverClient() {
 
     const dragRotation = dragX * 0.06;
     const dragOpacity = Math.max(0, 1 - Math.abs(dragX) / 300);
-    const showLikeStamp =
-        direction === 'right' || (!direction && dragX > SWIPE_THRESHOLD * 0.5);
-    const showPassStamp =
-        direction === 'left' || (!direction && dragX < -SWIPE_THRESHOLD * 0.5);
+    const showLikeStamp = direction === 'right' || (!direction && dragX > SWIPE_THRESHOLD * 0.5);
+    const showPassStamp = direction === 'left' || (!direction && dragX < -SWIPE_THRESHOLD * 0.5);
 
     return (
         <div className="flex flex-1 flex-col overflow-hidden bg-[#fcf8f8]">
@@ -149,10 +141,8 @@ export function DiscoverClient() {
                         className={cn(
                             'relative flex h-full min-h-[400px] w-full max-w-full flex-col overflow-hidden rounded-xl border border-black/10 bg-white shadow-sm',
                             !dragX && 'transition duration-300',
-                            direction === 'left' &&
-                                '-translate-x-24 -rotate-6 opacity-0',
-                            direction === 'right' &&
-                                'translate-x-24 rotate-6 opacity-0',
+                            direction === 'left' && '-translate-x-24 -rotate-6 opacity-0',
+                            direction === 'right' && 'translate-x-24 rotate-6 opacity-0',
                         )}
                         style={{
                             transform: direction
@@ -165,9 +155,9 @@ export function DiscoverClient() {
                         onTouchEnd={handleTouchEnd}
                     >
                         <div className="relative flex-1 overflow-hidden bg-[#ebe7e7]">
-                            {profile?.avatarUrl ? (
+                            {profile.gallery.length > 0 ? (
                                 <Image
-                                    src={profile.avatarUrl}
+                                    src={profile.gallery[imageIndex].imageUrl}
                                     alt={profile.name}
                                     fill
                                     priority
@@ -178,6 +168,46 @@ export function DiscoverClient() {
                             ) : (
                                 <div className="h-full w-full bg-[linear-gradient(135deg,#ffdbd1,#ebe7e7_45%,#f9f9f8)]" />
                             )}
+
+                            {profile.gallery.length > 1 && (
+                                <>
+                                    <div className="absolute inset-x-0 top-3 z-10 flex justify-center gap-1.5">
+                                        {profile.gallery.map((image, i) => (
+                                            <div
+                                                key={image.imageUrl}
+                                                className={`h-1 rounded-full transition-all ${
+                                                    i === imageIndex
+                                                        ? 'w-6 bg-white'
+                                                        : 'w-1.5 bg-white/50'
+                                                }`}
+                                            />
+                                        ))}
+                                    </div>
+                                    <button
+                                        type="button"
+                                        className="absolute left-0 top-0 z-10 h-full w-1/3"
+                                        aria-label="Previous photo"
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            setImageIndex((prev) =>
+                                                prev > 0 ? prev - 1 : profile.gallery.length - 1,
+                                            );
+                                        }}
+                                    />
+                                    <button
+                                        type="button"
+                                        className="absolute right-0 top-0 z-10 h-full w-1/3"
+                                        aria-label="Next photo"
+                                        onClick={(e) => {
+                                            e.stopPropagation();
+                                            setImageIndex((prev) =>
+                                                prev < profile.gallery.length - 1 ? prev + 1 : 0,
+                                            );
+                                        }}
+                                    />
+                                </>
+                            )}
+
                             <div className="absolute inset-x-0 bottom-0 h-36 bg-gradient-to-t from-black/50 to-transparent" />
                             {showLikeStamp && (
                                 <SwipeStamp
@@ -194,26 +224,25 @@ export function DiscoverClient() {
                         </div>
                         <div className="space-y-3 p-4">
                             <div className="flex items-end gap-2">
-                                <h1 className="text-xl font-semibold">
-                                    {profile?.name}
-                                    {profile?.age ? `, ${profile.age}` : ''}
-                                </h1>
+                                <button
+                                    type="button"
+                                    onClick={() => setSelectedProfileId(profile.id)}
+                                    className="text-left text-xl font-semibold active:opacity-70"
+                                >
+                                    {profile.name}
+                                </button>
                                 <span className="pb-0.5 text-sm text-[#6b6b6b]">
-                                    {profile?.nationality
-                                        ? profile.nationality.slice(0, 2)
-                                        : 'KBU'}
+                                    {profile?.nationality ? formatEnum(profile.nationality) : 'KBU'}
                                 </span>
                             </div>
-                            {profile?.faculty && <Chip>{profile.faculty}</Chip>}
-                            {profile?.bio && (
-                                <p className="text-sm leading-6 text-[#434655]">
-                                    {profile.bio}
-                                </p>
+                            <Chip>{profile.faculty}</Chip>
+                            {profile.bio && (
+                                <p className="text-sm leading-6 text-[#434655]">{profile.bio}</p>
                             )}
                             <div className="flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-                                {profile.interests.map((interest) => (
+                                {/* {profile.interests.map((interest) => (
                                     <Chip key={interest}>{interest}</Chip>
-                                ))}
+                                ))} */}
                             </div>
                         </div>
                     </div>
@@ -256,6 +285,15 @@ export function DiscoverClient() {
                     onSubmit={handleSendShoutout}
                 />
             )}
+            {selectedProfileId && (
+                <ProfileSheet
+                    userId={selectedProfileId}
+                    onClose={() => setSelectedProfileId(null)}
+                    onLike={() => handleSwipe('LIKE')}
+                    onDislike={() => handleSwipe('DISLIKE')}
+                    onShoutout={() => setIsShoutoutOpen(true)}
+                />
+            )}
         </div>
     );
 }
@@ -283,12 +321,8 @@ function ShoutoutSheet({
             >
                 <div className="mb-4 flex items-start justify-between gap-4">
                     <div>
-                        <h2 className="text-lg font-semibold">
-                            Send shoutout (Max 5 per day)
-                        </h2>
-                        <p className="mt-1 text-xs text-muted-foreground">
-                            Write to {name}.
-                        </p>
+                        <h2 className="text-lg font-semibold">Send shoutout (Max 5 per day)</h2>
+                        <p className="mt-1 text-xs text-muted-foreground">Write to {name}.</p>
                     </div>
                     <button
                         type="button"
@@ -318,13 +352,7 @@ function ShoutoutSheet({
     );
 }
 
-function SwipeStamp({
-    label,
-    className,
-}: {
-    label: string;
-    className?: string;
-}) {
+function SwipeStamp({ label, className }: { label: string; className?: string }) {
     return (
         <div
             className={cn(

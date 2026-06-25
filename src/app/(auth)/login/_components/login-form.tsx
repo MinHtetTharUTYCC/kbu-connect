@@ -19,13 +19,13 @@ import { VerifySchema } from '@/schema/verify.schema';
 
 export function LoginForm() {
     const [emailInAction, setEmailInAction] = useState('');
-    const login = useLogin((email) => setEmailInAction(email));
-    const verify = useVerify();
+    const { mutateAsync:login, isPending: isLoggingIn } = useLogin((email) => setEmailInAction(email));
+    const { mutateAsync: verify, isPending: isVerifying } = useVerify();
 
     const emailForm = useForm({
         defaultValues: { email: '' },
         validators: { onSubmit: LoginSchema },
-        onSubmit: async ({ value }) => login.mutateAsync({ data: value }),
+        onSubmit: async ({ value }) => await login({ data: value }),
     });
 
     const verifyForm = useForm({
@@ -33,7 +33,7 @@ export function LoginForm() {
         validators: { onSubmit: VerifySchema },
         onSubmit: async ({ value }) => {
             if (!emailInAction) return;
-            await verify.mutateAsync({
+            await verify({
                 data: { email: emailInAction, code: value.code },
             });
         },

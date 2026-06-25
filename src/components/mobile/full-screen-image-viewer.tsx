@@ -62,6 +62,7 @@ export function FullScreenImageViewer({
             className="fixed inset-0 z-[100] flex flex-col bg-black"
             onTouchStart={handleTouchStart}
             onTouchEnd={handleTouchEnd}
+            onClick={(e) => e.stopPropagation()}
         >
             <div className="flex shrink-0 items-center justify-between px-4 py-3">
                 <span className="text-sm font-medium text-white">
@@ -117,7 +118,7 @@ export function FullScreenImageViewer({
                 <div className="flex shrink-0 justify-center gap-1.5 px-4 pb-4 pt-2">
                     {images.map((img, index) => (
                         <button
-                            key={`${img}-${index}`}
+                            key={img}
                             type="button"
                             onClick={() => goTo(index)}
                             className={`size-2 rounded-full transition-colors ${

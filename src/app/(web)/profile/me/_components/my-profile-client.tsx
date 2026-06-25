@@ -21,25 +21,18 @@ export function MyProfileClient() {
 
     const logout = useAuthStore((state) => state.logout);
 
-    const {
-        mutate: toggleDiscoverable,
-        isPending: isToggleDiscoverablePending,
-    } = useToggleDiscoverable();
+    const { mutate: toggleDiscoverable, isPending: isToggleDiscoverablePending } =
+        useToggleDiscoverable();
 
     const [viewerIndex, setViewerIndex] = useState<number | null>(null);
 
     useTopBar({});
 
     if (isLoading || !profile) {
-        return (
-            <EmptyState
-                title="Loading profile"
-                body="Setting up your account..."
-            />
-        );
+        return <EmptyState title="Loading profile" body="Setting up your account..." />;
     }
 
-    const { avatarUrl, name, bio, faculty, birthYear, gallery } = profile;
+    const { avatarUrl, name, bio, faculty, birthYear, gallery, isDiscoverable } = profile;
     const galleryImages = gallery.map((item) => item.imageUrl);
 
     return (
@@ -55,15 +48,11 @@ export function MyProfileClient() {
                         <Pencil className="size-4" />
                     </Link>
                 </div>
-                <h1 className="text-xl font-semibold">
-                    {profile?.name ?? 'KBU Student'}
-                </h1>
-                <p className="mt-1 max-w-[300px] text-sm leading-6 text-[#6b6b6b]">
-                    {profile?.faculty
-                        ? `${formatEnum(faculty as string)} student`
-                        : 'KBU student'}
+                <h1 className="text-xl font-semibold">{name}</h1>
+                <p className="mt-1 max-w-[300px] text-sm leading-6 text-muted-foreground">
+                    {faculty ? `${formatEnum(faculty as string)} student` : 'KBU student'}
                     {birthYear ? ` • ${ageFromBirthYear(birthYear)}` : ''}
-                    {bio ? ` • ${profile.bio}` : ''}
+                    {bio ? ` • ${bio}` : ''}
                 </p>
             </section>
 
@@ -117,11 +106,9 @@ export function MyProfileClient() {
                 <div className="border-b border-black/10 px-5 py-4">
                     <div className="flex items-center justify-between">
                         <div className="min-w-0 flex-1">
-                            <span className="text-sm font-medium">
-                                Discoverable
-                            </span>
-                            <p className="mt-0.5 text-xs leading-5 text-[#6b6b6b]">
-                                {profile?.isDiscoverable
+                            <span className="text-sm font-medium">Discoverable</span>
+                            <p className="mt-0.5 text-xs leading-5 text-muted-foreground">
+                                {isDiscoverable
                                     ? 'Your profile is visible to others on the feed.'
                                     : 'Your profile is hidden from the feed.'}
                             </p>
@@ -129,27 +116,22 @@ export function MyProfileClient() {
                         <button
                             type="button"
                             role="switch"
-                            aria-checked={profile?.isDiscoverable}
+                            aria-checked={isDiscoverable}
                             disabled={isToggleDiscoverablePending}
                             onClick={() =>
                                 toggleDiscoverable({
                                     data: {
-                                        isDiscoverable:
-                                            !profile?.isDiscoverable,
+                                        isDiscoverable: !isDiscoverable,
                                     },
                                 })
                             }
                             className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full transition-colors ${
-                                profile?.isDiscoverable
-                                    ? 'bg-primary'
-                                    : 'bg-[#e5e2e1]'
+                                isDiscoverable ? 'bg-primary' : 'bg-[#e5e2e1]'
                             }`}
                         >
                             <span
                                 className={`inline-block size-4 rounded-full bg-white shadow-sm transition-transform ${
-                                    profile?.isDiscoverable
-                                        ? 'translate-x-6'
-                                        : 'translate-x-1'
+                                    isDiscoverable ? 'translate-x-6' : 'translate-x-1'
                                 }`}
                             />
                         </button>
@@ -160,7 +142,7 @@ export function MyProfileClient() {
             <SettingsSection title="Account">
                 <div className="flex items-center justify-between border-b border-black/10 px-5 py-4">
                     <span className="text-sm">Email address</span>
-                    <span className="max-w-[190px] truncate text-sm text-[#6b6b6b]">
+                    <span className="max-w-[190px] truncate text-sm text-muted-foreground">
                         {profile?.email ?? 'student@ms.kbu.ac.th'}
                     </span>
                 </div>
@@ -185,13 +167,7 @@ export function MyProfileClient() {
     );
 }
 
-function SettingsSection({
-    title,
-    children,
-}: {
-    title: string;
-    children: React.ReactNode;
-}) {
+function SettingsSection({ title, children }: { title: string; children: React.ReactNode }) {
     return (
         <section className="mb-6">
             <h2 className="mb-2 px-5 text-xs font-semibold uppercase tracking-wide text-[#6b6b6b]">

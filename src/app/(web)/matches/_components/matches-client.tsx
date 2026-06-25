@@ -4,7 +4,6 @@ import Link from 'next/link';
 import { Avatar } from '@/components/mobile/app-chrome';
 import { useTopBar } from '@/components/mobile/top-bar-provider';
 import { useMatchesList } from '@/hooks/matches/use-matches-list';
-import { getUserName } from '@/lib/profile-utils';
 
 export function MatchesClient() {
     const { matches, isLoading: matchesLoading } = useMatchesList({
@@ -21,9 +20,7 @@ export function MatchesClient() {
                 </div>
                 <div className="flex gap-4 overflow-x-auto px-5 pb-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                     {matchesLoading ? (
-                        <p className="py-4 text-sm text-[#6b6b6b]">
-                            Loading matches...
-                        </p>
+                        <p className="py-4 text-sm text-[#6b6b6b]">Loading matches...</p>
                     ) : matches.length ? (
                         matches.map((match) => (
                             <Link
@@ -37,11 +34,7 @@ export function MatchesClient() {
                             >
                                 <div className="relative">
                                     <Avatar
-                                        src={
-                                            match.matcher.avatarUrl as
-                                                | string
-                                                | null
-                                        }
+                                        src={match.matcher.avatarUrl}
                                         name={match.matcher.name}
                                         className="size-14"
                                     />
@@ -50,14 +43,13 @@ export function MatchesClient() {
                                     )}
                                 </div>
                                 <span className="max-w-16 truncate text-xs font-medium">
-                                    {getUserName(match.matcher).split(' ')[0]}
+                                    {match.matcher.name.split(' ')[0]}
                                 </span>
                             </Link>
                         ))
                     ) : (
-                        <p className="w-full px-5 py-10 text-center text-sm text-[#6b6b6b]">
-                            No matches yet. When someone likes you back, they
-                            will show here.
+                        <p className="w-full px-5 py-10 text-center text-sm text-muted-foreground">
+                            No matches yet. When someone likes you back, they will show here.
                         </p>
                     )}
                 </div>
