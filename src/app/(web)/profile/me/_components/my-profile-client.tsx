@@ -1,10 +1,13 @@
 "use client";
 
 import { LogOut, Pencil } from "lucide-react";
+import Image from "next/image";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useState } from "react";
 import { useAuthContext } from "@/components/auth-provider";
 import { Avatar } from "@/components/mobile/app-chrome";
+import { FullScreenImageViewer } from "@/components/mobile/full-screen-image-viewer";
 import { useTopBar } from "@/components/mobile/top-bar-provider";
 import { useToggleDiscoverable } from "@/hooks/profile/use-toggle-discoverable";
 import { ageFromBirthYear, formatEnum } from "@/lib/profile-utils";
@@ -16,6 +19,13 @@ export function MyProfileClient() {
     const logout = useAuthStore((state) => state.logout);
     const toggleDiscoverable = useToggleDiscoverable();
     const profile = user?.user;
+
+    const dummyDiscoverable = false; // TODO: Replace with actual discoverable state from user profile
+    const [viewerIndex, setViewerIndex] = useState<number | null>(null);
+
+    const galleryImages = (profile?.gallery ?? [])
+        .toSorted((a, b) => a.order - b.order)
+        .map((item) => item.imageUrl);
 
     useTopBar({});
 
@@ -60,27 +70,81 @@ export function MyProfileClient() {
                 </Link>
             </section>
 
+            {galleryImages.length > 0 && (
+                <SettingsSection title="Photos">
+                    <div className="grid grid-cols-3 gap-2 p-4">
+                        {galleryImages.map((imageUrl, index) => (
+                            <button
+                                key={imageUrl}
+                                type="button"
+                                onClick={() => setViewerIndex(index)}
+                                className={
+                                    index === 0
+                                        ? "relative col-span-2 aspect-square overflow-hidden rounded-lg bg-[#f0eeee]"
+                                        : "relative aspect-square overflow-hidden rounded-lg bg-[#f0eeee]"
+                                }
+                            >
+                                <Image
+                                    src={imageUrl}
+                                    alt={`Photo ${index + 1}`}
+                                    fill
+                                    sizes="(max-width: 430px) 33vw, 140px"
+                                    unoptimized
+                                    className="object-cover"
+                                />
+                            </button>
+                        ))}
+                    </div>
+                </SettingsSection>
+            )}
+
+            {viewerIndex !== null && (
+                <FullScreenImageViewer
+                    images={galleryImages}
+                    initialIndex={viewerIndex}
+                    onClose={() => setViewerIndex(null)}
+                />
+            )}
+
             <SettingsSection title="Privacy">
-                <div className="flex items-center justify-between border-b border-black/10 px-5 py-4">
-                    <span className="text-sm">Discoverable</span>
-                    <button
-                        type="button"
-                        onClick={() =>
-                            toggleDiscoverable.mutate({
-                                data: { isDiscoverable: true },
-                            })
-                        }
-                        className="flex h-6 w-10 items-center rounded-full bg-primary p-1 transition active:scale-95"
-                        aria-label="Toggle discoverable"
-                    >
-                        <span className="ml-auto size-4 rounded-full bg-white shadow-sm" />
-                    </button>
-                </div>
-                <div className="flex items-center justify-between px-5 py-4">
-                    <span className="text-sm">Push notifications</span>
-                    <span className="flex h-6 w-10 items-center rounded-full bg-[#e5e2e1] p-1">
-                        <span className="size-4 rounded-full bg-white shadow-sm" />
-                    </span>
+                <div className="border-b border-black/10 px-5 py-4">
+                    <div className="flex items-center justify-between">
+                        <div className="min-w-0 flex-1">
+                            <span className="text-sm font-medium">
+                                Discoverable
+                            </span>
+                            <p className="mt-0.5 text-xs leading-5 text-[#6b6b6b]">
+                                {dummyDiscoverable
+                                    ? "Your profile is visible to others on the feed."
+                                    : "Your profile is hidden from the feed."}
+                            </p>
+                        </div>
+                        <button
+                            type="button"
+                            role="switch"
+                            aria-checked={dummyDiscoverable}
+                            onClick={() =>
+                                toggleDiscoverable.mutate({
+                                    data: {
+                                        isDiscoverable: !dummyDiscoverable,
+                                    },
+                                })
+                            }
+                            className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full transition-colors ${
+                                dummyDiscoverable
+                                    ? "bg-primary"
+                                    : "bg-[#e5e2e1]"
+                            }`}
+                        >
+                            <span
+                                className={`inline-block size-4 rounded-full bg-white shadow-sm transition-transform ${
+                                    dummyDiscoverable
+                                        ? "translate-x-6"
+                                        : "translate-x-1"
+                                }`}
+                            />
+                        </button>
+                    </div>
                 </div>
             </SettingsSection>
 

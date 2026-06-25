@@ -73,9 +73,11 @@ export function AvatarUploadStep({
 export function GalleryUploadStep({
     gallery,
     onGalleryChange,
+    onImageClick,
 }: {
     gallery: NewGalleryImageDto[];
     onGalleryChange: (gallery: NewGalleryImageDto[]) => void;
+    onImageClick?: (index: number) => void;
 }) {
     const galleryInputRef = useRef<HTMLInputElement | null>(null);
     const uploadGallery = useUploadGalleryImages();
@@ -174,14 +176,20 @@ export function GalleryUploadStep({
                             key={item.id}
                             className="relative aspect-square overflow-hidden rounded-xl border border-black/10 bg-[#f9f9f8]"
                         >
-                            <Image
-                                src={item.imageUrl}
-                                alt={`Gallery photo ${index + 1}`}
-                                fill
-                                sizes="33vw"
-                                unoptimized
-                                className="object-cover"
-                            />
+                            <button
+                                type="button"
+                                onClick={() => onImageClick?.(index)}
+                                className="absolute inset-0"
+                            >
+                                <Image
+                                    src={item.imageUrl}
+                                    alt={`Gallery photo ${index + 1}`}
+                                    fill
+                                    sizes="33vw"
+                                    unoptimized
+                                    className="object-cover"
+                                />
+                            </button>
                             <div className="absolute left-1 top-1 grid size-7 place-items-center rounded-full bg-white/85 text-[#434655]">
                                 <GripVertical className="size-4" />
                             </div>

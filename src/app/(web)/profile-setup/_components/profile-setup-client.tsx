@@ -12,6 +12,7 @@ import { ArrowLeft, ArrowRight, Check } from "lucide-react";
 import { useMemo, useState } from "react";
 import { useAuthContext } from "@/components/auth-provider";
 import { Chip, EmptyState } from "@/components/mobile/app-chrome";
+import { FullScreenImageViewer } from "@/components/mobile/full-screen-image-viewer";
 import {
     AvatarUploadStep,
     GalleryUploadStep,
@@ -76,6 +77,7 @@ export function ProfileSetupClient() {
             order: item.order ?? index,
         })),
     );
+    const [viewerIndex, setViewerIndex] = useState<number | null>(null);
     const [faculty, setFaculty] = useState<UpdateProfileDtoFaculty>(
         current?.faculty ?? UpdateProfileDtoFaculty.CIVIL,
     );
@@ -364,6 +366,7 @@ export function ProfileSetupClient() {
                     <GalleryUploadStep
                         gallery={gallery}
                         onGalleryChange={setGallery}
+                        onImageClick={(index) => setViewerIndex(index)}
                     />
                 )}
 
@@ -434,6 +437,14 @@ export function ProfileSetupClient() {
                     )}
                 </Button>
             </footer>
+
+            {viewerIndex !== null && (
+                <FullScreenImageViewer
+                    images={gallery.map((item) => item.imageUrl)}
+                    initialIndex={viewerIndex}
+                    onClose={() => setViewerIndex(null)}
+                />
+            )}
         </>
     );
 }

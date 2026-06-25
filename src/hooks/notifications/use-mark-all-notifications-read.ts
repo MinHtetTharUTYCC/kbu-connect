@@ -1,11 +1,11 @@
-"use client";
+'use client';
 
 import {
     getNotificationsControllerGetNotificationsInfiniteQueryKey,
     getNotificationsControllerGetUnreadCountQueryKey,
     useNotificationsControllerMarkAllAsRead,
-} from "@services/generated/notifications/notifications";
-import { useQueryClient } from "@tanstack/react-query";
+} from '@services/generated/notifications/notifications';
+import { useQueryClient } from '@tanstack/react-query';
 
 export function useMarkAllNotificationsRead() {
     const queryClient = useQueryClient();
@@ -14,12 +14,10 @@ export function useMarkAllNotificationsRead() {
         mutation: {
             onSuccess: () => {
                 queryClient.invalidateQueries({
-                    queryKey:
-                        getNotificationsControllerGetNotificationsInfiniteQueryKey(),
+                    queryKey: getNotificationsControllerGetNotificationsInfiniteQueryKey(),
                 });
                 queryClient.invalidateQueries({
-                    queryKey:
-                        getNotificationsControllerGetUnreadCountQueryKey(),
+                    queryKey: getNotificationsControllerGetUnreadCountQueryKey(),
                 });
             },
         },
