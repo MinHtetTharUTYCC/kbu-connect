@@ -3,11 +3,12 @@
 import { ArrowLeft, ArrowRight, Check } from "lucide-react";
 import { useMemo, useState } from "react";
 import { useAuthContext } from "@/components/auth-provider";
-import { Chip, MobileScreen, TopBar } from "@/components/mobile/app-chrome";
+import { Chip } from "@/components/mobile/app-chrome";
 import {
   AvatarUploadStep,
   GalleryUploadStep,
 } from "@/components/mobile/profile-media-upload";
+import { useTopBar } from "@/components/mobile/top-bar-provider";
 import { Button } from "@/components/ui/button";
 import { useUpdateMyProfile } from "@/hooks/profile/use-update-my-profile";
 import type { NewGalleryImageDto } from "../../../../../services/model";
@@ -134,6 +135,12 @@ export function ProfileSetupClient() {
     selectedInterests.length,
   ]);
 
+  useTopBar({
+    title: isEditMode ? "Edit Profile" : "UniMatch",
+    backHref: isEditMode ? "/profile/me" : "/login",
+    action: <div className="w-10" />,
+  });
+
   function toggleInterest(value: UpdateProfileDtoInterestsItem) {
     setSelectedInterests((items) =>
       items.includes(value)
@@ -174,12 +181,7 @@ export function ProfileSetupClient() {
   }
 
   return (
-    <MobileScreen>
-      <TopBar
-        title={isEditMode ? "Edit Profile" : "UniMatch"}
-        backHref={isEditMode ? "/profile/me" : "/login"}
-        action={<div className="w-10" />}
-      />
+    <>
       <div className="h-1 bg-[#f6f3f2]">
         <div
           className="h-full bg-primary transition-all"
@@ -398,7 +400,7 @@ export function ProfileSetupClient() {
           )}
         </Button>
       </footer>
-    </MobileScreen>
+    </>
   );
 }
 

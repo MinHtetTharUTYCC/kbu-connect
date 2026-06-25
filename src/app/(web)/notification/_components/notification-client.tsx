@@ -2,16 +2,13 @@
 
 import { Bell, Heart, Megaphone, MessageCircle } from "lucide-react";
 import { useEffect, useRef } from "react";
-import {
-  EmptyState,
-  MobileScreen,
-  TopBar,
-} from "@/components/mobile/app-chrome";
+import { EmptyState } from "@/components/mobile/app-chrome";
+import { useTopBar } from "@/components/mobile/top-bar-provider";
 import { useMarkAllNotificationsRead } from "@/hooks/notifications/use-mark-all-notifications-read";
 import { useNotificationsList } from "@/hooks/notifications/use-notifications-list";
 import { relativeTime } from "@/lib/profile-utils";
 import {
-  NotificationItemDto,
+  type NotificationItemDto,
   NotificationItemDtoType,
 } from "../../../../../services/model";
 
@@ -26,6 +23,23 @@ export function NotificationClient() {
   const markAllRead = useMarkAllNotificationsRead();
   const loadMoreRef = useRef<HTMLDivElement | null>(null);
   const hasUnread = notifications.some((item) => !item.isRead);
+
+  useTopBar({
+    action: (
+      <button
+        type="button"
+        className="text-xs font-semibold text-primary disabled:text-[#a1a1a1]"
+        disabled={!hasUnread || markAllRead.isPending}
+        onClick={() => markAllRead.mutate()}
+      >
+        {markAllRead.isPending
+          ? "Marking..."
+          : hasUnread
+            ? "Mark all as read"
+            : "All read"}
+      </button>
+    ),
+  });
 
   useEffect(() => {
     const target = loadMoreRef.current;
@@ -45,53 +59,35 @@ export function NotificationClient() {
   }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
 
   return (
-    <MobileScreen className="bg-[#fcf8f8]">
-      <TopBar
-        action={
-          <button
-            type="button"
-            className="text-xs font-semibold text-primary disabled:text-[#a1a1a1]"
-            disabled={!hasUnread || markAllRead.isPending}
-            onClick={() => markAllRead.mutate()}
+    <main className="flex-1 overflow-y-auto bg-[#fcf8f8] pb-8">
+      {isLoading ? (
+        <EmptyState
+          title="Loading notifications"
+          body="Checking for new activity."
+        />
+      ) : notifications.length ? (
+        <Section title="Latest">
+          {notifications.map((item) => (
+            <NotificationRow key={item.id} notification={item} />
+          ))}
+          <div
+            ref={loadMoreRef}
+            className="px-5 py-4 text-center text-xs text-[#6b6b6b]"
           >
-            {markAllRead.isPending
-              ? "Marking..."
-              : hasUnread
-                ? "Mark all as read"
-                : "All read"}
-          </button>
-        }
-      />
-      <main className="flex-1 overflow-y-auto pb-8">
-        {isLoading ? (
-          <EmptyState
-            title="Loading notifications"
-            body="Checking for new activity."
-          />
-        ) : notifications.length ? (
-          <Section title="Latest">
-            {notifications.map((item) => (
-              <NotificationRow key={item.id} notification={item} />
-            ))}
-            <div
-              ref={loadMoreRef}
-              className="px-5 py-4 text-center text-xs text-[#6b6b6b]"
-            >
-              {isFetchingNextPage
-                ? "Loading more..."
-                : hasNextPage
-                  ? ""
-                  : "No more notifications"}
-            </div>
-          </Section>
-        ) : (
-          <EmptyState
-            title="No notifications"
-            body="You are all caught up. New matches, messages, and updates will show here."
-          />
-        )}
-      </main>
-    </MobileScreen>
+            {isFetchingNextPage
+              ? "Loading more..."
+              : hasNextPage
+                ? ""
+                : "No more notifications"}
+          </div>
+        </Section>
+      ) : (
+        <EmptyState
+          title="No notifications"
+          body="You are all caught up. New matches, messages, and updates will show here."
+        />
+      )}
+    </main>
   );
 }
 

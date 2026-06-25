@@ -3,12 +3,8 @@
 import { Heart, MessageCircle, X } from "lucide-react";
 import Image from "next/image";
 import { useCallback, useEffect, useRef, useState } from "react";
-import {
-  Chip,
-  EmptyState,
-  MobileScreen,
-  TopBar,
-} from "@/components/mobile/app-chrome";
+import { Chip, EmptyState } from "@/components/mobile/app-chrome";
+import { useTopBar } from "@/components/mobile/top-bar-provider";
 import { useSendShoutout } from "@/hooks/chat/use-send-shoutout";
 import { useDiscoveryProfiles } from "@/hooks/discovery/use-discovery-profiles";
 import { useSwipeProfile } from "@/hooks/swipes/use-swipe-profile";
@@ -38,6 +34,8 @@ export function DiscoverClient() {
     useSendShoutout();
   const profile = profiles[index];
   const remainingProfiles = profiles.length - index;
+
+  useTopBar({});
 
   useEffect(() => {
     if (remainingProfiles <= 3 && hasNextPage && !isFetchingNextPage) {
@@ -108,37 +106,28 @@ export function DiscoverClient() {
 
   if (isLoading) {
     return (
-      <MobileScreen className="h-full min-h-0">
-        <TopBar />
-        <EmptyState
-          title="Loading profiles"
-          body="Finding people you may want to meet."
-        />
-      </MobileScreen>
+      <EmptyState
+        title="Loading profiles"
+        body="Finding people you may want to meet."
+      />
     );
   }
 
   if (!profile) {
     if (isFetchingNextPage) {
       return (
-        <MobileScreen className="h-full min-h-0">
-          <TopBar />
-          <EmptyState
-            title="Loading more profiles"
-            body="Looking for more people from the campus."
-          />
-        </MobileScreen>
+        <EmptyState
+          title="Loading more profiles"
+          body="Looking for more people from the campus."
+        />
       );
     }
 
     return (
-      <MobileScreen className="h-full min-h-0">
-        <TopBar />
-        <EmptyState
-          title="No profiles nearby"
-          body="Check back later as more KBU students complete their profiles."
-        />
-      </MobileScreen>
+      <EmptyState
+        title="No profiles nearby"
+        body="Check back later as more KBU students complete their profiles."
+      />
     );
   }
 
@@ -150,8 +139,7 @@ export function DiscoverClient() {
     direction === "left" || (!direction && dragX < -SWIPE_THRESHOLD * 0.5);
 
   return (
-    <MobileScreen className="h-full min-h-0 overflow-hidden bg-[#fcf8f8]">
-      <TopBar />
+    <div className="flex flex-1 flex-col overflow-hidden bg-[#fcf8f8]">
       <main className="flex flex-1 flex-col overflow-hidden px-5 pb-6 pt-5">
         <section className="relative flex min-h-0 flex-1 items-center justify-center">
           <div
@@ -261,7 +249,7 @@ export function DiscoverClient() {
           onSubmit={handleSendShoutout}
         />
       )}
-    </MobileScreen>
+    </div>
   );
 }
 

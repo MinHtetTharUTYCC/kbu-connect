@@ -1,10 +1,10 @@
 import { Geist, Geist_Mono } from "next/font/google";
 
 import "./globals.css";
-import { cn } from "@/lib/utils";
 import Providers from "@/components/providers";
 import { Toaster } from "@/components/ui/sonner";
 import BottomNav from "@/components/web/bottom-nav";
+import { cn } from "@/lib/utils";
 
 const geist = Geist({ subsets: ["latin"], variable: "--font-sans" });
 

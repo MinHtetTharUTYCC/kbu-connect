@@ -5,13 +5,8 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { useAuthContext } from "@/components/auth-provider";
-import {
-  Avatar,
-  Chip,
-  EmptyState,
-  MobileScreen,
-  TopBar,
-} from "@/components/mobile/app-chrome";
+import { Avatar, Chip, EmptyState } from "@/components/mobile/app-chrome";
+import { useTopBar } from "@/components/mobile/top-bar-provider";
 import { useConversationMessages } from "@/hooks/chat/use-conversation-messages";
 import { useConversationsList } from "@/hooks/chat/use-conversations-list";
 import { useMarkConversationSeen } from "@/hooks/chat/use-mark-conversation-seen";
@@ -31,39 +26,38 @@ export function ChatHomeClient() {
   const activeTab: ChatTab =
     searchParams.get("tab") === "shoutouts" ? "shoutouts" : "chats";
 
+  useTopBar({ title: "Chats" });
+
   return (
-    <MobileScreen>
-      <TopBar title="Chats" />
-      <main className="flex-1 overflow-y-auto pb-5">
-        <div className="bg-white px-5 py-4">
-          <div className="flex rounded-xl border border-black/10 bg-[#f9f9f8] p-1">
-            <Link
-              href="/chats"
-              className={cn(
-                "flex-1 rounded-lg py-2 text-center text-xs font-semibold",
-                activeTab === "chats"
-                  ? "border border-primary bg-white text-primary shadow-sm"
-                  : "text-[#6b6b6b]",
-              )}
-            >
-              Chats
-            </Link>
-            <Link
-              href="/chats?tab=shoutouts"
-              className={cn(
-                "flex-1 rounded-lg py-2 text-center text-xs font-semibold",
-                activeTab === "shoutouts"
-                  ? "border border-primary bg-white text-primary shadow-sm"
-                  : "text-[#6b6b6b]",
-              )}
-            >
-              Shoutouts
-            </Link>
-          </div>
+    <main className="flex-1 overflow-y-auto pb-5">
+      <div className="bg-white px-5 py-4">
+        <div className="flex rounded-xl border border-black/10 bg-[#f9f9f8] p-1">
+          <Link
+            href="/chats"
+            className={cn(
+              "flex-1 rounded-lg py-2 text-center text-xs font-semibold",
+              activeTab === "chats"
+                ? "border border-primary bg-white text-primary shadow-sm"
+                : "text-[#6b6b6b]",
+            )}
+          >
+            Chats
+          </Link>
+          <Link
+            href="/chats?tab=shoutouts"
+            className={cn(
+              "flex-1 rounded-lg py-2 text-center text-xs font-semibold",
+              activeTab === "shoutouts"
+                ? "border border-primary bg-white text-primary shadow-sm"
+                : "text-[#6b6b6b]",
+            )}
+          >
+            Shoutouts
+          </Link>
         </div>
-        {activeTab === "shoutouts" ? <ShoutoutsPanel /> : <ChatListClient />}
-      </main>
-    </MobileScreen>
+      </div>
+      {activeTab === "shoutouts" ? <ShoutoutsPanel /> : <ChatListClient />}
+    </main>
   );
 }
 
@@ -324,6 +318,18 @@ export function ChatClient({ chatId }: { chatId: string }) {
   );
   const myId = user?.user?.id ?? "me";
 
+  useTopBar({
+    title: conversation?.otherUser?.name ?? "Messages",
+    backHref: "/chats",
+    action: conversation ? (
+      <Avatar
+        src={conversation.otherUser.avatarUrl as string | null}
+        name={conversation.otherUser.name}
+        className="size-10"
+      />
+    ) : undefined,
+  });
+
   useEffect(() => {
     if (chatId && conversation && !conversation.isRead) {
       markSeen({ conversationId: chatId });
@@ -369,84 +375,65 @@ export function ChatClient({ chatId }: { chatId: string }) {
 
   if (conversationsLoading) {
     return (
-      <MobileScreen>
-        <TopBar title="Messages" backHref="/chats" />
-        <EmptyState
-          title="Loading conversation"
-          body="Opening your conversation."
-        />
-      </MobileScreen>
+      <EmptyState
+        title="Loading conversation"
+        body="Opening your conversation."
+      />
     );
   }
 
   if (!conversation) {
     return (
-      <MobileScreen>
-        <TopBar title="Messages" backHref="/chats" />
-        <EmptyState
-          title="Conversation unavailable"
-          body="This chat may have been deleted or is no longer available."
-        />
-      </MobileScreen>
+      <EmptyState
+        title="Conversation unavailable"
+        body="This chat may have been deleted or is no longer available."
+      />
     );
   }
 
   return (
-    <MobileScreen>
-      <TopBar
-        title={conversation.otherUser.name}
-        backHref="/chats"
-        action={
-          <Avatar
-            src={conversation.otherUser.avatarUrl as string | null}
-            name={conversation.otherUser.name}
-            className="size-10"
-          />
-        }
-      />
-      <main className="flex flex-1 flex-col gap-3 overflow-y-auto bg-white px-5 py-6">
-        {messagesQuery.isLoading ? (
-          <EmptyState title="Loading messages" body="Opening your messages." />
-        ) : messages.length ? (
-          messages.map((message) => {
-            const mine = message.senderId === myId || message.senderId === "me";
-            return (
+    <main className="flex flex-1 flex-col gap-3 overflow-y-auto bg-white px-5 py-6">
+      {messagesQuery.isLoading ? (
+        <EmptyState title="Loading messages" body="Opening your messages." />
+      ) : messages.length ? (
+        messages.map((message) => {
+          const mine = message.senderId === myId || message.senderId === "me";
+          return (
+            <div
+              key={message.id}
+              className={cn(
+                "flex max-w-[85%] flex-col",
+                mine ? "self-end items-end" : "items-start",
+              )}
+            >
               <div
-                key={message.id}
                 className={cn(
-                  "flex max-w-[85%] flex-col",
-                  mine ? "self-end items-end" : "items-start",
+                  "rounded-xl p-3 text-sm leading-6",
+                  mine
+                    ? "rounded-tr-none bg-primary text-white"
+                    : "rounded-tl-none border border-black/10 bg-[#f9f9f8]",
                 )}
               >
-                <div
-                  className={cn(
-                    "rounded-xl p-3 text-sm leading-6",
-                    mine
-                      ? "rounded-tr-none bg-primary text-white"
-                      : "rounded-tl-none border border-black/10 bg-[#f9f9f8]",
-                  )}
-                >
-                  {message.content}
-                </div>
-                <span className="mt-1 px-1 text-[10px] text-[#6b6b6b]">
-                  {relativeTime(message.timestamp)}
-                </span>
+                {message.content}
               </div>
-            );
-          })
-        ) : (
-          <EmptyState
-            title="No messages yet"
-            body="Send the first message to start the conversation."
-          />
-        )}
-        <LoadMoreRow
-          ref={loadMoreMessagesRef}
-          hasNextPage={messagesQuery.hasNextPage}
-          isFetchingNextPage={messagesQuery.isFetchingNextPage}
-          endLabel="No more messages"
+              <span className="mt-1 px-1 text-[10px] text-[#6b6b6b]">
+                {relativeTime(message.timestamp)}
+              </span>
+            </div>
+          );
+        })
+      ) : (
+        <EmptyState
+          title="No messages yet"
+          body="Send the first message to start the conversation."
         />
-      </main>
+      )}
+      <LoadMoreRow
+        ref={loadMoreMessagesRef}
+        hasNextPage={messagesQuery.hasNextPage}
+        isFetchingNextPage={messagesQuery.isFetchingNextPage}
+        endLabel="No more messages"
+      />
       <form
         onSubmit={handleSubmit}
         className="flex shrink-0 items-center gap-3 border-t border-black/10 bg-white px-5 py-3"
@@ -472,6 +459,6 @@ export function ChatClient({ chatId }: { chatId: string }) {
           <Send className="size-5" />
         </button>
       </form>
-    </MobileScreen>
+    </main>
   );
 }
