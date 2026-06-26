@@ -7,7 +7,9 @@ import type {
 } from '@services/model';
 import type { InfiniteData } from '@tanstack/react-query';
 
-export function useDiscoveryProfiles(params: DiscoveryControllerGetDiscoveryParams) {
+export function useDiscoveryProfiles(
+    params: DiscoveryControllerGetDiscoveryParams,
+) {
     const query = useDiscoveryControllerGetDiscoveryInfinite<
         InfiniteData<DiscoveryListResponseDto>
     >(params, {

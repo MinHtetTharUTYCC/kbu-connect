@@ -6,7 +6,13 @@ import axiosInstanceFn from '@/lib/axios/axios-instance';
 import { handleBackendError } from '@/lib/error/error-util';
 import { getUsersControllerGetMyProfileQueryKey } from '@services/generated/users/users';
 
-const validImageTypes = ['image/jpeg', 'image/png', 'image/heic', 'image/heif', 'image/webp'];
+const validImageTypes = [
+    'image/jpeg',
+    'image/png',
+    'image/heic',
+    'image/heif',
+    'image/webp',
+];
 const maxImageSize = 20 * 1024 * 1024;
 
 export function useUploadGalleryImages() {

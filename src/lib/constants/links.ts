@@ -1,4 +1,12 @@
-import { Bell, Heart, Home, type LucideIcon, MessageCircle, Search, User } from 'lucide-react';
+import {
+    Bell,
+    Heart,
+    Home,
+    type LucideIcon,
+    MessageCircle,
+    Search,
+    User,
+} from 'lucide-react';
 
 export type NavItem = {
     href: string;

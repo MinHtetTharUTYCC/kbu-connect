@@ -4,7 +4,13 @@ import { useForm } from '@tanstack/react-form';
 import { GraduationCap } from 'lucide-react';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
-import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel } from '@/components/ui/field';
+import {
+    Field,
+    FieldDescription,
+    FieldError,
+    FieldGroup,
+    FieldLabel,
+} from '@/components/ui/field';
 import { Input } from '@/components/ui/input';
 import { useLogin } from '@/hooks/auth/use-login';
 import { useVerify } from '@/hooks/auth/use-verify';
@@ -43,7 +49,9 @@ export function LoginForm() {
                     <GraduationCap className="size-10" />
                 </div>
                 <h1 className="text-2xl font-bold tracking-normal">UniMatch</h1>
-                <p className="mt-2 text-sm text-[#6b6b6b]">Connect with your campus community</p>
+                <p className="mt-2 text-sm text-[#6b6b6b]">
+                    Connect with your campus community
+                </p>
             </section>
 
             {emailInAction ? (
@@ -55,7 +63,9 @@ export function LoginForm() {
                     }}
                 >
                     <div>
-                        <h2 className="text-xl font-semibold">Check your email</h2>
+                        <h2 className="text-xl font-semibold">
+                            Check your email
+                        </h2>
                         <p className="mt-2 text-sm leading-6 text-[#6b6b6b]">
                             We sent a 6-digit OTP to {emailInAction}.
                         </p>
@@ -64,7 +74,8 @@ export function LoginForm() {
                         <verifyForm.Field name="code">
                             {(field) => {
                                 const isInvalid =
-                                    field.state.meta.isTouched && !field.state.meta.isValid;
+                                    field.state.meta.isTouched &&
+                                    !field.state.meta.isValid;
                                 return (
                                     <Field data-invalid={isInvalid}>
                                         <FieldLabel htmlFor={field.name}>
@@ -80,12 +91,18 @@ export function LoginForm() {
                                             autoComplete="one-time-code"
                                             value={field.state.value}
                                             onBlur={field.handleBlur}
-                                            onChange={(e) => field.handleChange(e.target.value)}
+                                            onChange={(e) =>
+                                                field.handleChange(
+                                                    e.target.value,
+                                                )
+                                            }
                                             aria-invalid={isInvalid}
                                             className="h-11 rounded-xl border-black/10 bg-[#fff1ed] px-4 text-base focus-visible:ring-primary/25"
                                         />
                                         {isInvalid && (
-                                            <FieldError errors={field.state.meta.errors} />
+                                            <FieldError
+                                                errors={field.state.meta.errors}
+                                            />
                                         )}
                                     </Field>
                                 );
@@ -94,7 +111,9 @@ export function LoginForm() {
                         <Button
                             type="submit"
                             className="h-12 w-full rounded-xl text-base font-semibold"
-                            disabled={!verifyForm.state.canSubmit || isVerifying}
+                            disabled={
+                                !verifyForm.state.canSubmit || isVerifying
+                            }
                         >
                             {isVerifying ? 'Verifying...' : 'Continue'}
                         </Button>
@@ -122,7 +141,8 @@ export function LoginForm() {
                         <emailForm.Field name="email">
                             {(field) => {
                                 const isInvalid =
-                                    field.state.meta.isTouched && !field.state.meta.isValid;
+                                    field.state.meta.isTouched &&
+                                    !field.state.meta.isValid;
                                 return (
                                     <Field data-invalid={isInvalid}>
                                         <FieldLabel htmlFor={field.name}>
@@ -139,12 +159,18 @@ export function LoginForm() {
                                             autoComplete="email"
                                             value={field.state.value}
                                             onBlur={field.handleBlur}
-                                            onChange={(e) => field.handleChange(e.target.value)}
+                                            onChange={(e) =>
+                                                field.handleChange(
+                                                    e.target.value,
+                                                )
+                                            }
                                             aria-invalid={isInvalid}
                                             className="h-11 rounded-xl border-black/10 bg-[#fff1ed] px-4 text-base focus-visible:ring-primary/25"
                                         />
                                         {isInvalid && (
-                                            <FieldError errors={field.state.meta.errors} />
+                                            <FieldError
+                                                errors={field.state.meta.errors}
+                                            />
                                         )}
                                     </Field>
                                 );
@@ -166,8 +192,12 @@ export function LoginForm() {
 
             <p className="mt-auto px-4 text-center text-xs leading-5 text-[#a1a1a1]">
                 By continuing, you agree to our{' '}
-                <span className="font-medium text-primary">Terms of Service</span> and{' '}
-                <span className="font-medium text-primary">Privacy Policy</span>.
+                <span className="font-medium text-primary">
+                    Terms of Service
+                </span>{' '}
+                and{' '}
+                <span className="font-medium text-primary">Privacy Policy</span>
+                .
             </p>
         </main>
     );

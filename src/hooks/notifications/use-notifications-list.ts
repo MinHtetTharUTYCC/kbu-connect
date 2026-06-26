@@ -19,7 +19,8 @@ export function useNotificationsList(
         },
     });
 
-    const notifications = query.data?.pages.flatMap((page) => page.notifications) ?? [];
+    const notifications =
+        query.data?.pages.flatMap((page) => page.notifications) ?? [];
 
     return { ...query, notifications };
 }
