@@ -13,7 +13,10 @@ import { useMemo, useState } from 'react';
 import { useAuthContext } from '@/components/auth-provider';
 import { Chip, EmptyState } from '@/components/mobile/app-chrome';
 import { FullScreenImageViewer } from '@/components/mobile/full-screen-image-viewer';
-import { AvatarUploadStep, GalleryUploadStep } from '@/components/mobile/profile-media-upload';
+import {
+    AvatarUploadStep,
+    GalleryUploadStep,
+} from '@/components/mobile/profile-media-upload';
 import { useTopBar } from '@/components/mobile/top-bar-provider';
 import { Button } from '@/components/ui/button';
 import { useUpdateMyProfile } from '@/hooks/profile/use-update-my-profile';
@@ -22,7 +25,13 @@ const faculties = Object.values(UpdateProfileDtoFaculty);
 const interests = Object.values(UpdateProfileDtoInterestsItem);
 const nationalities = Object.values(UpdateProfileDtoNationality);
 
-type SetupStep = 'basic' | 'academic' | 'preferences' | 'avatar' | 'gallery' | 'review';
+type SetupStep =
+    | 'basic'
+    | 'academic'
+    | 'preferences'
+    | 'avatar'
+    | 'gallery'
+    | 'review';
 
 const steps: Array<{ id: SetupStep; eyebrow: string; title: string }> = [
     { id: 'basic', eyebrow: 'STEP 1 OF 6', title: 'Start with the essentials' },
@@ -51,9 +60,8 @@ export function ProfileSetupClient() {
 
     const isEditMode = Boolean(user?.isComplete);
 
-    const { mutate: updateProfile, isPending: isProfileUpdating } = useUpdateMyProfile(
-        isEditMode ? '/profile/me' : '/discover',
-    );
+    const { mutate: updateProfile, isPending: isProfileUpdating } =
+        useUpdateMyProfile(isEditMode ? '/profile/me' : '/discover');
 
     const [stepIndex, setStepIndex] = useState(0);
     const [name, setName] = useState(current?.name ?? '');
@@ -76,31 +84,47 @@ export function ProfileSetupClient() {
     const [gender, setGender] = useState<UpdateProfileDtoGender>(
         current?.gender ?? UpdateProfileDtoGender.OTHER,
     );
-    const [preferredGender, setPreferredGender] = useState<UpdateProfileDtoPreferredGender>(
-        current?.preferredGender ?? UpdateProfileDtoPreferredGender.ALL,
-    );
+    const [preferredGender, setPreferredGender] =
+        useState<UpdateProfileDtoPreferredGender>(
+            current?.preferredGender ?? UpdateProfileDtoPreferredGender.ALL,
+        );
     const [nationality, setNationality] = useState<UpdateProfileDtoNationality>(
         current?.nationality ?? UpdateProfileDtoNationality.THAI,
     );
-    const [minPreferredAge, setMinPreferredAge] = useState(current?.minPreferredAge ?? 18);
-    const [maxPreferredAge, setMaxPreferredAge] = useState(current?.maxPreferredAge ?? 28);
-    const [selectedInterests, setSelectedInterests] = useState<UpdateProfileDtoInterestsItem[]>(
-        () =>
-            current?.interests?.length
-                ? (current.interests as UpdateProfileDtoInterestsItem[])
-                : [UpdateProfileDtoInterestsItem.MUSIC, UpdateProfileDtoInterestsItem.SPORTS],
+    const [minPreferredAge, setMinPreferredAge] = useState(
+        current?.minPreferredAge ?? 18,
+    );
+    const [maxPreferredAge, setMaxPreferredAge] = useState(
+        current?.maxPreferredAge ?? 28,
+    );
+    const [selectedInterests, setSelectedInterests] = useState<
+        UpdateProfileDtoInterestsItem[]
+    >(() =>
+        current?.interests?.length
+            ? (current.interests as UpdateProfileDtoInterestsItem[])
+            : [
+                  UpdateProfileDtoInterestsItem.MUSIC,
+                  UpdateProfileDtoInterestsItem.SPORTS,
+              ],
     );
 
     if (isLoading || !current) {
-        return <EmptyState title="Loading profile" body="Setting up your account." />;
+        return (
+            <EmptyState
+                title="Loading profile"
+                body="Setting up your account."
+            />
+        );
     }
 
     const activeStep = steps[stepIndex];
     const isLastStep = stepIndex === steps.length - 1;
     const canGoNext = useMemo(() => {
-        if (activeStep.id === 'basic') return Boolean(name.trim()) && birthYear >= 1900;
+        if (activeStep.id === 'basic')
+            return Boolean(name.trim()) && birthYear >= 1900;
         if (activeStep.id === 'academic') return selectedInterests.length > 0;
-        if (activeStep.id === 'preferences') return minPreferredAge <= maxPreferredAge;
+        if (activeStep.id === 'preferences')
+            return minPreferredAge <= maxPreferredAge;
         if (activeStep.id === 'avatar') return Boolean(avatarUrl);
         if (activeStep.id === 'gallery') return gallery.length > 0;
         return true;
@@ -123,7 +147,9 @@ export function ProfileSetupClient() {
 
     function toggleInterest(value: UpdateProfileDtoInterestsItem) {
         setSelectedInterests((items) =>
-            items.includes(value) ? items.filter((item) => item !== value) : [...items, value],
+            items.includes(value)
+                ? items.filter((item) => item !== value)
+                : [...items, value],
         );
     }
 
@@ -142,7 +168,9 @@ export function ProfileSetupClient() {
             data: {
                 name: name.trim() || current!.name || 'KBU Student',
                 avatarUrl,
-                bio: bio.trim() || 'KBU student looking to meet people on campus.',
+                bio:
+                    bio.trim() ||
+                    'KBU student looking to meet people on campus.',
                 faculty,
                 interests: selectedInterests,
                 gender,
@@ -175,7 +203,9 @@ export function ProfileSetupClient() {
                             ? activeStep.eyebrow.replace('STEP', 'EDIT')
                             : activeStep.eyebrow}
                     </p>
-                    <h1 className="text-xl font-medium leading-7">{activeStep.title}</h1>
+                    <h1 className="text-xl font-medium leading-7">
+                        {activeStep.title}
+                    </h1>
                 </section>
 
                 {activeStep.id === 'basic' && (
@@ -184,7 +214,9 @@ export function ProfileSetupClient() {
                             <input
                                 id="name"
                                 value={name}
-                                onChange={(event) => setName(event.target.value)}
+                                onChange={(event) =>
+                                    setName(event.target.value)
+                                }
                                 placeholder="Your name"
                                 className="h-11 w-full rounded-xl border border-black/10 bg-[#f9f9f8] px-4 outline-none focus:border-primary"
                             />
@@ -193,7 +225,9 @@ export function ProfileSetupClient() {
                             <input
                                 id="birthYear"
                                 value={birthYear}
-                                onChange={(event) => setBirthYear(Number(event.target.value))}
+                                onChange={(event) =>
+                                    setBirthYear(Number(event.target.value))
+                                }
                                 type="number"
                                 min={1900}
                                 max={new Date().getFullYear()}
@@ -246,7 +280,11 @@ export function ProfileSetupClient() {
                                         key={interest}
                                         onClick={() => toggleInterest(interest)}
                                     >
-                                        <Chip active={selectedInterests.includes(interest)}>
+                                        <Chip
+                                            active={selectedInterests.includes(
+                                                interest,
+                                            )}
+                                        >
                                             {interest}
                                         </Chip>
                                     </button>
@@ -261,22 +299,30 @@ export function ProfileSetupClient() {
                         <Select
                             label="Your identity"
                             value={gender}
-                            onChange={(value) => setGender(value as UpdateProfileDtoGender)}
+                            onChange={(value) =>
+                                setGender(value as UpdateProfileDtoGender)
+                            }
                             options={Object.values(UpdateProfileDtoGender)}
                         />
                         <Select
                             label="Interested in"
                             value={preferredGender}
                             onChange={(value) =>
-                                setPreferredGender(value as UpdateProfileDtoPreferredGender)
+                                setPreferredGender(
+                                    value as UpdateProfileDtoPreferredGender,
+                                )
                             }
-                            options={Object.values(UpdateProfileDtoPreferredGender)}
+                            options={Object.values(
+                                UpdateProfileDtoPreferredGender,
+                            )}
                         />
                         <Select
                             label="Nationality"
                             value={nationality}
                             onChange={(value) =>
-                                setNationality(value as UpdateProfileDtoNationality)
+                                setNationality(
+                                    value as UpdateProfileDtoNationality,
+                                )
                             }
                             options={nationalities}
                         />
@@ -286,7 +332,9 @@ export function ProfileSetupClient() {
                                     id="minPreferredAge"
                                     value={minPreferredAge}
                                     onChange={(event) =>
-                                        setMinPreferredAge(Number(event.target.value))
+                                        setMinPreferredAge(
+                                            Number(event.target.value),
+                                        )
                                     }
                                     type="number"
                                     min={18}
@@ -298,7 +346,9 @@ export function ProfileSetupClient() {
                                     id="maxPreferredAge"
                                     value={maxPreferredAge}
                                     onChange={(event) =>
-                                        setMaxPreferredAge(Number(event.target.value))
+                                        setMaxPreferredAge(
+                                            Number(event.target.value),
+                                        )
                                     }
                                     type="number"
                                     min={18}
@@ -330,12 +380,18 @@ export function ProfileSetupClient() {
                         <ReviewRow label="Name" value={name || 'KBU Student'} />
                         <ReviewRow label="Faculty" value={faculty} />
                         <ReviewRow label="Identity" value={gender} />
-                        <ReviewRow label="Interested in" value={preferredGender} />
+                        <ReviewRow
+                            label="Interested in"
+                            value={preferredGender}
+                        />
                         <ReviewRow
                             label="Age range"
                             value={`${minPreferredAge} - ${maxPreferredAge}`}
                         />
-                        <ReviewRow label="Avatar" value={avatarUrl ? 'Uploaded' : 'Missing'} />
+                        <ReviewRow
+                            label="Avatar"
+                            value={avatarUrl ? 'Uploaded' : 'Missing'}
+                        />
                         <ReviewRow
                             label="Gallery"
                             value={`${gallery.length} photo${gallery.length === 1 ? '' : 's'}`}
@@ -379,7 +435,11 @@ export function ProfileSetupClient() {
                               ? 'Save'
                               : 'Finish'
                         : 'Next'}
-                    {isLastStep ? <Check className="size-5" /> : <ArrowRight className="size-5" />}
+                    {isLastStep ? (
+                        <Check className="size-5" />
+                    ) : (
+                        <ArrowRight className="size-5" />
+                    )}
                 </Button>
             </footer>
 

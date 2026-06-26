@@ -12,18 +12,14 @@ export function useNotificationsList(
 ) {
     const query = useNotificationsControllerGetNotificationsInfinite<
         InfiniteData<NotificationsListResponseDto>
-    >(
-        { cursor: params.cursor, limit: params.limit },
-        {
-            query: {
-                initialPageParam: undefined,
-                getNextPageParam: (lastPage) => lastPage.nextCursor,
-            },
+    >(params, {
+        query: {
+            initialPageParam: undefined,
+            getNextPageParam: (lastPage) => lastPage.nextCursor,
         },
-    );
+    });
 
-    const notifications =
-        query.data?.pages.flatMap((page) => page.notifications) ?? [];
+    const notifications = query.data?.pages.flatMap((page) => page.notifications) ?? [];
 
     return { ...query, notifications };
 }

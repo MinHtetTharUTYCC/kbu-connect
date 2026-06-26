@@ -19,9 +19,7 @@ export function useVerify() {
                     router.replace('/profile-setup');
                 }
             },
-            onError: (error) => {
-                handleBackendError(error);
-            },
+            onError: (error) => handleBackendError(error),
         },
     });
 }

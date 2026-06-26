@@ -30,13 +30,17 @@ export default function BottomNav() {
                             className={cn(
                                 'flex min-w-12 flex-col items-center gap-1 px-2 py-2 text-[10px] font-medium transition-colors',
                                 pathname === href ||
-                                    (href !== '/discover' && pathname.startsWith(href))
+                                    (href !== '/discover' &&
+                                        pathname.startsWith(href))
                                     ? 'text-primary'
                                     : 'text-[#737686]',
                             )}
                         >
                             <div className="relative">
-                                <Icon size={22} strokeWidth={pathname === href ? 2.5 : 2} />
+                                <Icon
+                                    size={22}
+                                    strokeWidth={pathname === href ? 2.5 : 2}
+                                />
                             </div>
                             <span>{label}</span>
                         </Link>

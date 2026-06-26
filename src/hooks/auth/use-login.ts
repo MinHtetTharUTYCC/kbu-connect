@@ -9,9 +9,7 @@ export function useLogin(onSuccess: (email: string) => void) {
             onSuccess: (data) => {
                 onSuccess(data.email);
             },
-            onError: (error) => {
-                handleBackendError(error);
-            },
+            onError: (error) => handleBackendError(error),
         },
     });
 }

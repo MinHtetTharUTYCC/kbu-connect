@@ -19,7 +19,8 @@ type ChatTab = 'chats' | 'shoutouts';
 
 export function ChatHomeClient() {
     const searchParams = useSearchParams();
-    const activeTab: ChatTab = searchParams.get('tab') === 'shoutouts' ? 'shoutouts' : 'chats';
+    const activeTab: ChatTab =
+        searchParams.get('tab') === 'shoutouts' ? 'shoutouts' : 'chats';
 
     useTopBar({ title: 'Chats' });
 
@@ -51,7 +52,11 @@ export function ChatHomeClient() {
                     </Link>
                 </div>
             </div>
-            {activeTab === 'shoutouts' ? <ShoutoutsPanel /> : <ChatListClient />}
+            {activeTab === 'shoutouts' ? (
+                <ShoutoutsPanel />
+            ) : (
+                <ChatListClient />
+            )}
         </main>
     );
 }
@@ -60,8 +65,13 @@ function ShoutoutsPanel() {
     const searchParams = useSearchParams();
     const activeSubTab: ShoutoutType =
         searchParams.get('shoutouts') === 'sent' ? 'sent' : 'received';
-    const { shoutouts, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } =
-        useShoutoutsList({ type: activeSubTab, limit: 20 });
+    const {
+        shoutouts,
+        isLoading,
+        fetchNextPage,
+        hasNextPage,
+        isFetchingNextPage,
+    } = useShoutoutsList({ type: activeSubTab, limit: 20 });
     const loadMoreRef = useRef<HTMLDivElement | null>(null);
 
     useEffect(() => {
@@ -110,7 +120,10 @@ function ShoutoutsPanel() {
                 </div>
             </div>
             {isLoading ? (
-                <EmptyState title="Loading shoutouts" body="Checking your shoutouts." />
+                <EmptyState
+                    title="Loading shoutouts"
+                    body="Checking your shoutouts."
+                />
             ) : shoutouts.length ? (
                 <div>
                     {shoutouts.map((item) => (
@@ -188,9 +201,13 @@ function ShoutoutRow({ shoutout }: { shoutout: ShoutoutItem }) {
                             {relativeTime(shoutout.createdAt)}
                         </span>
                     </div>
-                    <p className="line-clamp-2 text-sm leading-6">{shoutout.content}</p>
+                    <p className="line-clamp-2 text-sm leading-6">
+                        {shoutout.content}
+                    </p>
                     <div className="mt-4 flex items-center justify-between gap-3">
-                        <Chip>{shoutout.type === 'received' ? 'Received' : 'Sent'}</Chip>
+                        <Chip>
+                            {shoutout.type === 'received' ? 'Received' : 'Sent'}
+                        </Chip>
                         {shoutout.type === 'received' && (
                             <Link
                                 href={`/profile/${shoutout.otherUser.id}`}
@@ -207,8 +224,13 @@ function ShoutoutRow({ shoutout }: { shoutout: ShoutoutItem }) {
 }
 
 export function ChatListClient() {
-    const { conversations, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } =
-        useConversationsList({ cursor: null, limit: 20 });
+    const {
+        conversations,
+        isLoading,
+        fetchNextPage,
+        hasNextPage,
+        isFetchingNextPage,
+    } = useConversationsList({ cursor: null, limit: 20 });
     const loadMoreRef = useRef<HTMLDivElement | null>(null);
 
     useEffect(() => {
@@ -229,7 +251,12 @@ export function ChatListClient() {
     }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
 
     if (isLoading) {
-        return <EmptyState title="Loading chats" body="Checking your conversations." />;
+        return (
+            <EmptyState
+                title="Loading chats"
+                body="Checking your conversations."
+            />
+        );
     }
 
     if (!conversations.length) {
@@ -264,7 +291,8 @@ export function ChatListClient() {
                             </span>
                         </div>
                         <p className="truncate text-sm text-[#6b6b6b]">
-                            {conversation.lastMessage?.content ?? 'No messages yet.'}
+                            {conversation.lastMessage?.content ??
+                                'No messages yet.'}
                         </p>
                     </div>
                 </Link>

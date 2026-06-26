@@ -11,7 +11,7 @@ export default defineConfig({
             target: `${API_URL}/api/json`,
         },
         output: {
-            mode: 'tags-split', // one file per controller tag (saves, listings, agents...)
+            mode: 'tags-split', // one file per controller tag (auth, users, matches...)
             target: 'services/generated', // generated hooks go here
             schemas: 'services/model', // generated TS interfaces go here
             client: 'react-query',

@@ -4,14 +4,9 @@ import type { UploadGalleryImagesResponseDto } from '@services/model';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import axiosInstanceFn from '@/lib/axios/axios-instance';
 import { handleBackendError } from '@/lib/error/error-util';
+import { getUsersControllerGetMyProfileQueryKey } from '@services/generated/users/users';
 
-const validImageTypes = [
-    'image/jpeg',
-    'image/png',
-    'image/heic',
-    'image/heif',
-    'image/webp',
-];
+const validImageTypes = ['image/jpeg', 'image/png', 'image/heic', 'image/heif', 'image/webp'];
 const maxImageSize = 20 * 1024 * 1024;
 
 export function useUploadGalleryImages() {
@@ -45,7 +40,10 @@ export function useUploadGalleryImages() {
             });
         },
         onSuccess: () => {
-            queryClient.invalidateQueries({ queryKey: ['/users/me'] });
+            // TODO: let me think: this invalidation is not needed,cuz new data is not permanent yet.
+            queryClient.invalidateQueries({
+                queryKey: getUsersControllerGetMyProfileQueryKey(),
+            });
         },
         onError: (error) => handleBackendError(error),
     });

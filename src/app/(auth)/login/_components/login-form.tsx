@@ -8,11 +8,12 @@ import { Field, FieldDescription, FieldError, FieldGroup, FieldLabel } from '@/c
 import { Input } from '@/components/ui/input';
 import { useLogin } from '@/hooks/auth/use-login';
 import { useVerify } from '@/hooks/auth/use-verify';
-import { LoginSchema } from '@/schema/login.schama';
+import { LoginSchema } from '@/schema/login.schema';
 import { VerifySchema } from '@/schema/verify.schema';
 
 export function LoginForm() {
     const [emailInAction, setEmailInAction] = useState('');
+
     const { mutateAsync: login, isPending: isLoggingIn } = useLogin((email) =>
         setEmailInAction(email),
     );

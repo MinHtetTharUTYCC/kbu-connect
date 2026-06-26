@@ -41,7 +41,11 @@ export function ChatClient({ chatId }: { chatId: string }) {
     const conversation = conversations.find((item) => item.id === chatId);
 
     useEffect(() => {
-        if (!conversation && hasNextConversationsPage && !isFetchingNextPageConversations) {
+        if (
+            !conversation &&
+            hasNextConversationsPage &&
+            !isFetchingNextPageConversations
+        ) {
             fetchNextConversationsPage();
         }
     }, [
@@ -50,7 +54,10 @@ export function ChatClient({ chatId }: { chatId: string }) {
         isFetchingNextPageConversations,
         fetchNextConversationsPage,
     ]);
-    const allMessages = useMemo(() => [...messages, ...localMessages], [messages, localMessages]);
+    const allMessages = useMemo(
+        () => [...messages, ...localMessages],
+        [messages, localMessages],
+    );
     const myId = user?.user?.id ?? 'me';
 
     useTopBar({
@@ -86,7 +93,11 @@ export function ChatClient({ chatId }: { chatId: string }) {
 
         observer.observe(target);
         return () => observer.disconnect();
-    }, [fetchNextPageMessages, hasNextPageMessages, isFetchingNextPageMessages]);
+    }, [
+        fetchNextPageMessages,
+        hasNextPageMessages,
+        isFetchingNextPageMessages,
+    ]);
 
     function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
@@ -105,7 +116,12 @@ export function ChatClient({ chatId }: { chatId: string }) {
     }
 
     if (conversationsLoading || (!conversation && hasNextPageMessages)) {
-        return <EmptyState title="Loading conversation" body="Opening your conversation." />;
+        return (
+            <EmptyState
+                title="Loading conversation"
+                body="Opening your conversation."
+            />
+        );
     }
 
     if (!conversation) {
@@ -120,10 +136,14 @@ export function ChatClient({ chatId }: { chatId: string }) {
     return (
         <main className="flex flex-1 flex-col gap-3 overflow-y-auto bg-white px-5 py-6">
             {isLoadingMessages ? (
-                <EmptyState title="Loading messages" body="Opening your messages." />
+                <EmptyState
+                    title="Loading messages"
+                    body="Opening your messages."
+                />
             ) : messages.length ? (
                 messages.map((message) => {
-                    const mine = message.senderId === myId || message.senderId === 'me';
+                    const mine =
+                        message.senderId === myId || message.senderId === 'me';
                     return (
                         <div
                             key={message.id}
