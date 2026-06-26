@@ -1,6 +1,12 @@
 'use client';
 
-import { Cake, Flag, GraduationCap, type LucideIcon, UserRound } from 'lucide-react';
+import {
+    Cake,
+    Flag,
+    GraduationCap,
+    type LucideIcon,
+    UserRound,
+} from 'lucide-react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
@@ -13,12 +19,14 @@ import { ageFromBirthYear, formatEnum } from '@/lib/profile-utils';
 export function ProfileClient({ userId }: { userId: string }) {
     const router = useRouter();
 
-    const { data: me } = useMe();
+    const { data: me, isLoading: meLoading } = useMe();
 
     const myId = me?.user?.id;
     const isOwnProfile = Boolean(myId && myId === userId);
 
-    const { data: profile, isLoading } = useVisitProfile(userId);
+    const { data: profile, isLoading } = useVisitProfile(userId, {
+        enabled: !meLoading && !isOwnProfile,
+    });
 
     useTopBar({
         title: profile?.name ?? 'Profile',
@@ -32,7 +40,9 @@ export function ProfileClient({ userId }: { userId: string }) {
     }, [isOwnProfile, router]);
 
     if (isOwnProfile || isLoading) {
-        return <EmptyState title="Loading profile" body="Opening this profile." />;
+        return (
+            <EmptyState title="Loading profile" body="Opening this profile." />
+        );
     }
 
     if (!profile) {
@@ -44,7 +54,16 @@ export function ProfileClient({ userId }: { userId: string }) {
         );
     }
 
-    const { birthYear, bio, faculty, gender, nationality, avatarUrl, gallery, interests } = profile;
+    const {
+        birthYear,
+        bio,
+        faculty,
+        gender,
+        nationality,
+        avatarUrl,
+        gallery,
+        interests,
+    } = profile;
 
     const age = ageFromBirthYear(birthYear);
     const primaryImage = gallery[0]?.imageUrl ?? avatarUrl;
@@ -60,22 +79,37 @@ export function ProfileClient({ userId }: { userId: string }) {
         <main className="flex-1 overflow-y-auto bg-[#fcf8f8] pb-8">
             <section className="bg-white px-5 pb-5 pt-6">
                 <div className="flex items-center gap-4">
-                    <Avatar src={avatarUrl} name={profile.name} className="size-20" />
+                    <Avatar
+                        src={avatarUrl}
+                        name={profile.name}
+                        className="size-20"
+                    />
                     <div className="min-w-0 flex-1">
-                        <h1 className="truncate text-2xl font-bold">{profile.name}</h1>
+                        <h1 className="truncate text-2xl font-bold">
+                            {profile.name}
+                        </h1>
                         {metadataItems.length > 0 ? (
                             <div className="mt-3 flex flex-wrap gap-2">
                                 {metadataItems.map((item) => (
-                                    <ProfileMetaChip key={item.label} item={item} />
+                                    <ProfileMetaChip
+                                        key={item.label}
+                                        item={item}
+                                    />
                                 ))}
                             </div>
                         ) : (
-                            <p className="mt-1 text-sm text-[#6b6b6b]">KBU student</p>
+                            <p className="mt-1 text-sm text-[#6b6b6b]">
+                                KBU student
+                            </p>
                         )}
                     </div>
                 </div>
 
-                {bio && <p className="mt-5 text-sm leading-6 text-[#434655]">{bio}</p>}
+                {bio && (
+                    <p className="mt-5 text-sm leading-6 text-[#434655]">
+                        {bio}
+                    </p>
+                )}
             </section>
 
             <ProfileSection title="Photos">
@@ -146,7 +180,13 @@ function ProfileMetaChip({ item }: { item: ProfileMetaItem }) {
     );
 }
 
-function ProfileSection({ title, children }: { title: string; children: React.ReactNode }) {
+function ProfileSection({
+    title,
+    children,
+}: {
+    title: string;
+    children: React.ReactNode;
+}) {
     return (
         <section className="mt-3 bg-white px-5 py-5">
             <h2 className="mb-3 text-sm font-semibold uppercase tracking-wide text-[#6b6b6b]">

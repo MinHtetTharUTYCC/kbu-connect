@@ -20,7 +20,9 @@ export function MatchesClient() {
                 </div>
                 <div className="flex gap-4 overflow-x-auto px-5 pb-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                     {matchesLoading ? (
-                        <p className="py-4 text-sm text-[#6b6b6b]">Loading matches...</p>
+                        <p className="py-4 text-sm text-[#6b6b6b]">
+                            Loading matches...
+                        </p>
                     ) : matches.length ? (
                         matches.map((match) => (
                             <Link
@@ -49,7 +51,8 @@ export function MatchesClient() {
                         ))
                     ) : (
                         <p className="w-full px-5 py-10 text-center text-sm text-muted-foreground">
-                            No matches yet. When someone likes you back, they will show here.
+                            No matches yet. When someone likes you back, they
+                            will show here.
                         </p>
                     )}
                 </div>

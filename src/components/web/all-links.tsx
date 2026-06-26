@@ -27,7 +27,7 @@ const links: Array<{ href: string; label: string }> = [
         label: 'Discover Page',
     },
     {
-        href: '/profilesetup',
+        href: '/profile-setup',
         label: 'Profile Setup Page',
     },
     {

@@ -18,5 +18,6 @@ export function useConversationMessages(conversationId: string, _limit = 20) {
         hasNextPage: false,
         isFetchingNextPage: false,
         fetchNextPage: async () => undefined,
+        fetchingNextPage: false,
     };
 }

@@ -1,5 +1,10 @@
-import { ChatHomeClient } from '../chat/_components/chat-client';
+import { Suspense } from 'react';
+import { ChatHomeClient } from './_components/chat-list';
 
 export default function ChatsPage() {
-    return <ChatHomeClient />;
+    return (
+        <Suspense fallback="Loading...">
+            <ChatHomeClient />
+        </Suspense>
+    );
 }

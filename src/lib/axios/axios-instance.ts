@@ -7,7 +7,9 @@ let isRefreshing = false;
 let refreshSubscribers: (() => void)[] = [];
 
 const onRefreshed = () => {
-    refreshSubscribers.forEach((callback) => callback());
+    refreshSubscribers.forEach((callback) => {
+        callback();
+    });
     refreshSubscribers = [];
 };
 
@@ -58,9 +60,7 @@ axiosInstance.interceptors.response.use(
             _retry?: boolean;
         };
 
-        const isAuthRoute = RETRY_SKIP_ROUTES.some((path) =>
-            originalRequest.url?.includes(path),
-        );
+        const isAuthRoute = RETRY_SKIP_ROUTES.some((path) => originalRequest.url?.includes(path));
 
         // if signin or refresh request itself failed, just reject with error message
         if (isAuthRoute) {
@@ -92,10 +92,9 @@ axiosInstance.interceptors.response.use(
 
                 try {
                     // httpOnly refresh cookie is auto-sent
-                    const data = await axiosInstance.post<
-                        any,
-                        { access_token: string }
-                    >('/auth/refresh');
+                    const data = await axiosInstance.post<any, { access_token: string }>(
+                        '/auth/refresh',
+                    );
 
                     console.log('Token refreshed successfully', data);
 

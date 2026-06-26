@@ -19,17 +19,25 @@ export function DiscoverClient() {
     const [direction, setDirection] = useState<'left' | 'right' | null>(null);
     const [isShoutoutOpen, setIsShoutoutOpen] = useState(false);
     const [shoutoutMessage, setShoutoutMessage] = useState('');
-    const [selectedProfileId, setSelectedProfileId] = useState<string | null>(null);
+    const [selectedProfileId, setSelectedProfileId] = useState<string | null>(
+        null,
+    );
     const [imageIndex, setImageIndex] = useState(0);
     const [dragX, setDragX] = useState(0);
     const touchStartX = useRef(0);
     const touchStartY = useRef(0);
     const isDragging = useRef(false);
     const cardRef = useRef<HTMLDivElement>(null);
-    const { profiles, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } =
-        useDiscoveryProfiles({});
+    const {
+        profiles,
+        isLoading,
+        fetchNextPage,
+        hasNextPage,
+        isFetchingNextPage,
+    } = useDiscoveryProfiles({});
     const { like, dislike, isPending: isSwipePending } = useSwipeProfile();
-    const { mutateAsync: sendShoutout, isPending: isSendingShoutout } = useSendShoutout();
+    const { mutateAsync: sendShoutout, isPending: isSendingShoutout } =
+        useSendShoutout();
     const profile = profiles[index];
     const remainingProfiles = profiles.length - index;
 
@@ -106,7 +114,12 @@ export function DiscoverClient() {
     }
 
     if (isLoading) {
-        return <EmptyState title="Loading profiles" body="Finding people you may want to meet." />;
+        return (
+            <EmptyState
+                title="Loading profiles"
+                body="Finding people you may want to meet."
+            />
+        );
     }
 
     if (!profile) {
@@ -129,8 +142,10 @@ export function DiscoverClient() {
 
     const dragRotation = dragX * 0.06;
     const dragOpacity = Math.max(0, 1 - Math.abs(dragX) / 300);
-    const showLikeStamp = direction === 'right' || (!direction && dragX > SWIPE_THRESHOLD * 0.5);
-    const showPassStamp = direction === 'left' || (!direction && dragX < -SWIPE_THRESHOLD * 0.5);
+    const showLikeStamp =
+        direction === 'right' || (!direction && dragX > SWIPE_THRESHOLD * 0.5);
+    const showPassStamp =
+        direction === 'left' || (!direction && dragX < -SWIPE_THRESHOLD * 0.5);
 
     return (
         <div className="flex flex-1 flex-col overflow-hidden bg-[#fcf8f8]">
@@ -141,8 +156,10 @@ export function DiscoverClient() {
                         className={cn(
                             'relative flex h-full min-h-[400px] w-full max-w-full flex-col overflow-hidden rounded-xl border border-black/10 bg-white shadow-sm',
                             !dragX && 'transition duration-300',
-                            direction === 'left' && '-translate-x-24 -rotate-6 opacity-0',
-                            direction === 'right' && 'translate-x-24 rotate-6 opacity-0',
+                            direction === 'left' &&
+                                '-translate-x-24 -rotate-6 opacity-0',
+                            direction === 'right' &&
+                                'translate-x-24 rotate-6 opacity-0',
                         )}
                         style={{
                             transform: direction
@@ -190,7 +207,10 @@ export function DiscoverClient() {
                                         onClick={(e) => {
                                             e.stopPropagation();
                                             setImageIndex((prev) =>
-                                                prev > 0 ? prev - 1 : profile.gallery.length - 1,
+                                                prev > 0
+                                                    ? prev - 1
+                                                    : profile.gallery.length -
+                                                      1,
                                             );
                                         }}
                                     />
@@ -201,7 +221,10 @@ export function DiscoverClient() {
                                         onClick={(e) => {
                                             e.stopPropagation();
                                             setImageIndex((prev) =>
-                                                prev < profile.gallery.length - 1 ? prev + 1 : 0,
+                                                prev <
+                                                profile.gallery.length - 1
+                                                    ? prev + 1
+                                                    : 0,
                                             );
                                         }}
                                     />
@@ -226,18 +249,24 @@ export function DiscoverClient() {
                             <div className="flex items-end gap-2">
                                 <button
                                     type="button"
-                                    onClick={() => setSelectedProfileId(profile.id)}
+                                    onClick={() =>
+                                        setSelectedProfileId(profile.id)
+                                    }
                                     className="text-left text-xl font-semibold active:opacity-70"
                                 >
                                     {profile.name}
                                 </button>
                                 <span className="pb-0.5 text-sm text-[#6b6b6b]">
-                                    {profile?.nationality ? formatEnum(profile.nationality) : 'KBU'}
+                                    {profile?.nationality
+                                        ? formatEnum(profile.nationality)
+                                        : 'KBU'}
                                 </span>
                             </div>
                             <Chip>{profile.faculty}</Chip>
                             {profile.bio && (
-                                <p className="text-sm leading-6 text-[#434655]">{profile.bio}</p>
+                                <p className="text-sm leading-6 text-[#434655]">
+                                    {profile.bio}
+                                </p>
                             )}
                             <div className="flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
                                 {/* {profile.interests.map((interest) => (
@@ -321,8 +350,12 @@ function ShoutoutSheet({
             >
                 <div className="mb-4 flex items-start justify-between gap-4">
                     <div>
-                        <h2 className="text-lg font-semibold">Send shoutout (Max 5 per day)</h2>
-                        <p className="mt-1 text-xs text-muted-foreground">Write to {name}.</p>
+                        <h2 className="text-lg font-semibold">
+                            Send shoutout (Max 5 per day)
+                        </h2>
+                        <p className="mt-1 text-xs text-muted-foreground">
+                            Write to {name}.
+                        </p>
                     </div>
                     <button
                         type="button"
@@ -352,7 +385,13 @@ function ShoutoutSheet({
     );
 }
 
-function SwipeStamp({ label, className }: { label: string; className?: string }) {
+function SwipeStamp({
+    label,
+    className,
+}: {
+    label: string;
+    className?: string;
+}) {
     return (
         <div
             className={cn(

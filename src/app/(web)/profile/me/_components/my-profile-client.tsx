@@ -3,36 +3,48 @@
 import { LogOut, Pencil } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { useAuthContext } from '@/components/auth-provider';
 import { Avatar, EmptyState } from '@/components/mobile/app-chrome';
 import { FullScreenImageViewer } from '@/components/mobile/full-screen-image-viewer';
 import { useTopBar } from '@/components/mobile/top-bar-provider';
+import { useLogout } from '@/hooks/auth/use-logout';
 import { useToggleDiscoverable } from '@/hooks/profile/use-toggle-discoverable';
 import { ageFromBirthYear, formatEnum } from '@/lib/profile-utils';
-import { useAuthStore } from '@/stores/auth-store';
 
 export function MyProfileClient() {
-    const router = useRouter();
-
     const { user, isLoading } = useAuthContext();
     const profile = user?.user;
 
-    const logout = useAuthStore((state) => state.logout);
+    const { mutate: logout } = useLogout();
 
-    const { mutate: toggleDiscoverable, isPending: isToggleDiscoverablePending } =
-        useToggleDiscoverable();
+    const {
+        mutate: toggleDiscoverable,
+        isPending: isToggleDiscoverablePending,
+    } = useToggleDiscoverable();
 
     const [viewerIndex, setViewerIndex] = useState<number | null>(null);
 
     useTopBar({});
 
     if (isLoading || !profile) {
-        return <EmptyState title="Loading profile" body="Setting up your account..." />;
+        return (
+            <EmptyState
+                title="Loading profile"
+                body="Setting up your account..."
+            />
+        );
     }
 
-    const { avatarUrl, name, bio, faculty, birthYear, gallery, isDiscoverable } = profile;
+    const {
+        avatarUrl,
+        name,
+        bio,
+        faculty,
+        birthYear,
+        gallery,
+        isDiscoverable,
+    } = profile;
     const galleryImages = gallery.map((item) => item.imageUrl);
 
     return (
@@ -50,7 +62,9 @@ export function MyProfileClient() {
                 </div>
                 <h1 className="text-xl font-semibold">{name}</h1>
                 <p className="mt-1 max-w-[300px] text-sm leading-6 text-muted-foreground">
-                    {faculty ? `${formatEnum(faculty as string)} student` : 'KBU student'}
+                    {faculty
+                        ? `${formatEnum(faculty as string)} student`
+                        : 'KBU student'}
                     {birthYear ? ` • ${ageFromBirthYear(birthYear)}` : ''}
                     {bio ? ` • ${bio}` : ''}
                 </p>
@@ -106,7 +120,9 @@ export function MyProfileClient() {
                 <div className="border-b border-black/10 px-5 py-4">
                     <div className="flex items-center justify-between">
                         <div className="min-w-0 flex-1">
-                            <span className="text-sm font-medium">Discoverable</span>
+                            <span className="text-sm font-medium">
+                                Discoverable
+                            </span>
                             <p className="mt-0.5 text-xs leading-5 text-muted-foreground">
                                 {isDiscoverable
                                     ? 'Your profile is visible to others on the feed.'
@@ -131,7 +147,9 @@ export function MyProfileClient() {
                         >
                             <span
                                 className={`inline-block size-4 rounded-full bg-white shadow-sm transition-transform ${
-                                    isDiscoverable ? 'translate-x-6' : 'translate-x-1'
+                                    isDiscoverable
+                                        ? 'translate-x-6'
+                                        : 'translate-x-1'
                                 }`}
                             />
                         </button>
@@ -148,10 +166,7 @@ export function MyProfileClient() {
                 </div>
                 <button
                     type="button"
-                    onClick={() => {
-                        logout();
-                        router.replace('/login');
-                    }}
+                    onClick={() => logout()}
                     className="flex w-full items-center justify-between px-5 py-4 text-left text-primary active:bg-[#fff1ed]"
                 >
                     <span className="text-sm">Logout</span>
@@ -167,7 +182,13 @@ export function MyProfileClient() {
     );
 }
 
-function SettingsSection({ title, children }: { title: string; children: React.ReactNode }) {
+function SettingsSection({
+    title,
+    children,
+}: {
+    title: string;
+    children: React.ReactNode;
+}) {
     return (
         <section className="mb-6">
             <h2 className="mb-2 px-5 text-xs font-semibold uppercase tracking-wide text-[#6b6b6b]">
