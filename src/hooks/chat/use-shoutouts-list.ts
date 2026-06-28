@@ -12,7 +12,9 @@ import type { InfiniteData } from '@tanstack/react-query';
 export type ShoutoutType = ChatControllerGetShoutoutsType;
 export type ShoutoutItem = ShoutoutItemDto;
 
-export function useShoutoutsList(params: ChatControllerGetShoutoutsParams = { limit: 20 }) {
+export function useShoutoutsList(
+    params: ChatControllerGetShoutoutsParams = { limit: 20 },
+) {
     const query = useChatControllerGetShoutoutsInfinite<
         InfiniteData<ShoutoutsListResponseDto, string | undefined>
     >(params, {
