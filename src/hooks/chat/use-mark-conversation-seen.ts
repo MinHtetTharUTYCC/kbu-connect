@@ -14,9 +14,12 @@ export function useMarkConversationSeen() {
     return useChatControllerMarkNewestConversationMessageAsSeen({
         mutation: {
             onSuccess: (_data, variables) => {
-                queryClient.setQueriesData<InfiniteData<ConversationsListResponseDto>>(
+                queryClient.setQueriesData<
+                    InfiniteData<ConversationsListResponseDto>
+                >(
                     {
-                        queryKey: getChatControllerGetConversationsInfiniteQueryKey(),
+                        queryKey:
+                            getChatControllerGetConversationsInfiniteQueryKey(),
                     },
                     (oldData) => {
                         if (!oldData) return oldData;
@@ -25,10 +28,12 @@ export function useMarkConversationSeen() {
                             ...oldData,
                             pages: oldData.pages.map((page) => ({
                                 ...page,
-                                conversations: page.conversations.map((conversation) =>
-                                    conversation.id === variables.conversationId
-                                        ? { ...conversation, isRead: true }
-                                        : conversation,
+                                conversations: page.conversations.map(
+                                    (conversation) =>
+                                        conversation.id ===
+                                        variables.conversationId
+                                            ? { ...conversation, isRead: true }
+                                            : conversation,
                                 ),
                             })),
                         };

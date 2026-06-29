@@ -8,7 +8,7 @@ import {
     UpdateProfileDtoNationality,
     UpdateProfileDtoPreferredGender,
 } from '@services/model';
-import { ArrowLeft, ArrowRight, Check } from 'lucide-react';
+import { ArrowLeft, ArrowRight, Check, X } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { useAuthContext } from '@/components/auth-provider';
 import { Chip, EmptyState } from '@/components/mobile/app-chrome';
@@ -142,7 +142,17 @@ export function ProfileSetupClient() {
     useTopBar({
         title: isEditMode ? 'Edit Profile' : 'UniMatch',
         backHref: isEditMode ? '/profile/me' : '/login',
-        action: <div className="w-10" />,
+        action: isEditMode ? (
+            <a
+                href="/profile/me"
+                className="grid size-10 place-items-center rounded-full text-[#6b6b6b] transition active:scale-95"
+                aria-label="Cancel editing"
+            >
+                <X className="size-5" />
+            </a>
+        ) : (
+            <div className="w-10" />
+        ),
     });
 
     function toggleInterest(value: UpdateProfileDtoInterestsItem) {

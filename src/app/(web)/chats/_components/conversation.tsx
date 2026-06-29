@@ -23,7 +23,8 @@ export function ChatClient({ chatId }: { chatId: string }) {
         hasNextPage: hasNextPageMessages,
         isFetchingNextPage: isFetchingNextPageMessages,
     } = useConversationMessages(chatId);
-    const { data: conversation, isLoading: conversationLoading } = useConversation(chatId);
+    const { data: conversation, isLoading: conversationLoading } =
+        useConversation(chatId);
     const { mutate: markSeen } = useMarkConversationSeen();
 
     const loadMoreMessagesRef = useRef<HTMLDivElement | null>(null);
@@ -32,11 +33,8 @@ export function ChatClient({ chatId }: { chatId: string }) {
 
     const myId = user?.user?.id;
 
-    const { mutateAsync: sendMessage, isPending: isSendingMessage } = useSendMessage(
-        chatId,
-        myId,
-        () => {},
-    );
+    const { mutateAsync: sendMessage, isPending: isSendingMessage } =
+        useSendMessage(chatId, myId, () => {});
 
     useTopBar({
         title: conversation?.participant.name ?? 'Messages',
@@ -71,7 +69,11 @@ export function ChatClient({ chatId }: { chatId: string }) {
 
         observer.observe(target);
         return () => observer.disconnect();
-    }, [fetchNextPageMessages, hasNextPageMessages, isFetchingNextPageMessages]);
+    }, [
+        fetchNextPageMessages,
+        hasNextPageMessages,
+        isFetchingNextPageMessages,
+    ]);
 
     async function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
@@ -82,7 +84,12 @@ export function ChatClient({ chatId }: { chatId: string }) {
     }
 
     if (conversationLoading || (!conversation && hasNextPageMessages)) {
-        return <EmptyState title="Loading conversation" body="Opening your conversation." />;
+        return (
+            <EmptyState
+                title="Loading conversation"
+                body="Opening your conversation."
+            />
+        );
     }
 
     if (!conversation) {
@@ -106,7 +113,10 @@ export function ChatClient({ chatId }: { chatId: string }) {
     return (
         <main className="flex flex-1 flex-col gap-3 overflow-y-auto bg-white px-5 py-6">
             {isLoadingMessages ? (
-                <EmptyState title="Loading messages" body="Opening your messages." />
+                <EmptyState
+                    title="Loading messages"
+                    body="Opening your messages."
+                />
             ) : messages.length ? (
                 messages.map((message) => {
                     const mine = message.senderId === myId;

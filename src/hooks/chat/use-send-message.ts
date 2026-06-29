@@ -13,7 +13,10 @@ export function useSendMessage(
 ) {
     const queryClient = useQueryClient();
 
-    const queryKey = getChatControllerGetConversationMessagesInfiniteQueryKey(conversationId);
+    const queryKey =
+        getChatControllerGetConversationMessagesInfiniteQueryKey(
+            conversationId,
+        );
 
     const optimisticUpdate = (content: string, tempId: string) => {
         if (!userId) return undefined;
@@ -27,53 +30,60 @@ export function useSendMessage(
             timestamp: new Date().toISOString(),
         };
 
-        queryClient.setQueryData<InfiniteData<MessagesListResponseDto>>(queryKey, (old) => {
-            if (!old?.pages) return old;
+        queryClient.setQueryData<InfiniteData<MessagesListResponseDto>>(
+            queryKey,
+            (old) => {
+                if (!old?.pages) return old;
 
-            return {
-                ...old,
-                pages: old.pages.map((page, idx) =>
-                    idx === 0
-                        ? {
-                              ...page,
-                              messages: [tempMessage, ...page.messages],
-                          }
-                        : page,
-                ),
-            };
-        });
+                return {
+                    ...old,
+                    pages: old.pages.map((page, idx) =>
+                        idx === 0
+                            ? {
+                                  ...page,
+                                  messages: [tempMessage, ...page.messages],
+                              }
+                            : page,
+                    ),
+                };
+            },
+        );
 
         return previous;
     };
 
     const replaceTempMessage = (tempId: string, newMessage: MessageItemDto) => {
-        queryClient.setQueryData<InfiniteData<MessagesListResponseDto>>(queryKey, (old) => {
-            if (!old?.pages) return old;
+        queryClient.setQueryData<InfiniteData<MessagesListResponseDto>>(
+            queryKey,
+            (old) => {
+                if (!old?.pages) return old;
 
-            let didReplace = false;
-            const pages = old.pages.map((page) => {
-                const hasResolved = page.messages.some(
-                    (item) => item.id === newMessage.id && item.id !== tempId,
-                );
-                const messages = hasResolved
-                    ? page.messages.filter((item) => item.id !== tempId)
-                    : page.messages.map((item) => {
-                          if (item.id === tempId) {
-                              didReplace = true;
-                              return newMessage;
-                          }
-                          return item;
-                      });
+                let didReplace = false;
+                const pages = old.pages.map((page) => {
+                    const hasResolved = page.messages.some(
+                        (item) =>
+                            item.id === newMessage.id && item.id !== tempId,
+                    );
+                    const messages = hasResolved
+                        ? page.messages.filter((item) => item.id !== tempId)
+                        : page.messages.map((item) => {
+                              if (item.id === tempId) {
+                                  didReplace = true;
+                                  return newMessage;
+                              }
+                              return item;
+                          });
 
-                if (hasResolved) {
-                    didReplace = true;
-                }
+                    if (hasResolved) {
+                        didReplace = true;
+                    }
 
-                return didReplace ? { ...page, messages } : page;
-            });
+                    return didReplace ? { ...page, messages } : page;
+                });
 
-            return didReplace ? { ...old, pages } : old;
-        });
+                return didReplace ? { ...old, pages } : old;
+            },
+        );
     };
 
     return useChatControllerSendMessage({
