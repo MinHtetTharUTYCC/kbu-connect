@@ -1,23 +1,26 @@
 'use client';
 
-import { useChatControllerGetConversationMessages } from '@services/generated/chat/chat';
+import { useChatControllerGetConversationMessagesInfinite } from '@services/generated/chat/chat';
+import {
+    ChatControllerGetConversationMessagesParams,
+    MessagesListResponseDto,
+} from '@services/model';
+import { InfiniteData } from '@tanstack/react-query';
 
-// TODO: infinite scroll here, but the API doesn't support pagination yet, so we just return all messages for now(API coming soon)
-
-export function useConversationMessages(conversationId: string, _limit = 20) {
-    const query = useChatControllerGetConversationMessages(conversationId, {
+export function useConversationMessages(
+    conversationId: string,
+    params?: ChatControllerGetConversationMessagesParams,
+) {
+    const query = useChatControllerGetConversationMessagesInfinite<
+        InfiniteData<MessagesListResponseDto, string | null>
+    >(conversationId, params, {
         query: {
+            initialPageParam: null,
+            getNextPageParam: (lastPage) => lastPage.nextCursor,
             enabled: Boolean(conversationId),
         },
     });
-    const messages = query.data?.messages ?? [];
+    const messages = query.data?.pages.flatMap((page) => page.messages) ?? [];
 
-    return {
-        ...query,
-        messages,
-        hasNextPage: false,
-        isFetchingNextPage: false,
-        fetchNextPage: async () => undefined,
-        fetchingNextPage: false,
-    };
+    return { ...query, messages };
 }

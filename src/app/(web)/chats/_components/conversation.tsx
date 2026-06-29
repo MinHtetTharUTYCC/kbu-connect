@@ -1,79 +1,57 @@
 'use client';
 
 import { PlusCircle, Send } from 'lucide-react';
-import { useEffect, useMemo, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { useAuthContext } from '@/components/auth-provider';
 import { Avatar, EmptyState } from '@/components/mobile/app-chrome';
 import { useTopBar } from '@/components/mobile/top-bar-provider';
 import { useConversationMessages } from '@/hooks/chat/use-conversation-messages';
-import { useConversationsList } from '@/hooks/chat/use-conversations-list';
 import { useMarkConversationSeen } from '@/hooks/chat/use-mark-conversation-seen';
 import { relativeTime } from '@/lib/profile-utils';
 import { cn } from '@/lib/utils';
-import type { MessageItemDto } from '@services/model';
 import { LoadMoreRow } from './chat-list';
+import { useConversation } from '@/hooks/chat/use-conversation';
+import { useSendMessage } from '@/hooks/chat/use-send-message';
 
 export function ChatClient({ chatId }: { chatId: string }) {
     const { user } = useAuthContext();
+
     const {
         messages,
         isLoading: isLoadingMessages,
         fetchNextPage: fetchNextPageMessages,
         hasNextPage: hasNextPageMessages,
-        fetchingNextPage: isFetchingNextPageMessages,
-    } = useConversationMessages(chatId, 20);
-    const loadMoreMessagesRef = useRef<HTMLDivElement | null>(null);
-
-    const {
-        conversations,
-        isLoading: conversationsLoading,
-        fetchNextPage: fetchNextConversationsPage,
-        hasNextPage: hasNextConversationsPage,
-        isFetchingNextPage: isFetchingNextPageConversations,
-    } = useConversationsList({
-        cursor: null,
-        limit: 20,
-    });
+        isFetchingNextPage: isFetchingNextPageMessages,
+    } = useConversationMessages(chatId);
+    const { data: conversation, isLoading: conversationLoading } = useConversation(chatId);
     const { mutate: markSeen } = useMarkConversationSeen();
 
-    const [draft, setDraft] = useState('');
-    const [localMessages, setLocalMessages] = useState<MessageItemDto[]>([]);
-    const conversation = conversations.find((item) => item.id === chatId);
+    const loadMoreMessagesRef = useRef<HTMLDivElement | null>(null);
 
-    useEffect(() => {
-        if (
-            !conversation &&
-            hasNextConversationsPage &&
-            !isFetchingNextPageConversations
-        ) {
-            fetchNextConversationsPage();
-        }
-    }, [
-        conversation,
-        hasNextConversationsPage,
-        isFetchingNextPageConversations,
-        fetchNextConversationsPage,
-    ]);
-    const allMessages = useMemo(
-        () => [...messages, ...localMessages],
-        [messages, localMessages],
+    const [draft, setDraft] = useState('');
+
+    const myId = user?.user?.id;
+
+    const { mutateAsync: sendMessage, isPending: isSendingMessage } = useSendMessage(
+        chatId,
+        myId,
+        () => {},
     );
-    const myId = user?.user?.id ?? 'me';
 
     useTopBar({
-        title: conversation?.otherUser?.name ?? 'Messages',
+        title: conversation?.participant.name ?? 'Messages',
         backHref: '/chats',
         action: conversation ? (
             <Avatar
-                src={conversation.otherUser.avatarUrl}
-                name={conversation.otherUser.name}
+                src={conversation.participant.avatarUrl}
+                name={conversation.participant.name}
                 className="size-10"
             />
         ) : undefined,
     });
 
     useEffect(() => {
-        if (chatId && conversation && !conversation.isRead) {
+        if (chatId && conversation) {
             markSeen({ conversationId: chatId });
         }
     }, [chatId, conversation, markSeen]);
@@ -93,35 +71,18 @@ export function ChatClient({ chatId }: { chatId: string }) {
 
         observer.observe(target);
         return () => observer.disconnect();
-    }, [
-        fetchNextPageMessages,
-        hasNextPageMessages,
-        isFetchingNextPageMessages,
-    ]);
+    }, [fetchNextPageMessages, hasNextPageMessages, isFetchingNextPageMessages]);
 
-    function handleSubmit(e: React.FormEvent) {
+    async function handleSubmit(e: React.FormEvent) {
         e.preventDefault();
         const content = draft.trim();
-        if (!content) return;
-        setLocalMessages((items) => [
-            ...items,
-            {
-                id: `local-${Date.now()}`,
-                content,
-                senderId: myId,
-                timestamp: new Date().toISOString(),
-            },
-        ]);
-        setDraft('');
+        if (!content || !myId) return;
+
+        await sendMessage({ data: { conversationId: chatId, content } });
     }
 
-    if (conversationsLoading || (!conversation && hasNextPageMessages)) {
-        return (
-            <EmptyState
-                title="Loading conversation"
-                body="Opening your conversation."
-            />
-        );
+    if (conversationLoading || (!conversation && hasNextPageMessages)) {
+        return <EmptyState title="Loading conversation" body="Opening your conversation." />;
     }
 
     if (!conversation) {
@@ -133,17 +94,22 @@ export function ChatClient({ chatId }: { chatId: string }) {
         );
     }
 
+    if (!myId) {
+        return (
+            <EmptyState
+                title="Authentication required"
+                body="Please sign in to view this conversation."
+            />
+        );
+    }
+
     return (
         <main className="flex flex-1 flex-col gap-3 overflow-y-auto bg-white px-5 py-6">
             {isLoadingMessages ? (
-                <EmptyState
-                    title="Loading messages"
-                    body="Opening your messages."
-                />
+                <EmptyState title="Loading messages" body="Opening your messages." />
             ) : messages.length ? (
                 messages.map((message) => {
-                    const mine =
-                        message.senderId === myId || message.senderId === 'me';
+                    const mine = message.senderId === myId;
                     return (
                         <div
                             key={message.id}
@@ -194,12 +160,13 @@ export function ChatClient({ chatId }: { chatId: string }) {
                 <input
                     value={draft}
                     onChange={(e) => setDraft(e.target.value)}
-                    placeholder="Type a message"
+                    placeholder="Type here..."
                     aria-label="Message"
                     className="h-11 min-w-0 flex-1 rounded-xl border border-black/10 bg-[#f9f9f8] px-4 text-sm outline-none focus:border-primary"
                 />
                 <button
                     type="submit"
+                    disabled={isSendingMessage || !draft.trim()}
                     className="grid size-11 place-items-center rounded-xl bg-primary text-white transition active:scale-95"
                     aria-label="Send message"
                 >
