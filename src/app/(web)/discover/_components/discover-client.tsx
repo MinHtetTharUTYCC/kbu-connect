@@ -1,5 +1,7 @@
 'use client';
 
+import { getUsersControllerGetUserProfileQueryOptions } from '@services/generated/users/users';
+import { useQueryClient } from '@tanstack/react-query';
 import { Heart, MessageCircle, X } from 'lucide-react';
 import Image from 'next/image';
 import { useCallback, useEffect, useRef, useState } from 'react';
@@ -42,6 +44,20 @@ export function DiscoverClient() {
     const remainingProfiles = profiles.length - index;
 
     useTopBar({});
+
+    const queryClient = useQueryClient();
+
+    useEffect(() => {
+        if (!profile) return;
+        const timer = window.setTimeout(() => {
+            queryClient.prefetchQuery(
+                getUsersControllerGetUserProfileQueryOptions(profile.id, {
+                    query: { staleTime: 1000 * 60 * 5 },
+                }),
+            );
+        }, 3000);
+        return () => clearTimeout(timer);
+    }, [queryClient, profile]);
 
     useEffect(() => {
         if (remainingProfiles <= 3 && hasNextPage && !isFetchingNextPage) {
