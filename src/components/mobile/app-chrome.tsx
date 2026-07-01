@@ -17,7 +17,7 @@ export function MobileScreen({
     return (
         <div
             className={cn(
-                'mx-auto flex min-h-svh w-full max-w-[430px] flex-col bg-white text-[#1c1b1b]',
+                'mx-auto flex w-full max-w-[430px] flex-col bg-white text-[#1c1b1b]',
                 className,
             )}
         >
