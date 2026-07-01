@@ -337,6 +337,7 @@ export function DiscoverClient() {
                     onLike={() => handleSwipe('LIKE')}
                     onDislike={() => handleSwipe('DISLIKE')}
                     onShoutout={() => setIsShoutoutOpen(true)}
+                    from="discovery"
                 />
             )}
         </div>

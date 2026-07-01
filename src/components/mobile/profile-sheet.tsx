@@ -12,7 +12,7 @@ import {
     X,
 } from 'lucide-react';
 import Image from 'next/image';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Chip } from '@/components/mobile/app-chrome';
 import { FullScreenImageViewer } from '@/components/mobile/full-screen-image-viewer';
 import { useVisitProfile } from '@/hooks/users/use-visit-profile';
@@ -24,15 +24,26 @@ export function ProfileSheet({
     onLike,
     onDislike,
     onShoutout,
+    onMessage,
+    from,
 }: {
     userId: string;
     onClose: () => void;
-    onLike: () => void;
-    onDislike: () => void;
-    onShoutout: () => void;
+    onLike?: () => void;
+    onDislike?: () => void;
+    onShoutout?: () => void;
+    onMessage?: () => void;
+    from: 'discovery' | 'visit';
 }) {
     const { data: profile, isLoading } = useVisitProfile(userId);
     const [viewerIndex, setViewerIndex] = useState<number | null>(null);
+
+    useEffect(() => {
+        document.body.style.overflow = 'hidden';
+        return () => {
+            document.body.style.overflow = '';
+        };
+    }, []);
 
     const galleryImages = (profile?.gallery ?? [])
         .toSorted((a, b) => a.order - b.order)
@@ -113,16 +124,21 @@ export function ProfileSheet({
                                         </div>
                                     )}
                                     <div className="min-w-0 flex-1">
-                                        <h1 className="truncate text-xl font-bold">
-                                            {profile.name}
-                                        </h1>
+                                        <div className="flex items-center gap-2">
+                                            <h1 className="truncate text-xl font-bold">
+                                                {profile.name}
+                                            </h1>
+                                            {profile.isMatched && (
+                                                <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-xs font-semibold text-primary">
+                                                    <Heart className="size-3 fill-primary" />
+                                                    Matched
+                                                </span>
+                                            )}
+                                        </div>
                                         {metadataItems.length > 0 ? (
                                             <div className="mt-2 flex flex-wrap gap-1.5">
                                                 {metadataItems.map((item) => (
-                                                    <ProfileMetaChip
-                                                        key={item.label}
-                                                        item={item}
-                                                    />
+                                                    <ProfileMetaChip key={item.label} item={item} />
                                                 ))}
                                             </div>
                                         ) : (
@@ -146,91 +162,113 @@ export function ProfileSheet({
                                         Photos
                                     </h3>
                                     <div className="grid grid-cols-3 gap-2">
-                                        {galleryImages.map(
-                                            (imageUrl, index) => (
-                                                <button
-                                                    key={imageUrl}
-                                                    type="button"
-                                                    onClick={() =>
-                                                        setViewerIndex(index)
-                                                    }
-                                                    className={
-                                                        index === 0
-                                                            ? 'relative col-span-2 aspect-square overflow-hidden rounded-lg bg-[#f0eeee]'
-                                                            : 'relative aspect-square overflow-hidden rounded-lg bg-[#f0eeee]'
-                                                    }
-                                                >
-                                                    <Image
-                                                        src={imageUrl}
-                                                        alt={`Photo ${index + 1}`}
-                                                        fill
-                                                        sizes="(max-width: 430px) 33vw, 140px"
-                                                        unoptimized
-                                                        className="object-cover"
-                                                    />
-                                                </button>
-                                            ),
-                                        )}
+                                        {galleryImages.map((imageUrl, index) => (
+                                            <button
+                                                key={`${imageUrl}-${index}`} //TODO: can remove idex cuz index is tempo fix for development
+                                                type="button"
+                                                onClick={() => setViewerIndex(index)}
+                                                className={
+                                                    index === 0
+                                                        ? 'relative col-span-2 aspect-square overflow-hidden rounded-lg bg-[#f0eeee]'
+                                                        : 'relative aspect-square overflow-hidden rounded-lg bg-[#f0eeee]'
+                                                }
+                                            >
+                                                <Image
+                                                    src={imageUrl}
+                                                    alt={`Photo ${index + 1}`}
+                                                    fill
+                                                    sizes="(max-width: 430px) 33vw, 140px"
+                                                    unoptimized
+                                                    className="object-cover"
+                                                />
+                                            </button>
+                                        ))}
                                     </div>
                                 </section>
                             )}
 
-                            {profile.interests &&
-                                profile.interests.length > 0 && (
-                                    <section className="bg-white px-5 py-4">
-                                        <h3 className="mb-3 text-xs font-semibold uppercase tracking-wide text-[#6b6b6b]">
-                                            Interests
-                                        </h3>
-                                        <div className="flex flex-wrap gap-2">
-                                            {profile.interests.map(
-                                                (interest) => (
-                                                    <Chip key={interest}>
-                                                        {formatEnum(interest)}
-                                                    </Chip>
-                                                ),
-                                            )}
-                                        </div>
-                                    </section>
-                                )}
+                            {profile.interests && profile.interests.length > 0 && (
+                                <section className="bg-white px-5 py-4">
+                                    <h3 className="mb-3 text-xs font-semibold uppercase tracking-wide text-[#6b6b6b]">
+                                        Interests
+                                    </h3>
+                                    <div className="flex flex-wrap gap-2">
+                                        {profile.interests.map((interest) => (
+                                            <Chip key={interest}>{formatEnum(interest)}</Chip>
+                                        ))}
+                                    </div>
+                                </section>
+                            )}
                         </>
                     )}
                 </div>
 
                 {!isLoading && profile && (
                     <div className="flex shrink-0 items-center justify-center gap-6 border-t border-black/10 px-5 py-4">
-                        <button
-                            type="button"
-                            onClick={() => {
-                                onDislike();
-                                onClose();
-                            }}
-                            className="grid size-12 place-items-center rounded-full border border-black/10 bg-white text-[#737686] shadow-sm transition active:scale-90"
-                            aria-label="Pass"
-                        >
-                            <X className="size-6" />
-                        </button>
-                        <button
-                            type="button"
-                            onClick={() => {
-                                onShoutout();
-                                onClose();
-                            }}
-                            className="grid size-12 place-items-center rounded-full border border-black/10 bg-white text-primary shadow-sm transition active:scale-90"
-                            aria-label="Send shoutout"
-                        >
-                            <MessageCircle className="size-5" />
-                        </button>
-                        <button
-                            type="button"
-                            onClick={() => {
-                                onLike();
-                                onClose();
-                            }}
-                            className="grid size-12 place-items-center rounded-full border border-black/10 bg-white text-primary shadow-sm transition active:scale-90"
-                            aria-label="Like"
-                        >
-                            <Heart className="size-6 fill-primary" />
-                        </button>
+                        {from === 'discovery' && (
+                            <>
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        onDislike?.();
+                                        onClose();
+                                    }}
+                                    className="grid size-12 place-items-center rounded-full border border-black/10 bg-white text-[#737686] shadow-sm transition active:scale-90"
+                                    aria-label="Pass"
+                                >
+                                    <X className="size-6" />
+                                </button>
+                                {profile.isMatched && onMessage ? (
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            onMessage();
+                                            onClose();
+                                        }}
+                                        className="grid size-12 place-items-center rounded-full border border-black/10 bg-primary text-white shadow-sm transition active:scale-90"
+                                        aria-label="Message"
+                                    >
+                                        <MessageCircle className="size-5" />
+                                    </button>
+                                ) : (
+                                    <button
+                                        type="button"
+                                        onClick={() => {
+                                            onShoutout?.();
+                                            onClose();
+                                        }}
+                                        className="grid size-12 place-items-center rounded-full border border-black/10 bg-white text-primary shadow-sm transition active:scale-90"
+                                        aria-label="Send shoutout"
+                                    >
+                                        <MessageCircle className="size-5" />
+                                    </button>
+                                )}
+                                <button
+                                    type="button"
+                                    onClick={() => {
+                                        onLike?.();
+                                        onClose();
+                                    }}
+                                    className="grid size-12 place-items-center rounded-full border border-black/10 bg-white text-primary shadow-sm transition active:scale-90"
+                                    aria-label="Like"
+                                >
+                                    <Heart className="size-6 fill-primary" />
+                                </button>
+                            </>
+                        )}
+                        {from === 'visit' && profile.isMatched && onMessage && (
+                            <button
+                                type="button"
+                                onClick={() => {
+                                    onMessage();
+                                    onClose();
+                                }}
+                                className="grid size-12 place-items-center rounded-full border border-black/10 bg-primary text-white shadow-sm transition active:scale-90"
+                                aria-label="Message"
+                            >
+                                <MessageCircle className="size-5" />
+                            </button>
+                        )}
                     </div>
                 )}
             </div>

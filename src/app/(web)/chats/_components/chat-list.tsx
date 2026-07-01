@@ -2,9 +2,10 @@
 
 import { Lock } from 'lucide-react';
 import Link from 'next/link';
-import { useSearchParams } from 'next/navigation';
-import { useEffect, useRef } from 'react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { useEffect, useRef, useState } from 'react';
 import { Avatar, Chip, EmptyState } from '@/components/mobile/app-chrome';
+import { ProfileSheet } from '@/components/mobile/profile-sheet';
 import { useTopBar } from '@/components/mobile/top-bar-provider';
 import { useConversationsList } from '@/hooks/chat/use-conversations-list';
 import {
@@ -73,6 +74,10 @@ function ShoutoutsPanel() {
         isFetchingNextPage,
     } = useShoutoutsList({ type: activeSubTab, limit: 20 });
     const loadMoreRef = useRef<HTMLDivElement | null>(null);
+    const [selectedProfileId, setSelectedProfileId] = useState<string | null>(
+        null,
+    );
+    const router = useRouter();
 
     useEffect(() => {
         const target = loadMoreRef.current;
@@ -127,7 +132,11 @@ function ShoutoutsPanel() {
             ) : shoutouts.length ? (
                 <div>
                     {shoutouts.map((item) => (
-                        <ShoutoutRow key={item.id} shoutout={item} />
+                        <ShoutoutRow
+                            key={item.id}
+                            shoutout={item}
+                            onUserClick={setSelectedProfileId}
+                        />
                     ))}
                     <LoadMoreRow
                         ref={loadMoreRef}
@@ -156,6 +165,14 @@ function ShoutoutsPanel() {
                     />
                 </div>
             )}
+            {selectedProfileId && (
+                <ProfileSheet
+                    userId={selectedProfileId}
+                    onClose={() => setSelectedProfileId(null)}
+                    onMessage={() => router.push(`/chats/${selectedProfileId}`)}
+                    from="visit"
+                />
+            )}
         </section>
     );
 }
@@ -176,11 +193,21 @@ export const LoadMoreRow = ({
     </div>
 );
 
-function ShoutoutRow({ shoutout }: { shoutout: ShoutoutItem }) {
+function ShoutoutRow({
+    shoutout,
+    onUserClick,
+}: {
+    shoutout: ShoutoutItem;
+    onUserClick: (userId: string) => void;
+}) {
     return (
         <article className="border-b border-black/10 bg-white p-5">
             <div className="flex items-start gap-3">
-                <div className="relative">
+                <button
+                    type="button"
+                    onClick={() => onUserClick(shoutout.otherUser.id)}
+                    className="relative shrink-0"
+                >
                     <Avatar
                         src={shoutout.otherUser.avatarUrl}
                         name={shoutout.otherUser.name}
@@ -191,12 +218,16 @@ function ShoutoutRow({ shoutout }: { shoutout: ShoutoutItem }) {
                             <Lock className="size-5 fill-black/20 drop-shadow" />
                         </div>
                     )}
-                </div>
+                </button>
                 <div className="min-w-0 flex-1">
                     <div className="mb-1 flex items-center justify-between gap-3">
-                        <h2 className="truncate text-xs font-bold text-primary">
+                        <button
+                            type="button"
+                            onClick={() => onUserClick(shoutout.otherUser.id)}
+                            className="truncate text-xs font-bold text-primary active:opacity-70"
+                        >
                             {shoutout.otherUser.name}
-                        </h2>
+                        </button>
                         <span className="text-xs text-[#a1a1a1]">
                             {relativeTime(shoutout.createdAt)}
                         </span>
@@ -208,14 +239,6 @@ function ShoutoutRow({ shoutout }: { shoutout: ShoutoutItem }) {
                         <Chip>
                             {shoutout.type === 'received' ? 'Received' : 'Sent'}
                         </Chip>
-                        {shoutout.type === 'received' && (
-                            <Link
-                                href={`/profile/${shoutout.otherUser.id}`}
-                                className="rounded-lg bg-primary px-4 py-1.5 text-xs font-semibold text-white active:scale-95"
-                            >
-                                View
-                            </Link>
-                        )}
                     </div>
                 </div>
             </div>
@@ -232,6 +255,10 @@ export function ChatListClient() {
         isFetchingNextPage,
     } = useConversationsList({ cursor: null, limit: 20 });
     const loadMoreRef = useRef<HTMLDivElement | null>(null);
+    const [selectedProfileId, setSelectedProfileId] = useState<string | null>(
+        null,
+    );
+    const router = useRouter();
 
     useEffect(() => {
         const target = loadMoreRef.current;
@@ -271,31 +298,49 @@ export function ChatListClient() {
     return (
         <div className="flex flex-col">
             {conversations.map((conversation) => (
-                <Link
+                <div
                     key={conversation.id}
-                    href={`/chats/${conversation.id}`}
                     className="flex items-center border-b border-black/10 px-5 py-4"
                 >
-                    <Avatar
-                        src={conversation.otherUser.avatarUrl}
-                        name={conversation.otherUser.name}
-                        className="size-12"
-                    />
+                    <button
+                        type="button"
+                        onClick={() =>
+                            setSelectedProfileId(conversation.otherUser.id)
+                        }
+                        className="shrink-0"
+                    >
+                        <Avatar
+                            src={conversation.otherUser.avatarUrl}
+                            name={conversation.otherUser.name}
+                            className="size-12"
+                        />
+                    </button>
                     <div className="ml-3 min-w-0 flex-1">
                         <div className="flex items-baseline justify-between gap-3">
-                            <span className="truncate font-semibold">
+                            <button
+                                type="button"
+                                onClick={() =>
+                                    setSelectedProfileId(
+                                        conversation.otherUser.id,
+                                    )
+                                }
+                                className="truncate font-semibold active:opacity-70"
+                            >
                                 {conversation.otherUser.name}
-                            </span>
+                            </button>
                             <span className="text-xs text-[#6b6b6b]">
                                 {relativeTime(conversation.updatedAt)}
                             </span>
                         </div>
-                        <p className="truncate text-sm text-[#6b6b6b]">
+                        <Link
+                            href={`/chats/${conversation.id}`}
+                            className="block truncate text-sm text-[#6b6b6b]"
+                        >
                             {conversation.lastMessage?.content ??
                                 'No messages yet.'}
-                        </p>
+                        </Link>
                     </div>
-                </Link>
+                </div>
             ))}
             <LoadMoreRow
                 ref={loadMoreRef}
@@ -303,6 +348,14 @@ export function ChatListClient() {
                 isFetchingNextPage={isFetchingNextPage}
                 endLabel="No more chats"
             />
+            {selectedProfileId && (
+                <ProfileSheet
+                    userId={selectedProfileId}
+                    onClose={() => setSelectedProfileId(null)}
+                    onMessage={() => router.push(`/chats/${selectedProfileId}`)}
+                    from="visit"
+                />
+            )}
         </div>
     );
 }
