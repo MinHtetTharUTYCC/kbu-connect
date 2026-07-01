@@ -1,11 +1,11 @@
 'use client';
 
-import { Lock } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import { Avatar, Chip, EmptyState } from '@/components/mobile/app-chrome';
 import { ProfileSheet } from '@/components/mobile/profile-sheet';
+import { ReplyShoutoutSheet } from '@/components/mobile/reply-shoutout-sheet';
 import { useTopBar } from '@/components/mobile/top-bar-provider';
 import { useConversationsList } from '@/hooks/chat/use-conversations-list';
 import {
@@ -13,6 +13,7 @@ import {
     type ShoutoutType,
     useShoutoutsList,
 } from '@/hooks/chat/use-shoutouts-list';
+import { useReplyShoutout } from '@/hooks/chat/use-reply-shoutout';
 import { relativeTime } from '@/lib/profile-utils';
 import { cn } from '@/lib/utils';
 
@@ -20,8 +21,7 @@ type ChatTab = 'chats' | 'shoutouts';
 
 export function ChatHomeClient() {
     const searchParams = useSearchParams();
-    const activeTab: ChatTab =
-        searchParams.get('tab') === 'shoutouts' ? 'shoutouts' : 'chats';
+    const activeTab: ChatTab = searchParams.get('tab') === 'shoutouts' ? 'shoutouts' : 'chats';
 
     useTopBar({ title: 'Chats' });
 
@@ -53,31 +53,23 @@ export function ChatHomeClient() {
                     </Link>
                 </div>
             </div>
-            {activeTab === 'shoutouts' ? (
-                <ShoutoutsPanel />
-            ) : (
-                <ChatListClient />
-            )}
+            {activeTab === 'shoutouts' ? <ShoutoutsPanel /> : <ChatListClient />}
         </main>
     );
 }
 
 function ShoutoutsPanel() {
+    const router = useRouter();
     const searchParams = useSearchParams();
+
     const activeSubTab: ShoutoutType =
         searchParams.get('shoutouts') === 'sent' ? 'sent' : 'received';
-    const {
-        shoutouts,
-        isLoading,
-        fetchNextPage,
-        hasNextPage,
-        isFetchingNextPage,
-    } = useShoutoutsList({ type: activeSubTab, limit: 20 });
+    const { shoutouts, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } =
+        useShoutoutsList({ type: activeSubTab, limit: 20 });
     const loadMoreRef = useRef<HTMLDivElement | null>(null);
-    const [selectedProfileId, setSelectedProfileId] = useState<string | null>(
-        null,
-    );
-    const router = useRouter();
+    const [selectedProfileId, setSelectedProfileId] = useState<string | null>(null);
+    const [selectedShoutoutId, setSelectedShoutoutId] = useState<string | null>(null);
+    const { mutate: replyToShoutout, isPending: isReplying } = useReplyShoutout();
 
     useEffect(() => {
         const target = loadMoreRef.current;
@@ -125,10 +117,7 @@ function ShoutoutsPanel() {
                 </div>
             </div>
             {isLoading ? (
-                <EmptyState
-                    title="Loading shoutouts"
-                    body="Checking your shoutouts."
-                />
+                <EmptyState title="Loading shoutouts" body="Checking your shoutouts." />
             ) : shoutouts.length ? (
                 <div>
                     {shoutouts.map((item) => (
@@ -136,6 +125,7 @@ function ShoutoutsPanel() {
                             key={item.id}
                             shoutout={item}
                             onUserClick={setSelectedProfileId}
+                            onReplyClick={setSelectedShoutoutId}
                         />
                     ))}
                     <LoadMoreRow
@@ -173,6 +163,27 @@ function ShoutoutsPanel() {
                     from="visit"
                 />
             )}
+            {selectedShoutoutId && (
+                <ReplyShoutoutSheet
+                    shoutout={shoutouts.find((s) => s.id === selectedShoutoutId)!}
+                    onClose={() => setSelectedShoutoutId(null)}
+                    onSubmit={(message) =>
+                        replyToShoutout(
+                            {
+                                senderId: shoutouts.find((s) => s.id === selectedShoutoutId)!
+                                    .otherUser.id,
+                                data: { message },
+                            },
+                            {
+                                onSuccess: () => {
+                                    setSelectedShoutoutId(null);
+                                },
+                            },
+                        )
+                    }
+                    isPending={isReplying}
+                />
+            )}
         </section>
     );
 }
@@ -196,10 +207,14 @@ export const LoadMoreRow = ({
 function ShoutoutRow({
     shoutout,
     onUserClick,
+    onReplyClick,
 }: {
     shoutout: ShoutoutItem;
     onUserClick: (userId: string) => void;
+    onReplyClick: (shoutoutId: string) => void;
 }) {
+    const canReply = shoutout.type === 'received';
+
     return (
         <article className="border-b border-black/10 bg-white p-5">
             <div className="flex items-start gap-3">
@@ -213,18 +228,13 @@ function ShoutoutRow({
                         name={shoutout.otherUser.name}
                         className="size-12"
                     />
-                    {shoutout.type === 'received' && (
-                        <div className="absolute inset-0 grid place-items-center text-white">
-                            <Lock className="size-5 fill-black/20 drop-shadow" />
-                        </div>
-                    )}
                 </button>
                 <div className="min-w-0 flex-1">
                     <div className="mb-1 flex items-center justify-between gap-3">
                         <button
                             type="button"
                             onClick={() => onUserClick(shoutout.otherUser.id)}
-                            className="truncate text-xs font-bold text-primary active:opacity-70"
+                            className="truncate text-xs font-bold active:opacity-70"
                         >
                             {shoutout.otherUser.name}
                         </button>
@@ -232,13 +242,18 @@ function ShoutoutRow({
                             {relativeTime(shoutout.createdAt)}
                         </span>
                     </div>
-                    <p className="line-clamp-2 text-sm leading-6">
-                        {shoutout.content}
-                    </p>
-                    <div className="mt-4 flex items-center justify-between gap-3">
-                        <Chip>
-                            {shoutout.type === 'received' ? 'Received' : 'Sent'}
-                        </Chip>
+
+                    <div className="flex items-center justify-between gap-3">
+                        <p className="line-clamp-1 text-sm leading-6">
+                            {shoutout.type === 'sent'
+                                ? `You: ${shoutout.content}`
+                                : shoutout.content}
+                        </p>
+                        {canReply && (
+                            <Chip active onClick={() => onReplyClick(shoutout.id)}>
+                                Reply
+                            </Chip>
+                        )}
                     </div>
                 </div>
             </div>
@@ -247,17 +262,10 @@ function ShoutoutRow({
 }
 
 export function ChatListClient() {
-    const {
-        conversations,
-        isLoading,
-        fetchNextPage,
-        hasNextPage,
-        isFetchingNextPage,
-    } = useConversationsList({ cursor: null, limit: 20 });
+    const { conversations, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } =
+        useConversationsList({ cursor: null, limit: 20 });
     const loadMoreRef = useRef<HTMLDivElement | null>(null);
-    const [selectedProfileId, setSelectedProfileId] = useState<string | null>(
-        null,
-    );
+    const [selectedProfileId, setSelectedProfileId] = useState<string | null>(null);
     const router = useRouter();
 
     useEffect(() => {
@@ -278,12 +286,7 @@ export function ChatListClient() {
     }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
 
     if (isLoading) {
-        return (
-            <EmptyState
-                title="Loading chats"
-                body="Checking your conversations."
-            />
-        );
+        return <EmptyState title="Loading chats" body="Checking your conversations." />;
     }
 
     if (!conversations.length) {
@@ -304,9 +307,7 @@ export function ChatListClient() {
                 >
                     <button
                         type="button"
-                        onClick={() =>
-                            setSelectedProfileId(conversation.otherUser.id)
-                        }
+                        onClick={() => setSelectedProfileId(conversation.otherUser.id)}
                         className="shrink-0"
                     >
                         <Avatar
@@ -319,11 +320,7 @@ export function ChatListClient() {
                         <div className="flex items-baseline justify-between gap-3">
                             <button
                                 type="button"
-                                onClick={() =>
-                                    setSelectedProfileId(
-                                        conversation.otherUser.id,
-                                    )
-                                }
+                                onClick={() => setSelectedProfileId(conversation.otherUser.id)}
                                 className="truncate font-semibold active:opacity-70"
                             >
                                 {conversation.otherUser.name}
@@ -336,8 +333,7 @@ export function ChatListClient() {
                             href={`/chats/${conversation.id}`}
                             className="block truncate text-sm text-[#6b6b6b]"
                         >
-                            {conversation.lastMessage?.content ??
-                                'No messages yet.'}
+                            {conversation.lastMessage?.content ?? 'No messages yet.'}
                         </Link>
                     </div>
                 </div>

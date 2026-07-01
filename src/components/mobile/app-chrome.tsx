@@ -7,13 +7,7 @@ import type { ReactNode } from 'react';
 import { initials } from '@/lib/profile-utils';
 import { cn } from '@/lib/utils';
 
-export function MobileScreen({
-    children,
-    className,
-}: {
-    children: ReactNode;
-    className?: string;
-}) {
+export function MobileScreen({ children, className }: { children: ReactNode; className?: string }) {
     return (
         <div
             className={cn(
@@ -49,19 +43,9 @@ export function TopBar({
                 ) : (
                     <GraduationCap className="size-6 text-primary" />
                 )}
-                <span className="truncate text-xl font-bold text-primary">
-                    {title}
-                </span>
+                <span className="truncate text-xl font-bold text-primary">{title}</span>
             </div>
-            {action ?? (
-                <button
-                    type="button"
-                    className="grid size-10 place-items-center rounded-full text-[#434655] transition active:scale-95"
-                    aria-label="Filters"
-                >
-                    <SlidersHorizontal className="size-5" />
-                </button>
-            )}
+            {action && action}
         </header>
     );
 }
@@ -101,12 +85,15 @@ export function Avatar({
 export function Chip({
     children,
     active = false,
+    onClick,
 }: {
     children: ReactNode;
     active?: boolean;
+    onClick?: () => void;
 }) {
     return (
         <span
+            onClick={() => onClick?.()}
             className={cn(
                 'inline-flex h-7 shrink-0 items-center rounded-full border px-3 text-xs font-medium',
                 active
