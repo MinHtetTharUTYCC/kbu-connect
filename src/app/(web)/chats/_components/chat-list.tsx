@@ -21,7 +21,8 @@ type ChatTab = 'chats' | 'shoutouts';
 
 export function ChatHomeClient() {
     const searchParams = useSearchParams();
-    const activeTab: ChatTab = searchParams.get('tab') === 'shoutouts' ? 'shoutouts' : 'chats';
+    const activeTab: ChatTab =
+        searchParams.get('tab') === 'shoutouts' ? 'shoutouts' : 'chats';
 
     useTopBar({ title: 'Chats' });
 
@@ -53,7 +54,11 @@ export function ChatHomeClient() {
                     </Link>
                 </div>
             </div>
-            {activeTab === 'shoutouts' ? <ShoutoutsPanel /> : <ChatListClient />}
+            {activeTab === 'shoutouts' ? (
+                <ShoutoutsPanel />
+            ) : (
+                <ChatListClient />
+            )}
         </main>
     );
 }
@@ -64,12 +69,22 @@ function ShoutoutsPanel() {
 
     const activeSubTab: ShoutoutType =
         searchParams.get('shoutouts') === 'sent' ? 'sent' : 'received';
-    const { shoutouts, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } =
-        useShoutoutsList({ type: activeSubTab, limit: 20 });
+    const {
+        shoutouts,
+        isLoading,
+        fetchNextPage,
+        hasNextPage,
+        isFetchingNextPage,
+    } = useShoutoutsList({ type: activeSubTab, limit: 20 });
     const loadMoreRef = useRef<HTMLDivElement | null>(null);
-    const [selectedProfileId, setSelectedProfileId] = useState<string | null>(null);
-    const [selectedShoutoutId, setSelectedShoutoutId] = useState<string | null>(null);
-    const { mutate: replyToShoutout, isPending: isReplying } = useReplyShoutout();
+    const [selectedProfileId, setSelectedProfileId] = useState<string | null>(
+        null,
+    );
+    const [selectedShoutoutId, setSelectedShoutoutId] = useState<string | null>(
+        null,
+    );
+    const { mutate: replyToShoutout, isPending: isReplying } =
+        useReplyShoutout();
 
     useEffect(() => {
         const target = loadMoreRef.current;
@@ -117,7 +132,10 @@ function ShoutoutsPanel() {
                 </div>
             </div>
             {isLoading ? (
-                <EmptyState title="Loading shoutouts" body="Checking your shoutouts." />
+                <EmptyState
+                    title="Loading shoutouts"
+                    body="Checking your shoutouts."
+                />
             ) : shoutouts.length ? (
                 <div>
                     {shoutouts.map((item) => (
@@ -165,13 +183,16 @@ function ShoutoutsPanel() {
             )}
             {selectedShoutoutId && (
                 <ReplyShoutoutSheet
-                    shoutout={shoutouts.find((s) => s.id === selectedShoutoutId)!}
+                    shoutout={
+                        shoutouts.find((s) => s.id === selectedShoutoutId)!
+                    }
                     onClose={() => setSelectedShoutoutId(null)}
                     onSubmit={(message) =>
                         replyToShoutout(
                             {
-                                senderId: shoutouts.find((s) => s.id === selectedShoutoutId)!
-                                    .otherUser.id,
+                                senderId: shoutouts.find(
+                                    (s) => s.id === selectedShoutoutId,
+                                )!.otherUser.id,
                                 data: { message },
                             },
                             {
@@ -250,7 +271,10 @@ function ShoutoutRow({
                                 : shoutout.content}
                         </p>
                         {canReply && (
-                            <Chip active onClick={() => onReplyClick(shoutout.id)}>
+                            <Chip
+                                active
+                                onClick={() => onReplyClick(shoutout.id)}
+                            >
                                 Reply
                             </Chip>
                         )}
@@ -262,10 +286,17 @@ function ShoutoutRow({
 }
 
 export function ChatListClient() {
-    const { conversations, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } =
-        useConversationsList({ cursor: null, limit: 20 });
+    const {
+        conversations,
+        isLoading,
+        fetchNextPage,
+        hasNextPage,
+        isFetchingNextPage,
+    } = useConversationsList({ cursor: null, limit: 20 });
     const loadMoreRef = useRef<HTMLDivElement | null>(null);
-    const [selectedProfileId, setSelectedProfileId] = useState<string | null>(null);
+    const [selectedProfileId, setSelectedProfileId] = useState<string | null>(
+        null,
+    );
     const router = useRouter();
 
     useEffect(() => {
@@ -286,7 +317,12 @@ export function ChatListClient() {
     }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
 
     if (isLoading) {
-        return <EmptyState title="Loading chats" body="Checking your conversations." />;
+        return (
+            <EmptyState
+                title="Loading chats"
+                body="Checking your conversations."
+            />
+        );
     }
 
     if (!conversations.length) {
@@ -307,7 +343,9 @@ export function ChatListClient() {
                 >
                     <button
                         type="button"
-                        onClick={() => setSelectedProfileId(conversation.otherUser.id)}
+                        onClick={() =>
+                            setSelectedProfileId(conversation.otherUser.id)
+                        }
                         className="shrink-0"
                     >
                         <Avatar
@@ -320,7 +358,11 @@ export function ChatListClient() {
                         <div className="flex items-baseline justify-between gap-3">
                             <button
                                 type="button"
-                                onClick={() => setSelectedProfileId(conversation.otherUser.id)}
+                                onClick={() =>
+                                    setSelectedProfileId(
+                                        conversation.otherUser.id,
+                                    )
+                                }
                                 className="truncate font-semibold active:opacity-70"
                             >
                                 {conversation.otherUser.name}
@@ -333,7 +375,8 @@ export function ChatListClient() {
                             href={`/chats/${conversation.id}`}
                             className="block truncate text-sm text-[#6b6b6b]"
                         >
-                            {conversation.lastMessage?.content ?? 'No messages yet.'}
+                            {conversation.lastMessage?.content ??
+                                'No messages yet.'}
                         </Link>
                     </div>
                 </div>

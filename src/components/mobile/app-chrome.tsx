@@ -7,7 +7,13 @@ import type { ReactNode } from 'react';
 import { initials } from '@/lib/profile-utils';
 import { cn } from '@/lib/utils';
 
-export function MobileScreen({ children, className }: { children: ReactNode; className?: string }) {
+export function MobileScreen({
+    children,
+    className,
+}: {
+    children: ReactNode;
+    className?: string;
+}) {
     return (
         <div
             className={cn(
@@ -43,7 +49,9 @@ export function TopBar({
                 ) : (
                     <GraduationCap className="size-6 text-primary" />
                 )}
-                <span className="truncate text-xl font-bold text-primary">{title}</span>
+                <span className="truncate text-xl font-bold text-primary">
+                    {title}
+                </span>
             </div>
             {action && action}
         </header>

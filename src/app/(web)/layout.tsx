@@ -4,7 +4,9 @@ import { TopBarProvider } from '@/components/mobile/top-bar-provider';
 export default function WebLayout({ children }: { children: React.ReactNode }) {
     return (
         <TopBarProvider>
-            <MobileScreen className="flex-1 min-h-0 overflow-y-auto">{children}</MobileScreen>
+            <MobileScreen className="flex-1 min-h-0 overflow-y-auto">
+                {children}
+            </MobileScreen>
         </TopBarProvider>
     );
 }

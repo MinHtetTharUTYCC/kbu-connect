@@ -5,7 +5,10 @@ import {
     getChatControllerGetShoutoutsInfiniteQueryKey,
     useChatControllerReplyToShoutout,
 } from '@services/generated/chat/chat';
-import type { ConversationsListResponseDto, ShoutoutsListResponseDto } from '@services/model';
+import type {
+    ConversationsListResponseDto,
+    ShoutoutsListResponseDto,
+} from '@services/model';
 import type { InfiniteData } from '@tanstack/react-query';
 import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
@@ -20,46 +23,48 @@ export function useReplyShoutout() {
             onSuccess: (data, variables) => {
                 const { senderId } = variables;
 
-                const shoutoutsQueryKey = getChatControllerGetShoutoutsInfiniteQueryKey();
-                const chatsQueryKey = getChatControllerGetConversationsInfiniteQueryKey();
+                const shoutoutsQueryKey =
+                    getChatControllerGetShoutoutsInfiniteQueryKey();
+                const chatsQueryKey =
+                    getChatControllerGetConversationsInfiniteQueryKey();
 
-                queryClient.setQueryData<InfiniteData<ShoutoutsListResponseDto>>(
-                    shoutoutsQueryKey,
-                    (old) => {
-                        if (!old) return old;
-                        return {
-                            ...old,
-                            pages: old.pages.map((page) => ({
-                                ...page,
-                                shoutouts: page.shoutouts.filter(
-                                    (s) => s.otherUser.id !== senderId,
-                                ),
-                            })),
-                        };
-                    },
-                );
-
-                queryClient.setQueryData<InfiniteData<ConversationsListResponseDto>>(
-                    chatsQueryKey,
-                    (old) => {
-                        if (!old) return old;
-
-                        const pages = old.pages.map((page) => ({
+                queryClient.setQueryData<
+                    InfiniteData<ShoutoutsListResponseDto>
+                >(shoutoutsQueryKey, (old) => {
+                    if (!old) return old;
+                    return {
+                        ...old,
+                        pages: old.pages.map((page) => ({
                             ...page,
-                            conversations: page.conversations.filter((c) => c.id !== data.id),
-                        }));
+                            shoutouts: page.shoutouts.filter(
+                                (s) => s.otherUser.id !== senderId,
+                            ),
+                        })),
+                    };
+                });
 
-                        pages[0] = {
-                            ...pages[0],
-                            conversations: [data, ...pages[0].conversations],
-                        };
+                queryClient.setQueryData<
+                    InfiniteData<ConversationsListResponseDto>
+                >(chatsQueryKey, (old) => {
+                    if (!old) return old;
 
-                        return {
-                            ...old,
-                            pages,
-                        };
-                    },
-                );
+                    const pages = old.pages.map((page) => ({
+                        ...page,
+                        conversations: page.conversations.filter(
+                            (c) => c.id !== data.id,
+                        ),
+                    }));
+
+                    pages[0] = {
+                        ...pages[0],
+                        conversations: [data, ...pages[0].conversations],
+                    };
+
+                    return {
+                        ...old,
+                        pages,
+                    };
+                });
 
                 toast.success('Replied.');
             },

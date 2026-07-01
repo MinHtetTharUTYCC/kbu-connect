@@ -71,7 +71,7 @@ export function ProfileSheet({
 
     return (
         <div
-            className="fixed inset-0 z-[70] flex items-end justify-center bg-black/35"
+            className="fixed inset-0 z-70 flex items-end justify-center bg-black/35"
             onClick={onClose}
             onKeyDown={(e) => e.key === 'Escape' && onClose()}
         >
@@ -83,7 +83,7 @@ export function ProfileSheet({
                 aria-label="Profile"
             >
                 <div className="flex shrink-0 items-center justify-between border-b border-black/10 px-5 py-3">
-                    <h2 className="text-base font-semibold">Profile</h2>
+                    <h2 className="text-base font-semibold">{profile?.name ?? 'Profile'}</h2>
                     <button
                         type="button"
                         onClick={onClose}
@@ -138,10 +138,7 @@ export function ProfileSheet({
                                         {metadataItems.length > 0 ? (
                                             <div className="mt-2 flex flex-wrap gap-1.5">
                                                 {metadataItems.map((item) => (
-                                                    <ProfileMetaChip
-                                                        key={item.label}
-                                                        item={item}
-                                                    />
+                                                    <ProfileMetaChip key={item.label} item={item} />
                                                 ))}
                                             </div>
                                         ) : (
@@ -165,52 +162,43 @@ export function ProfileSheet({
                                         Photos
                                     </h3>
                                     <div className="grid grid-cols-3 gap-2">
-                                        {galleryImages.map(
-                                            (imageUrl, index) => (
-                                                <button
-                                                    key={`${imageUrl}-${index}`} //TODO: can remove idex cuz index is tempo fix for development
-                                                    type="button"
-                                                    onClick={() =>
-                                                        setViewerIndex(index)
-                                                    }
-                                                    className={
-                                                        index === 0
-                                                            ? 'relative col-span-2 aspect-square overflow-hidden rounded-lg bg-[#f0eeee]'
-                                                            : 'relative aspect-square overflow-hidden rounded-lg bg-[#f0eeee]'
-                                                    }
-                                                >
-                                                    <Image
-                                                        src={imageUrl}
-                                                        alt={`Photo ${index + 1}`}
-                                                        fill
-                                                        sizes="(max-width: 430px) 33vw, 140px"
-                                                        unoptimized
-                                                        className="object-cover"
-                                                    />
-                                                </button>
-                                            ),
-                                        )}
+                                        {galleryImages.map((imageUrl, index) => (
+                                            <button
+                                                key={`${imageUrl}-${index}`} //TODO: can remove idex cuz index is tempo fix for development
+                                                type="button"
+                                                onClick={() => setViewerIndex(index)}
+                                                className={
+                                                    index === 0
+                                                        ? 'relative col-span-2 aspect-square overflow-hidden rounded-lg bg-[#f0eeee]'
+                                                        : 'relative aspect-square overflow-hidden rounded-lg bg-[#f0eeee]'
+                                                }
+                                            >
+                                                <Image
+                                                    src={imageUrl}
+                                                    alt={`Photo ${index + 1}`}
+                                                    fill
+                                                    sizes="(max-width: 430px) 33vw, 140px"
+                                                    unoptimized
+                                                    className="object-cover"
+                                                />
+                                            </button>
+                                        ))}
                                     </div>
                                 </section>
                             )}
 
-                            {profile.interests &&
-                                profile.interests.length > 0 && (
-                                    <section className="bg-white px-5 py-4">
-                                        <h3 className="mb-3 text-xs font-semibold uppercase tracking-wide text-[#6b6b6b]">
-                                            Interests
-                                        </h3>
-                                        <div className="flex flex-wrap gap-2">
-                                            {profile.interests.map(
-                                                (interest) => (
-                                                    <Chip key={interest}>
-                                                        {formatEnum(interest)}
-                                                    </Chip>
-                                                ),
-                                            )}
-                                        </div>
-                                    </section>
-                                )}
+                            {profile.interests && profile.interests.length > 0 && (
+                                <section className="bg-white px-5 py-4">
+                                    <h3 className="mb-3 text-xs font-semibold uppercase tracking-wide text-[#6b6b6b]">
+                                        Interests
+                                    </h3>
+                                    <div className="flex flex-wrap gap-2">
+                                        {profile.interests.map((interest) => (
+                                            <Chip key={interest}>{formatEnum(interest)}</Chip>
+                                        ))}
+                                    </div>
+                                </section>
+                            )}
                         </>
                     )}
                 </div>

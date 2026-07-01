@@ -70,13 +70,17 @@ export function ReplyShoutoutSheet({
                 </div>
 
                 <div className="max-h-24 overflow-hidden rounded-lg border border-black/10 bg-[#f9f9f8]">
-                    <p className="p-3 text-sm leading-5 text-[#6b6b6b]">{shoutout.content}</p>
+                    <p className="p-3 text-sm leading-5 text-[#6b6b6b]">
+                        {shoutout.content}
+                    </p>
                 </div>
 
                 <div className="flex flex-col gap-2">
                     <textarea
                         value={message}
-                        onChange={(e) => setMessage(e.target.value.slice(0, MAX_CHARS))}
+                        onChange={(e) =>
+                            setMessage(e.target.value.slice(0, MAX_CHARS))
+                        }
                         onKeyDown={handleKeyDown}
                         placeholder="Write your reply..."
                         className="min-h-[100px] resize-none rounded-lg border border-black/10 p-3 text-sm placeholder-[#a1a1a1] focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
@@ -85,7 +89,9 @@ export function ReplyShoutoutSheet({
                     <div className="flex items-center justify-between">
                         <span
                             className={`text-xs ${
-                                message.length > MAX_CHARS ? 'text-red-500' : 'text-[#a1a1a1]'
+                                message.length > MAX_CHARS
+                                    ? 'text-red-500'
+                                    : 'text-[#a1a1a1]'
                             }`}
                         >
                             {message.length}/{MAX_CHARS}
