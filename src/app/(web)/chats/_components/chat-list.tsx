@@ -75,7 +75,7 @@ function ShoutoutsPanel() {
         fetchNextPage,
         hasNextPage,
         isFetchingNextPage,
-    } = useShoutoutsList({ type: activeSubTab, limit: 20 });
+    } = useShoutoutsList({ type: activeSubTab });
     const loadMoreRef = useRef<HTMLDivElement | null>(null);
     const [selectedProfileId, setSelectedProfileId] = useState<string | null>(
         null,
@@ -190,9 +190,7 @@ function ShoutoutsPanel() {
                     onSubmit={(message) =>
                         replyToShoutout(
                             {
-                                senderId: shoutouts.find(
-                                    (s) => s.id === selectedShoutoutId,
-                                )!.otherUser.id,
+                                shoutoutId: selectedShoutoutId!,
                                 data: { message },
                             },
                             {
@@ -292,7 +290,7 @@ export function ChatListClient() {
         fetchNextPage,
         hasNextPage,
         isFetchingNextPage,
-    } = useConversationsList({ cursor: null, limit: 20 });
+    } = useConversationsList({ cursor: null });
     const loadMoreRef = useRef<HTMLDivElement | null>(null);
     const [selectedProfileId, setSelectedProfileId] = useState<string | null>(
         null,

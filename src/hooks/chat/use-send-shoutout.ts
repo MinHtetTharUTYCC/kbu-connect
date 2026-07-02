@@ -18,7 +18,6 @@ export function useSendShoutout() {
                 queryClient.invalidateQueries({
                     queryKey: getChatControllerGetShoutoutsInfiniteQueryKey({
                         type: 'sent',
-                        limit: 20,
                     }),
                 });
 

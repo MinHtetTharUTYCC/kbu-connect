@@ -6,9 +6,7 @@ import { useTopBar } from '@/components/mobile/top-bar-provider';
 import { useMatchesList } from '@/hooks/matches/use-matches-list';
 
 export function MatchesClient() {
-    const { matches, isLoading: matchesLoading } = useMatchesList({
-        limit: 20,
-    });
+    const { matches, isLoading: matchesLoading } = useMatchesList({});
 
     useTopBar({});
 

@@ -5,8 +5,10 @@ dotenv.config();
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL!;
 
+console.log('API_URL', API_URL);
+
 export default defineConfig({
-    bkkRentApi: {
+    KBUConnectApi: {
         input: {
             target: `${API_URL}/api/json`,
         },

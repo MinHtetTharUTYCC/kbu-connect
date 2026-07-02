@@ -19,7 +19,7 @@ export function NotificationClient() {
         fetchNextPage,
         hasNextPage,
         isFetchingNextPage,
-    } = useNotificationsList({ limit: 20 });
+    } = useNotificationsList({});
     const markAllRead = useMarkAllNotificationsRead();
     const loadMoreRef = useRef<HTMLDivElement | null>(null);
     const hasUnread = notifications.some((item) => !item.isRead);

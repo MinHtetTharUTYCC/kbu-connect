@@ -13,7 +13,7 @@ export type ShoutoutType = ChatControllerGetShoutoutsType;
 export type ShoutoutItem = ShoutoutItemDto;
 
 export function useShoutoutsList(
-    params: ChatControllerGetShoutoutsParams = { limit: 20 },
+    params: ChatControllerGetShoutoutsParams = {},
 ) {
     const query = useChatControllerGetShoutoutsInfinite<
         InfiniteData<ShoutoutsListResponseDto, string | undefined>

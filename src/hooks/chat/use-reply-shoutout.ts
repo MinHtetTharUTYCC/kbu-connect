@@ -21,7 +21,7 @@ export function useReplyShoutout() {
         mutation: {
             onError: (error) => handleBackendError(error),
             onSuccess: (data, variables) => {
-                const { senderId } = variables;
+                const { shoutoutId } = variables;
 
                 const shoutoutsQueryKey =
                     getChatControllerGetShoutoutsInfiniteQueryKey();
@@ -37,7 +37,7 @@ export function useReplyShoutout() {
                         pages: old.pages.map((page) => ({
                             ...page,
                             shoutouts: page.shoutouts.filter(
-                                (s) => s.otherUser.id !== senderId,
+                                (s) => s.id !== shoutoutId,
                             ),
                         })),
                     };

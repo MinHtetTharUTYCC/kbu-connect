@@ -10,7 +10,6 @@ import type { InfiniteData } from '@tanstack/react-query';
 export function useConversationsList(
     params: ChatControllerGetConversationsParams = {
         cursor: null,
-        limit: 20,
     },
 ) {
     const query = useChatControllerGetConversationsInfinite<

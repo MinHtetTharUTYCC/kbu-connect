@@ -8,7 +8,7 @@ import type {
 import type { InfiniteData } from '@tanstack/react-query';
 
 export function useMatchesList(
-    params: MatchesControllerGetMatchesParams = { limit: 20 },
+    params: MatchesControllerGetMatchesParams = {},
 ) {
     const query = useMatchesControllerGetMatchesInfinite<
         InfiniteData<MatchListResponseDto, string | undefined>

@@ -8,7 +8,7 @@ import type {
 import type { InfiniteData } from '@tanstack/react-query';
 
 export function useNotificationsList(
-    params: NotificationsControllerGetNotificationsParams = { limit: 20 },
+    params: NotificationsControllerGetNotificationsParams = {},
 ) {
     const query = useNotificationsControllerGetNotificationsInfinite<
         InfiniteData<NotificationsListResponseDto>
