@@ -1,0 +1,30 @@
+'use client';
+
+import { useChatControllerGetShoutoutsInfinite } from '@services/generated/chat/chat';
+import type {
+    ChatControllerGetShoutoutsParams,
+    ChatControllerGetShoutoutsType,
+    ShoutoutItemDto,
+    ShoutoutsListResponseDto,
+} from '@services/model';
+import type { InfiniteData } from '@tanstack/react-query';
+
+export type ShoutoutType = ChatControllerGetShoutoutsType;
+export type ShoutoutItem = ShoutoutItemDto;
+
+export function useShoutoutsList(
+    params: ChatControllerGetShoutoutsParams = { limit: 20 },
+) {
+    const query = useChatControllerGetShoutoutsInfinite<
+        InfiniteData<ShoutoutsListResponseDto, string | undefined>
+    >(params, {
+        query: {
+            initialPageParam: undefined,
+            getNextPageParam: (lastPage) => lastPage.nextCursor,
+        },
+    });
+
+    const shoutouts = query.data?.pages.flatMap((page) => page.shoutouts) ?? [];
+
+    return { ...query, shoutouts };
+}
