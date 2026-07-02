@@ -118,44 +118,46 @@ export function ChatClient({ chatId }: { chatId: string }) {
                     body="Opening your messages."
                 />
             ) : messages.length ? (
-                messages.map((message) => {
-                    const mine = message.senderId === myId;
-                    return (
-                        <div
-                            key={message.id}
-                            className={cn(
-                                'flex max-w-[85%] flex-col',
-                                mine ? 'self-end items-end' : 'items-start',
-                            )}
-                        >
+                <>
+                    <LoadMoreRow
+                        ref={loadMoreMessagesRef}
+                        hasNextPage={hasNextPageMessages}
+                        isFetchingNextPage={isFetchingNextPageMessages}
+                        endLabel=""
+                    />
+                    {messages.map((message) => {
+                        const mine = message.senderId === myId;
+                        return (
                             <div
+                                key={message.id}
                                 className={cn(
-                                    'rounded-xl p-3 text-sm leading-6',
-                                    mine
-                                        ? 'rounded-tr-none bg-primary text-white'
-                                        : 'rounded-tl-none border border-black/10 bg-[#f9f9f8]',
+                                    'flex max-w-[85%] flex-col',
+                                    mine ? 'self-end items-end' : 'items-start',
                                 )}
                             >
-                                {message.content}
+                                <div
+                                    className={cn(
+                                        'rounded-xl p-3 text-sm leading-6',
+                                        mine
+                                            ? 'rounded-tr-none bg-primary text-white'
+                                            : 'rounded-tl-none border border-black/10 bg-[#f9f9f8]',
+                                    )}
+                                >
+                                    {message.content}
+                                </div>
+                                <span className="mt-1 px-1 text-[10px] text-[#6b6b6b]">
+                                    {relativeTime(message.timestamp)}
+                                </span>
                             </div>
-                            <span className="mt-1 px-1 text-[10px] text-[#6b6b6b]">
-                                {relativeTime(message.timestamp)}
-                            </span>
-                        </div>
-                    );
-                })
+                        );
+                    })}
+                </>
             ) : (
                 <EmptyState
                     title="No messages yet"
                     body="Send the first message to start the conversation."
                 />
             )}
-            <LoadMoreRow
-                ref={loadMoreMessagesRef}
-                hasNextPage={hasNextPageMessages}
-                isFetchingNextPage={isFetchingNextPageMessages}
-                endLabel="No more messages"
-            />
             <form
                 onSubmit={handleSubmit}
                 className="flex shrink-0 items-center gap-3 border-t border-black/10 bg-white px-5 py-3"
