@@ -3,11 +3,7 @@ import {
     getChatControllerGetConversationsInfiniteQueryKey,
     useChatControllerSendMessage,
 } from '@services/generated/chat/chat';
-import {
-    ConversationsListResponseDto,
-    MessageItemDto,
-    MessagesListResponseDto,
-} from '@services/model';
+import { MessageItemDto, MessagesListResponseDto } from '@services/model';
 import { InfiniteData, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 
@@ -121,38 +117,9 @@ export function useSendMessage(
                 }
 
                 if (data) {
-                    const conversationsQueryKey =
-                        getChatControllerGetConversationsInfiniteQueryKey();
-
-                    queryClient.setQueryData<
-                        InfiniteData<ConversationsListResponseDto>
-                    >(conversationsQueryKey, (old) => {
-                        if (!old) return old;
-
-                        let updatedConversation = null;
-                        const pages = old.pages.map((page) => {
-                            const idx = page.conversations.findIndex(
-                                (c) => c.id === conversationId,
-                            );
-                            if (idx === -1) return page;
-
-                            updatedConversation = {
-                                ...page.conversations[idx],
-                                lastMessage: data,
-                                updatedAt: data.timestamp,
-                            };
-
-                            const conversations = [
-                                updatedConversation,
-                                ...page.conversations.filter(
-                                    (_, i) => i !== idx,
-                                ),
-                            ];
-
-                            return { ...page, conversations };
-                        });
-
-                        return { ...old, pages };
+                    queryClient.invalidateQueries({
+                        queryKey:
+                            getChatControllerGetConversationsInfiniteQueryKey(),
                     });
                 }
 
