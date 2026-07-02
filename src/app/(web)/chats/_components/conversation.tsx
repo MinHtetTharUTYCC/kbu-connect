@@ -25,6 +25,7 @@ import {
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { useDeleteConversation } from '@/hooks/chat/use-delete-conversation';
 
 export function ChatClient({ chatId }: { chatId: string }) {
     const { user } = useAuthContext();
@@ -53,19 +54,7 @@ export function ChatClient({ chatId }: { chatId: string }) {
         useSendMessage(chatId, myId, () => {});
 
     const { mutate: deleteConversation, isPending: isDeleting } =
-        useChatControllerDeleteConversation({
-            mutation: {
-                onError: (error) => handleBackendError(error),
-                onSuccess: () => {
-                    queryClient.invalidateQueries({
-                        queryKey:
-                            getChatControllerGetConversationsInfiniteQueryKey(),
-                    });
-                    toast.success('Conversation deleted');
-                    router.push('/chats');
-                },
-            },
-        });
+        useDeleteConversation();
 
     useEffect(() => {
         if (chatId && conversation) {
@@ -137,7 +126,7 @@ export function ChatClient({ chatId }: { chatId: string }) {
 
     return (
         <div className="flex flex-1 flex-col min-h-0">
-            <header className="sticky top-0 z-10 flex shrink-0 items-center gap-3 border-b border-black/10 bg-white/90 px-5 py-3 backdrop-blur">
+            <header className="flex shrink-0 items-center gap-3 border-b border-black/10 bg-white px-5 py-3">
                 <Link
                     href="/chats"
                     className="-ml-2 grid size-10 place-items-center text-primary"
@@ -245,7 +234,7 @@ export function ChatClient({ chatId }: { chatId: string }) {
             </main>
             <form
                 onSubmit={handleSubmit}
-                className="sticky bottom-0 flex shrink-0 items-center gap-3 border-t border-black/10 bg-white px-5 py-3"
+                className="flex shrink-0 items-center gap-3 border-t border-black/10 bg-white px-5 py-3"
             >
                 <button
                     type="button"
