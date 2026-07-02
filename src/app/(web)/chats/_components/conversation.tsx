@@ -137,7 +137,7 @@ export function ChatClient({ chatId }: { chatId: string }) {
 
     return (
         <div className="flex flex-1 flex-col min-h-0">
-            <header className="flex items-center gap-3 border-b border-black/10 bg-white/90 px-5 py-3 backdrop-blur">
+            <header className="sticky top-0 z-10 flex shrink-0 items-center gap-3 border-b border-black/10 bg-white/90 px-5 py-3 backdrop-blur">
                 <Link
                     href="/chats"
                     className="-ml-2 grid size-10 place-items-center text-primary"
@@ -193,14 +193,14 @@ export function ChatClient({ chatId }: { chatId: string }) {
                 </DropdownMenu>
             </header>
 
-            <main className="flex flex-1 flex-col gap-3 overflow-y-auto bg-white px-5 py-6">
+            <main className="flex-1 overflow-y-auto bg-white px-5 py-6">
                 {isLoadingMessages ? (
                     <EmptyState
                         title="Loading messages"
                         body="Opening your messages."
                     />
                 ) : messages.length ? (
-                    <>
+                    <div className="flex flex-col gap-3">
                         <LoadMoreRow
                             ref={loadMoreMessagesRef}
                             hasNextPage={hasNextPageMessages}
@@ -235,41 +235,41 @@ export function ChatClient({ chatId }: { chatId: string }) {
                                 </div>
                             );
                         })}
-                    </>
+                    </div>
                 ) : (
                     <EmptyState
                         title="No messages yet"
                         body="Send the first message to start the conversation."
                     />
                 )}
-                <form
-                    onSubmit={handleSubmit}
-                    className="flex shrink-0 items-center gap-3 border-t border-black/10 bg-white px-5 py-3"
-                >
-                    <button
-                        type="button"
-                        className="grid size-11 place-items-center text-primary"
-                        aria-label="Add attachment"
-                    >
-                        <PlusCircle className="size-6" />
-                    </button>
-                    <input
-                        value={draft}
-                        onChange={(e) => setDraft(e.target.value)}
-                        placeholder="Type here..."
-                        aria-label="Message"
-                        className="h-11 min-w-0 flex-1 rounded-xl border border-black/10 bg-[#f9f9f8] px-4 text-sm outline-none focus:border-primary"
-                    />
-                    <button
-                        type="submit"
-                        disabled={isSendingMessage || !draft.trim()}
-                        className="grid size-11 place-items-center rounded-xl bg-primary text-white transition active:scale-95"
-                        aria-label="Send message"
-                    >
-                        <Send className="size-5" />
-                    </button>
-                </form>
             </main>
+            <form
+                onSubmit={handleSubmit}
+                className="sticky bottom-0 flex shrink-0 items-center gap-3 border-t border-black/10 bg-white px-5 py-3"
+            >
+                <button
+                    type="button"
+                    className="grid size-11 place-items-center text-primary"
+                    aria-label="Add attachment"
+                >
+                    <PlusCircle className="size-6" />
+                </button>
+                <input
+                    value={draft}
+                    onChange={(e) => setDraft(e.target.value)}
+                    placeholder="Type here..."
+                    aria-label="Message"
+                    className="h-11 min-w-0 flex-1 rounded-xl border border-black/10 bg-[#f9f9f8] px-4 text-sm outline-none focus:border-primary"
+                />
+                <button
+                    type="submit"
+                    disabled={isSendingMessage || !draft.trim()}
+                    className="grid size-11 place-items-center rounded-xl bg-primary text-white transition active:scale-95"
+                    aria-label="Send message"
+                >
+                    <Send className="size-5" />
+                </button>
+            </form>
 
             {showDeleteConfirm && (
                 <DeleteConfirmSheet
