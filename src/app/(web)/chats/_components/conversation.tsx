@@ -7,7 +7,6 @@ import { useEffect, useRef, useState } from 'react';
 import { useAuthContext } from '@/components/auth-provider';
 import { Avatar, EmptyState } from '@/components/mobile/app-chrome';
 import { DeleteConfirmSheet } from '@/components/mobile/delete-confirm-sheet';
-import { useTopBar } from '@/components/mobile/top-bar-provider';
 import { useConversationMessages } from '@/hooks/chat/use-conversation-messages';
 import { useMarkConversationSeen } from '@/hooks/chat/use-mark-conversation-seen';
 import { relativeTime } from '@/lib/profile-utils';
@@ -67,29 +66,6 @@ export function ChatClient({ chatId }: { chatId: string }) {
                 },
             },
         });
-
-    useTopBar({
-        title: undefined,
-        backHref: '/chats',
-        action: conversation ? (
-            <div className="flex items-center gap-2">
-                <DropdownMenu>
-                    <DropdownMenuTrigger className="grid size-10 place-items-center text-primary">
-                        <MoreVertical className="size-5" />
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                        <DropdownMenuItem
-                            className="text-red-500"
-                            onClick={() => setShowDeleteConfirm(true)}
-                        >
-                            <Trash className="size-4" />
-                            Delete chat
-                        </DropdownMenuItem>
-                    </DropdownMenuContent>
-                </DropdownMenu>
-            </div>
-        ) : undefined,
-    });
 
     useEffect(() => {
         if (chatId && conversation) {
@@ -160,7 +136,7 @@ export function ChatClient({ chatId }: { chatId: string }) {
           : '';
 
     return (
-        <>
+        <div className="flex flex-1 flex-col min-h-0">
             <header className="flex items-center gap-3 border-b border-black/10 bg-white/90 px-5 py-3 backdrop-blur">
                 <Link
                     href="/chats"
@@ -306,6 +282,6 @@ export function ChatClient({ chatId }: { chatId: string }) {
                     }
                 />
             )}
-        </>
+        </div>
     );
 }
