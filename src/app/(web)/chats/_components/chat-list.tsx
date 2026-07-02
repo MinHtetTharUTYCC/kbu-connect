@@ -219,9 +219,7 @@ function ShoutoutsPanel() {
                         deleteShoutout(
                             { shoutoutId: deleteTargetId },
                             {
-                                onSuccess: () => {
-                                    setDeleteTargetId(null);
-                                },
+                                onSuccess: () => setDeleteTargetId(null),
                             },
                         )
                     }
