@@ -5,7 +5,6 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useRef, useState, useCallback } from 'react';
 import { Avatar, Chip, EmptyState } from '@/components/mobile/app-chrome';
 import { DeleteConfirmSheet } from '@/components/mobile/delete-confirm-sheet';
-import { ProfileSheet } from '@/components/mobile/profile-sheet';
 import { ReplyShoutoutSheet } from '@/components/mobile/reply-shoutout-sheet';
 import { useTopBar } from '@/components/mobile/top-bar-provider';
 import { useConversationsList } from '@/hooks/chat/use-conversations-list';
@@ -344,9 +343,6 @@ export function ChatListClient() {
         isFetchingNextPage,
     } = useConversationsList({ cursor: null });
     const loadMoreRef = useRef<HTMLDivElement | null>(null);
-    const [selectedProfileId, setSelectedProfileId] = useState<string | null>(
-        null,
-    );
     const router = useRouter();
 
     useEffect(() => {
@@ -387,49 +383,33 @@ export function ChatListClient() {
     return (
         <div className="flex flex-col">
             {conversations.map((conversation) => (
-                <div
+                <Link
                     key={conversation.id}
-                    className="flex items-center border-b border-black/10 px-5 py-4"
+                    href={`/chats/${conversation.id}`}
+                    className="flex items-center border-b border-black/10 px-5 py-4 active:bg-black/5"
                 >
-                    <button
-                        type="button"
-                        onClick={() =>
-                            setSelectedProfileId(conversation.otherUser.id)
-                        }
-                        className="shrink-0"
-                    >
+                    <div className="shrink-0">
                         <Avatar
                             src={conversation.otherUser.avatarUrl}
                             name={conversation.otherUser.name}
                             className="size-12"
                         />
-                    </button>
+                    </div>
                     <div className="ml-3 min-w-0 flex-1">
                         <div className="flex items-baseline justify-between gap-3">
-                            <button
-                                type="button"
-                                onClick={() =>
-                                    setSelectedProfileId(
-                                        conversation.otherUser.id,
-                                    )
-                                }
-                                className="truncate font-semibold active:opacity-70"
-                            >
+                            <span className="truncate font-semibold">
                                 {conversation.otherUser.name}
-                            </button>
+                            </span>
                             <span className="text-xs text-[#6b6b6b]">
                                 {relativeTime(conversation.updatedAt)}
                             </span>
                         </div>
-                        <Link
-                            href={`/chats/${conversation.id}`}
-                            className="block truncate text-sm text-[#6b6b6b]"
-                        >
+                        <p className="block truncate text-sm text-[#6b6b6b]">
                             {conversation.lastMessage?.content ??
                                 'No messages yet.'}
-                        </Link>
+                        </p>
                     </div>
-                </div>
+                </Link>
             ))}
             <LoadMoreRow
                 ref={loadMoreRef}
@@ -437,14 +417,6 @@ export function ChatListClient() {
                 isFetchingNextPage={isFetchingNextPage}
                 endLabel="No more chats"
             />
-            {selectedProfileId && (
-                <ProfileSheet
-                    userId={selectedProfileId}
-                    onClose={() => setSelectedProfileId(null)}
-                    onMessage={() => router.push(`/chats/${selectedProfileId}`)}
-                    from="visit"
-                />
-            )}
         </div>
     );
 }
