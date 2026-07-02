@@ -2,8 +2,9 @@
 
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState, useCallback } from 'react';
 import { Avatar, Chip, EmptyState } from '@/components/mobile/app-chrome';
+import { DeleteConfirmSheet } from '@/components/mobile/delete-confirm-sheet';
 import { ProfileSheet } from '@/components/mobile/profile-sheet';
 import { ReplyShoutoutSheet } from '@/components/mobile/reply-shoutout-sheet';
 import { useTopBar } from '@/components/mobile/top-bar-provider';
@@ -13,6 +14,7 @@ import {
     type ShoutoutType,
     useShoutoutsList,
 } from '@/hooks/chat/use-shoutouts-list';
+import { useDeleteShoutout } from '@/hooks/chat/use-delete-shoutout';
 import { useReplyShoutout } from '@/hooks/chat/use-reply-shoutout';
 import { relativeTime } from '@/lib/profile-utils';
 import { cn } from '@/lib/utils';
@@ -83,8 +85,11 @@ function ShoutoutsPanel() {
     const [selectedShoutoutId, setSelectedShoutoutId] = useState<string | null>(
         null,
     );
+    const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
     const { mutate: replyToShoutout, isPending: isReplying } =
         useReplyShoutout();
+    const { mutate: deleteShoutout, isPending: isDeleting } =
+        useDeleteShoutout();
 
     useEffect(() => {
         const target = loadMoreRef.current;
@@ -144,6 +149,7 @@ function ShoutoutsPanel() {
                             shoutout={item}
                             onUserClick={setSelectedProfileId}
                             onReplyClick={setSelectedShoutoutId}
+                            onDeleteClick={setDeleteTargetId}
                         />
                     ))}
                     <LoadMoreRow
@@ -203,6 +209,24 @@ function ShoutoutsPanel() {
                     isPending={isReplying}
                 />
             )}
+            {deleteTargetId && (
+                <DeleteConfirmSheet
+                    title="Delete shoutout"
+                    message="Are you sure you want to delete this shoutout? This action cannot be undone."
+                    isPending={isDeleting}
+                    onClose={() => setDeleteTargetId(null)}
+                    onConfirm={() =>
+                        deleteShoutout(
+                            { shoutoutId: deleteTargetId },
+                            {
+                                onSuccess: () => {
+                                    setDeleteTargetId(null);
+                                },
+                            },
+                        )
+                    }
+                />
+            )}
         </section>
     );
 }
@@ -227,15 +251,45 @@ function ShoutoutRow({
     shoutout,
     onUserClick,
     onReplyClick,
+    onDeleteClick,
 }: {
     shoutout: ShoutoutItem;
     onUserClick: (userId: string) => void;
     onReplyClick: (shoutoutId: string) => void;
+    onDeleteClick: (shoutoutId: string) => void;
 }) {
     const canReply = shoutout.type === 'received';
+    const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+    const handleTouchStart = useCallback(() => {
+        longPressTimer.current = setTimeout(() => {
+            onDeleteClick(shoutout.id);
+        }, 500);
+    }, [shoutout.id, onDeleteClick]);
+
+    const handleTouchEnd = useCallback(() => {
+        if (longPressTimer.current) {
+            clearTimeout(longPressTimer.current);
+            longPressTimer.current = null;
+        }
+    }, []);
+
+    const handleContextMenu = useCallback(
+        (e: React.MouseEvent) => {
+            e.preventDefault();
+            onDeleteClick(shoutout.id);
+        },
+        [shoutout.id, onDeleteClick],
+    );
 
     return (
-        <article className="border-b border-black/10 bg-white p-5">
+        <article
+            className="border-b border-black/10 bg-white p-5"
+            onTouchStart={handleTouchStart}
+            onTouchEnd={handleTouchEnd}
+            onTouchCancel={handleTouchEnd}
+            onContextMenu={handleContextMenu}
+        >
             <div className="flex items-start gap-3">
                 <button
                     type="button"
