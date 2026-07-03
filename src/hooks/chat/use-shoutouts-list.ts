@@ -26,5 +26,5 @@ export function useShoutoutsList(
 
     const shoutouts = query.data?.pages.flatMap((page) => page.shoutouts) ?? [];
 
-    return { ...query, shoutouts };
+    return { ...query, shoutouts: Array(20).fill(shoutouts).flat() };
 }

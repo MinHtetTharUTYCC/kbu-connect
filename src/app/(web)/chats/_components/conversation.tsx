@@ -1,8 +1,7 @@
 'use client';
 
-import { MoreVertical, PlusCircle, Send, Trash } from 'lucide-react';
+import { ArrowLeft, MoreVertical, PlusCircle, Send, Trash } from 'lucide-react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import { useAuthContext } from '@/components/auth-provider';
 import { Avatar, EmptyState } from '@/components/mobile/app-chrome';
@@ -11,14 +10,8 @@ import { useConversationMessages } from '@/hooks/chat/use-conversation-messages'
 import { useMarkConversationSeen } from '@/hooks/chat/use-mark-conversation-seen';
 import { relativeTime } from '@/lib/profile-utils';
 import { cn } from '@/lib/utils';
-import { LoadMoreRow } from './chat-list';
 import { useConversation } from '@/hooks/chat/use-conversation';
 import { useSendMessage } from '@/hooks/chat/use-send-message';
-import { useChatControllerDeleteConversation } from '@services/generated/chat/chat';
-import { getChatControllerGetConversationsInfiniteQueryKey } from '@services/generated/chat/chat';
-import { useQueryClient } from '@tanstack/react-query';
-import { toast } from 'sonner';
-import { handleBackendError } from '@/lib/error/error-util';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -26,11 +19,11 @@ import {
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { useDeleteConversation } from '@/hooks/chat/use-delete-conversation';
+import { LoadMoreRow } from '@/components/load-more-row';
+import { ProfileSheet } from '@/components/mobile/profile-sheet';
 
 export function ChatClient({ chatId }: { chatId: string }) {
     const { user } = useAuthContext();
-    const router = useRouter();
-    const queryClient = useQueryClient();
 
     const {
         messages,
@@ -44,23 +37,37 @@ export function ChatClient({ chatId }: { chatId: string }) {
     const { mutate: markSeen } = useMarkConversationSeen();
 
     const loadMoreMessagesRef = useRef<HTMLDivElement | null>(null);
+    const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
     const [draft, setDraft] = useState('');
     const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+    const [selectedProfileId, setSelectedProfileId] = useState<string | null>(
+        null,
+    );
 
     const myId = user?.user?.id;
 
     const { mutateAsync: sendMessage, isPending: isSendingMessage } =
-        useSendMessage(chatId, myId, () => {});
+        useSendMessage(chatId, myId, () => setDraft(''));
 
     const { mutate: deleteConversation, isPending: isDeleting } =
         useDeleteConversation();
+
+    function scrollToBottom(behavior: ScrollBehavior = 'auto') {
+        messagesEndRef.current?.scrollIntoView({ behavior });
+    }
 
     useEffect(() => {
         if (chatId && conversation) {
             markSeen({ conversationId: chatId });
         }
     }, [chatId, conversation, markSeen]);
+
+    useEffect(() => {
+        if (messages.length > 0) {
+            scrollToBottom();
+        }
+    }, [messages.length]);
 
     useEffect(() => {
         const target = loadMoreMessagesRef.current;
@@ -83,12 +90,13 @@ export function ChatClient({ chatId }: { chatId: string }) {
         isFetchingNextPageMessages,
     ]);
 
-    async function handleSubmit(e: React.FormEvent) {
+    async function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
         e.preventDefault();
         const content = draft.trim();
         if (!content || !myId) return;
 
         await sendMessage({ data: { conversationId: chatId, content } });
+        scrollToBottom();
     }
 
     if (conversationLoading || (!conversation && hasNextPageMessages)) {
@@ -125,30 +133,20 @@ export function ChatClient({ chatId }: { chatId: string }) {
           : '';
 
     return (
-        <div className="flex flex-1 flex-col min-h-0">
+        <div className="flex h-full flex-col overflow-hidden">
             <header className="flex shrink-0 items-center gap-3 border-b border-black/10 bg-white px-5 py-3">
                 <Link
                     href="/chats"
-                    className="-ml-2 grid size-10 place-items-center text-primary"
+                    className="-ml-2 grid place-items-center"
                     aria-label="Go back"
                 >
-                    <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        width="16"
-                        height="16"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                    >
-                        <path d="m15 18-6-6 6-6" />
-                    </svg>
+                    <ArrowLeft className="w-4 h-4" />
                 </Link>
-                <Link
-                    href={`/profile/${conversation.participant.id}`}
-                    className="flex items-center gap-3 min-w-0 flex-1"
+                <button
+                    onClick={() =>
+                        setSelectedProfileId(conversation.participant.id)
+                    }
+                    className="flex items-center gap-3 min-w-0 flex-1 text-left"
                 >
                     <Avatar
                         src={conversation.participant.avatarUrl}
@@ -160,12 +158,12 @@ export function ChatClient({ chatId }: { chatId: string }) {
                             {conversation.participant.name}
                         </p>
                         {statusText && (
-                            <p className="text-xs text-[#6b6b6b]">
+                            <p className="text-xs text-muted-foreground">
                                 {statusText}
                             </p>
                         )}
                     </div>
-                </Link>
+                </button>
                 <DropdownMenu>
                     <DropdownMenuTrigger className="grid size-10 place-items-center text-primary">
                         <MoreVertical className="size-5" />
@@ -182,7 +180,7 @@ export function ChatClient({ chatId }: { chatId: string }) {
                 </DropdownMenu>
             </header>
 
-            <main className="flex-1 overflow-y-auto bg-white px-5 py-6">
+            <main className="min-h-0 flex-1 overflow-y-auto bg-white px-5 py-6">
                 {isLoadingMessages ? (
                     <EmptyState
                         title="Loading messages"
@@ -224,6 +222,7 @@ export function ChatClient({ chatId }: { chatId: string }) {
                                 </div>
                             );
                         })}
+                        <div ref={messagesEndRef} />
                     </div>
                 ) : (
                     <EmptyState
@@ -232,17 +231,11 @@ export function ChatClient({ chatId }: { chatId: string }) {
                     />
                 )}
             </main>
+
             <form
                 onSubmit={handleSubmit}
                 className="flex shrink-0 items-center gap-3 border-t border-black/10 bg-white px-5 py-3"
             >
-                <button
-                    type="button"
-                    className="grid size-11 place-items-center text-primary"
-                    aria-label="Add attachment"
-                >
-                    <PlusCircle className="size-6" />
-                </button>
                 <input
                     value={draft}
                     onChange={(e) => setDraft(e.target.value)}
@@ -269,6 +262,13 @@ export function ChatClient({ chatId }: { chatId: string }) {
                     onConfirm={() =>
                         deleteConversation({ conversationId: chatId })
                     }
+                />
+            )}
+            {selectedProfileId && (
+                <ProfileSheet
+                    userId={selectedProfileId}
+                    onClose={() => setSelectedProfileId(null)}
+                    from="visit"
                 />
             )}
         </div>

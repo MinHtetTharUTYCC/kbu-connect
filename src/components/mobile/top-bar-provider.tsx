@@ -13,7 +13,7 @@ import { TopBar } from './app-chrome';
 type TopBarConfig = {
     title?: string;
     action?: ReactNode;
-    backHref?: string;
+    showBack?: boolean;
 };
 
 const TopBarContext = createContext<React.Dispatch<
@@ -23,7 +23,7 @@ const TopBarContext = createContext<React.Dispatch<
 export function TopBarProvider({ children }: { children: ReactNode }) {
     const [config, setConfig] = useState<TopBarConfig>({});
 
-    const hasConfig = config.title || config.backHref || config.action;
+    const hasConfig = config.title || config.showBack || config.action;
 
     return (
         <TopBarContext.Provider value={setConfig}>
@@ -44,9 +44,9 @@ export function useTopBar(config: TopBarConfig) {
     useLayoutEffect(() => {
         setConfig({
             title: config.title,
-            backHref: config.backHref,
+            showBack: config.showBack,
             action: actionRef.current,
         });
         return () => setConfig({});
-    }, [config.title, config.backHref, setConfig]);
+    }, [config.title, config.showBack, setConfig]);
 }

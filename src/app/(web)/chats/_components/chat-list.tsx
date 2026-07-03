@@ -17,6 +17,8 @@ import { useDeleteShoutout } from '@/hooks/chat/use-delete-shoutout';
 import { useReplyShoutout } from '@/hooks/chat/use-reply-shoutout';
 import { relativeTime } from '@/lib/profile-utils';
 import { cn } from '@/lib/utils';
+import { ProfileSheet } from '@/components/mobile/profile-sheet';
+import { LoadMoreRow } from '@/components/load-more-row';
 
 type ChatTab = 'chats' | 'shoutouts';
 
@@ -142,9 +144,9 @@ function ShoutoutsPanel() {
                 />
             ) : shoutouts.length ? (
                 <div>
-                    {shoutouts.map((item) => (
+                    {shoutouts.map((item, index) => (
                         <ShoutoutRow
-                            key={item.id}
+                            key={`${item.id}-${index}`}
                             shoutout={item}
                             onUserClick={setSelectedProfileId}
                             onReplyClick={setSelectedShoutoutId}
@@ -227,22 +229,6 @@ function ShoutoutsPanel() {
         </section>
     );
 }
-
-export const LoadMoreRow = ({
-    ref,
-    hasNextPage,
-    isFetchingNextPage,
-    endLabel = 'No more shoutouts',
-}: {
-    ref: React.Ref<HTMLDivElement>;
-    hasNextPage: boolean;
-    isFetchingNextPage: boolean;
-    endLabel?: string;
-}) => (
-    <div ref={ref} className="px-5 py-4 text-center text-xs text-[#6b6b6b]">
-        {isFetchingNextPage ? 'Loading more...' : hasNextPage ? '' : endLabel}
-    </div>
-);
 
 function ShoutoutRow({
     shoutout,

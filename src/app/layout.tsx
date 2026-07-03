@@ -29,7 +29,7 @@ export default function RootLayout({
                 geist.variable,
             )}
         >
-            <body className="flex flex-col min-h-screen">
+            <body className="flex flex-col h-dvh">
                 <Providers>
                     <main className="flex-1 flex flex-col overflow-hidden min-h-0">
                         {children}

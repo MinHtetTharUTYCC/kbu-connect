@@ -1,8 +1,8 @@
 'use client';
 
-import { ArrowLeft, GraduationCap, SlidersHorizontal } from 'lucide-react';
+import { ArrowLeft, GraduationCap } from 'lucide-react';
 import Image from 'next/image';
-import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import type { ReactNode } from 'react';
 import { initials } from '@/lib/profile-utils';
 import { cn } from '@/lib/utils';
@@ -18,6 +18,7 @@ export function MobileScreen({
         <div
             className={cn(
                 'mx-auto flex w-full max-w-[430px] flex-col bg-white text-[#1c1b1b]',
+                'flex-1 min-h-0',
                 className,
             )}
         >
@@ -29,23 +30,33 @@ export function MobileScreen({
 export function TopBar({
     title = 'UniMatch',
     action,
-    backHref,
+    showBack = false,
 }: {
     title?: string;
     action?: ReactNode;
-    backHref?: string;
+    showBack?: boolean;
 }) {
+    const router = useRouter();
+
+    const handleBack = () => {
+        if (window.history.length > 1) {
+            router.back();
+        } else {
+            router.push('/');
+        }
+    };
+
     return (
         <header className="sticky top-0 z-40 flex h-14 shrink-0 items-center justify-between border-b border-black/10 bg-white/90 px-5 backdrop-blur">
             <div className="flex min-w-0 items-center gap-2">
-                {backHref ? (
-                    <Link
-                        href={backHref}
-                        className="-ml-2 grid size-10 place-items-center text-primary"
+                {showBack ? (
+                    <button
+                        onClick={handleBack}
+                        className="-ml-2 grid size-10 place-items-center"
                         aria-label="Go back"
                     >
                         <ArrowLeft className="w-4 h-4" />
-                    </Link>
+                    </button>
                 ) : (
                     <GraduationCap className="size-6 text-primary" />
                 )}

@@ -141,7 +141,7 @@ export function ProfileSetupClient() {
 
     useTopBar({
         title: isEditMode ? 'Edit Profile' : 'UniMatch',
-        backHref: isEditMode ? '/profile/me' : '/login',
+        showBack: true,
         action: isEditMode ? (
             <a
                 href="/profile/me"

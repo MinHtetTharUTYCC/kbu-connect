@@ -11,6 +11,7 @@ import { useTopBar } from '@/components/mobile/top-bar-provider';
 import { useMarkAllNotificationsRead } from '@/hooks/notifications/use-mark-all-notifications-read';
 import { useNotificationsList } from '@/hooks/notifications/use-notifications-list';
 import { relativeTime } from '@/lib/profile-utils';
+import { LoadMoreRow } from '@/components/load-more-row';
 
 export function NotificationClient() {
     const {
@@ -67,19 +68,17 @@ export function NotificationClient() {
                 />
             ) : notifications.length ? (
                 <Section title="Latest">
-                    {notifications.map((item) => (
-                        <NotificationRow key={item.id} notification={item} />
+                    {notifications.map((item, index) => (
+                        <NotificationRow
+                            key={`${item.id}-${index}`}
+                            notification={item}
+                        />
                     ))}
-                    <div
+                    <LoadMoreRow
                         ref={loadMoreRef}
-                        className="px-5 py-4 text-center text-xs text-[#6b6b6b]"
-                    >
-                        {isFetchingNextPage
-                            ? 'Loading more...'
-                            : hasNextPage
-                              ? ''
-                              : 'No more notifications'}
-                    </div>
+                        hasNextPage={hasNextPage}
+                        isFetchingNextPage={isFetchingNextPage}
+                    />
                 </Section>
             ) : (
                 <EmptyState

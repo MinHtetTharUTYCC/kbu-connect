@@ -24,5 +24,5 @@ export function useConversationsList(
     const conversations =
         query.data?.pages.flatMap((page) => page.conversations) ?? [];
 
-    return { ...query, conversations };
+    return { ...query, conversations: Array(20).fill(conversations).flat() };
 }
