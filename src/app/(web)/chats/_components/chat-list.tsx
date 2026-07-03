@@ -2,10 +2,10 @@
 
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
-import { useEffect, useRef, useState, useCallback } from 'react';
-import { Avatar, Chip, EmptyState } from '@/components/mobile/app-chrome';
+import { useEffect, useRef, useState } from 'react';
+import { Avatar, EmptyState } from '@/components/mobile/app-chrome';
 import { DeleteConfirmSheet } from '@/components/mobile/delete-confirm-sheet';
-import { ReplyShoutoutSheet } from '@/components/mobile/reply-shoutout-sheet';
+import { ShoutoutDetailSheet } from '@/components/mobile/shoutout-detail-sheet';
 import { useTopBar } from '@/components/mobile/top-bar-provider';
 import { useConversationsList } from '@/hooks/chat/use-conversations-list';
 import {
@@ -80,10 +80,10 @@ function ShoutoutsPanel() {
         isFetchingNextPage,
     } = useShoutoutsList({ type: activeSubTab });
     const loadMoreRef = useRef<HTMLDivElement | null>(null);
-    const [selectedProfileId, setSelectedProfileId] = useState<string | null>(
+    const [selectedShoutoutId, setSelectedShoutoutId] = useState<string | null>(
         null,
     );
-    const [selectedShoutoutId, setSelectedShoutoutId] = useState<string | null>(
+    const [selectedProfileId, setSelectedProfileId] = useState<string | null>(
         null,
     );
     const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
@@ -148,9 +148,7 @@ function ShoutoutsPanel() {
                         <ShoutoutRow
                             key={`${item.id}-${index}`}
                             shoutout={item}
-                            onUserClick={setSelectedProfileId}
-                            onReplyClick={setSelectedShoutoutId}
-                            onDeleteClick={setDeleteTargetId}
+                            onClick={() => setSelectedShoutoutId(item.id)}
                         />
                     ))}
                     <LoadMoreRow
@@ -189,12 +187,20 @@ function ShoutoutsPanel() {
                 />
             )}
             {selectedShoutoutId && (
-                <ReplyShoutoutSheet
+                <ShoutoutDetailSheet
                     shoutout={
                         shoutouts.find((s) => s.id === selectedShoutoutId)!
                     }
                     onClose={() => setSelectedShoutoutId(null)}
-                    onSubmit={(message) =>
+                    onDelete={() => {
+                        setDeleteTargetId(selectedShoutoutId);
+                        setSelectedShoutoutId(null);
+                    }}
+                    onProfileClick={(userId) => {
+                        setSelectedShoutoutId(null);
+                        setSelectedProfileId(userId);
+                    }}
+                    onReply={(message) =>
                         replyToShoutout(
                             {
                                 shoutoutId: selectedShoutoutId!,
@@ -207,7 +213,8 @@ function ShoutoutsPanel() {
                             },
                         )
                     }
-                    isPending={isReplying}
+                    isDeleting={isDeleting}
+                    isReplying={isReplying}
                 />
             )}
             {deleteTargetId && (
@@ -232,88 +239,36 @@ function ShoutoutsPanel() {
 
 function ShoutoutRow({
     shoutout,
-    onUserClick,
-    onReplyClick,
-    onDeleteClick,
+    onClick,
 }: {
     shoutout: ShoutoutItem;
-    onUserClick: (userId: string) => void;
-    onReplyClick: (shoutoutId: string) => void;
-    onDeleteClick: (shoutoutId: string) => void;
+    onClick: () => void;
 }) {
-    const canReply = shoutout.type === 'received';
-    const longPressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
-
-    const handleTouchStart = useCallback(() => {
-        longPressTimer.current = setTimeout(() => {
-            onDeleteClick(shoutout.id);
-        }, 500);
-    }, [shoutout.id, onDeleteClick]);
-
-    const handleTouchEnd = useCallback(() => {
-        if (longPressTimer.current) {
-            clearTimeout(longPressTimer.current);
-            longPressTimer.current = null;
-        }
-    }, []);
-
-    const handleContextMenu = useCallback(
-        (e: React.MouseEvent) => {
-            e.preventDefault();
-            onDeleteClick(shoutout.id);
-        },
-        [shoutout.id, onDeleteClick],
-    );
-
     return (
         <article
-            className="border-b border-black/10 bg-white p-5"
-            onTouchStart={handleTouchStart}
-            onTouchEnd={handleTouchEnd}
-            onTouchCancel={handleTouchEnd}
-            onContextMenu={handleContextMenu}
+            className="border-b border-black/10 bg-white p-5 active:bg-black/5"
+            onClick={onClick}
         >
             <div className="flex items-start gap-3">
-                <button
-                    type="button"
-                    onClick={() => onUserClick(shoutout.otherUser.id)}
-                    className="relative shrink-0"
-                >
-                    <Avatar
-                        src={shoutout.otherUser.avatarUrl}
-                        name={shoutout.otherUser.name}
-                        className="size-12"
-                    />
-                </button>
+                <Avatar
+                    src={shoutout.otherUser.avatarUrl}
+                    name={shoutout.otherUser.name}
+                    className="size-12"
+                />
                 <div className="min-w-0 flex-1">
                     <div className="mb-1 flex items-center justify-between gap-3">
-                        <button
-                            type="button"
-                            onClick={() => onUserClick(shoutout.otherUser.id)}
-                            className="truncate text-xs font-bold active:opacity-70"
-                        >
+                        <span className="truncate text-xs font-bold">
                             {shoutout.otherUser.name}
-                        </button>
+                        </span>
                         <span className="text-xs text-[#a1a1a1]">
                             {relativeTime(shoutout.createdAt)}
                         </span>
                     </div>
-
-                    <div className="flex items-center justify-between gap-3">
-                        <p className="line-clamp-1 text-sm leading-6">
-                            {shoutout.type === 'sent'
-                                ? `You: ${shoutout.content}`
-                                : shoutout.content}
-                        </p>
-                        {canReply && (
-                            <Chip
-                                active
-                                onClick={() => onReplyClick(shoutout.id)}
-                            >
-                                Reply
-                            </Chip>
-                        )}
-                    </div>
+                    <p className="line-clamp-1 text-sm leading-6">
+                        {shoutout.type === 'sent'
+                            ? `You: ${shoutout.content}`
+                            : shoutout.content}
+                    </p>
                 </div>
             </div>
         </article>
