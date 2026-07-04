@@ -43,6 +43,12 @@ pnpm dev
 
 App runs on [http://localhost:3001](http://localhost:3001).
 
+### API Generation
+
+```bash
+pnpm generate:api
+```
+
 ### Build & Start
 
 ```bash
