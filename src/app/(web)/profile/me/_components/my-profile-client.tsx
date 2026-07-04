@@ -177,6 +177,9 @@ export function MyProfileClient() {
             <div className="flex flex-col items-center py-8 text-xs text-[#a1a1a1]">
                 <span>Version 1.0.0</span>
                 <span className="mt-1">KBU Connect</span>
+                <Link href="/about" className="mt-2 font-medium text-primary">
+                    About KBU Connect
+                </Link>
             </div>
         </main>
     );

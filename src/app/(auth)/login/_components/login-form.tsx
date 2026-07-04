@@ -2,6 +2,7 @@
 
 import { useForm } from '@tanstack/react-form';
 import { GraduationCap } from 'lucide-react';
+import Link from 'next/link';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import {
@@ -198,6 +199,11 @@ export function LoginForm() {
                 and{' '}
                 <span className="font-medium text-primary">Privacy Policy</span>
                 .
+            </p>
+            <p className="mt-3 text-center text-xs text-[#a1a1a1]">
+                <Link href="/about" className="font-medium text-primary">
+                    About KBU Connect
+                </Link>
             </p>
         </main>
     );
