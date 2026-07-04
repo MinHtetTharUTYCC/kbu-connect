@@ -1,5 +1,6 @@
 import {
     getChatControllerGetConversationMessagesInfiniteQueryKey,
+    getChatControllerGetConversationsInfiniteQueryKey,
     useChatControllerSendMessage,
 } from '@services/generated/chat/chat';
 import { MessageItemDto, MessagesListResponseDto } from '@services/model';
@@ -113,6 +114,13 @@ export function useSendMessage(
             onSuccess: (data, _vars, context?: { tempId?: string }) => {
                 if (data && context?.tempId) {
                     replaceTempMessage(context.tempId, data);
+                }
+
+                if (data) {
+                    queryClient.invalidateQueries({
+                        queryKey:
+                            getChatControllerGetConversationsInfiniteQueryKey(),
+                    });
                 }
 
                 onSuccess();

@@ -23,7 +23,10 @@ export function MyProfileClient() {
 
     const [viewerIndex, setViewerIndex] = useState<number | null>(null);
 
-    useTopBar({});
+    useTopBar({
+        title: profile?.name ?? 'My Profile',
+        showBack: true,
+    });
 
     if (isLoading || !profile) {
         return <EmptyState title="Loading profile" body="Setting up your account..." />;

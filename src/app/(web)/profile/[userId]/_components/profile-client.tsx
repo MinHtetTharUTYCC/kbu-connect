@@ -30,7 +30,7 @@ export function ProfileClient({ userId }: { userId: string }) {
 
     useTopBar({
         title: profile?.name ?? 'Profile',
-        backHref: '/matches',
+        showBack: true,
     });
 
     useEffect(() => {

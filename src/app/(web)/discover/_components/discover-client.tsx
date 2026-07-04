@@ -115,7 +115,7 @@ export function DiscoverClient() {
         isDragging.current = false;
     }
 
-    async function handleSendShoutout(e: React.FormEvent) {
+    async function handleSendShoutout(e: React.SubmitEvent<HTMLFormElement>) {
         e.preventDefault();
         if (!profile || !shoutoutMessage.trim()) return;
 
@@ -357,10 +357,10 @@ function ShoutoutSheet({
     isSending: boolean;
     onChange: (value: string) => void;
     onClose: () => void;
-    onSubmit: (e: React.FormEvent) => void;
+    onSubmit: (e: React.SubmitEvent<HTMLFormElement>) => void;
 }) {
     return (
-        <div className="fixed inset-0 z-[60] flex items-end justify-center bg-black/35 px-4 pb-4">
+        <div className="fixed inset-0 z-60 flex items-end justify-center bg-black/35 px-4 pb-4">
             <form
                 onSubmit={onSubmit}
                 className="w-full max-w-[398px] rounded-t-2xl bg-white p-5 shadow-xl"

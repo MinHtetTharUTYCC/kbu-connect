@@ -3,70 +3,22 @@
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
+import { LoadMoreRow } from '@/components/load-more-row';
 import { Avatar, EmptyState } from '@/components/mobile/app-chrome';
 import { DeleteConfirmSheet } from '@/components/mobile/delete-confirm-sheet';
+import { ProfileSheet } from '@/components/mobile/profile-sheet';
 import { ShoutoutDetailSheet } from '@/components/mobile/shoutout-detail-sheet';
-import { useTopBar } from '@/components/mobile/top-bar-provider';
-import { useConversationsList } from '@/hooks/chat/use-conversations-list';
+import { useDeleteShoutout } from '@/hooks/chat/use-delete-shoutout';
+import { useReplyShoutout } from '@/hooks/chat/use-reply-shoutout';
 import {
     type ShoutoutItem,
     type ShoutoutType,
     useShoutoutsList,
 } from '@/hooks/chat/use-shoutouts-list';
-import { useDeleteShoutout } from '@/hooks/chat/use-delete-shoutout';
-import { useReplyShoutout } from '@/hooks/chat/use-reply-shoutout';
-import { relativeTime } from '@/lib/profile-utils';
+import { getFormattedDate } from '@/lib/date/format-date';
 import { cn } from '@/lib/utils';
-import { ProfileSheet } from '@/components/mobile/profile-sheet';
-import { LoadMoreRow } from '@/components/load-more-row';
 
-type ChatTab = 'chats' | 'shoutouts';
-
-export function ChatHomeClient() {
-    const searchParams = useSearchParams();
-    const activeTab: ChatTab =
-        searchParams.get('tab') === 'shoutouts' ? 'shoutouts' : 'chats';
-
-    useTopBar({ title: 'Chats' });
-
-    return (
-        <main className="flex-1 overflow-y-auto pb-5">
-            <div className="bg-white px-5 py-4">
-                <div className="flex rounded-xl border border-black/10 bg-[#f9f9f8] p-1">
-                    <Link
-                        href="/chats"
-                        className={cn(
-                            'flex-1 rounded-lg py-2 text-center text-xs font-semibold',
-                            activeTab === 'chats'
-                                ? 'border border-primary bg-white text-primary shadow-sm'
-                                : 'text-[#6b6b6b]',
-                        )}
-                    >
-                        Chats
-                    </Link>
-                    <Link
-                        href="/chats?tab=shoutouts"
-                        className={cn(
-                            'flex-1 rounded-lg py-2 text-center text-xs font-semibold',
-                            activeTab === 'shoutouts'
-                                ? 'border border-primary bg-white text-primary shadow-sm'
-                                : 'text-[#6b6b6b]',
-                        )}
-                    >
-                        Shoutouts
-                    </Link>
-                </div>
-            </div>
-            {activeTab === 'shoutouts' ? (
-                <ShoutoutsPanel />
-            ) : (
-                <ChatListClient />
-            )}
-        </main>
-    );
-}
-
-function ShoutoutsPanel() {
+export function ShoutoutsPanel() {
     const router = useRouter();
     const searchParams = useSearchParams();
 
@@ -260,8 +212,8 @@ function ShoutoutRow({
                         <span className="truncate text-xs font-bold">
                             {shoutout.otherUser.name}
                         </span>
-                        <span className="text-xs text-[#a1a1a1]">
-                            {relativeTime(shoutout.createdAt)}
+                        <span className="text-xs text-muted-foreground">
+                            {getFormattedDate(shoutout.createdAt)}
                         </span>
                     </div>
                     <p className="line-clamp-1 text-sm leading-6">
@@ -272,92 +224,5 @@ function ShoutoutRow({
                 </div>
             </div>
         </article>
-    );
-}
-
-export function ChatListClient() {
-    const {
-        conversations,
-        isLoading,
-        fetchNextPage,
-        hasNextPage,
-        isFetchingNextPage,
-    } = useConversationsList({ cursor: null });
-    const loadMoreRef = useRef<HTMLDivElement | null>(null);
-    const router = useRouter();
-
-    useEffect(() => {
-        const target = loadMoreRef.current;
-        if (!target || !hasNextPage) return;
-
-        const observer = new IntersectionObserver(
-            ([entry]) => {
-                if (entry.isIntersecting && !isFetchingNextPage) {
-                    fetchNextPage();
-                }
-            },
-            { rootMargin: '180px 0px' },
-        );
-
-        observer.observe(target);
-        return () => observer.disconnect();
-    }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
-
-    if (isLoading) {
-        return (
-            <EmptyState
-                title="Loading chats"
-                body="Checking your conversations."
-            />
-        );
-    }
-
-    if (!conversations.length) {
-        return (
-            <EmptyState
-                title="No chats"
-                body="After you match and start a conversation, it will show here."
-            />
-        );
-    }
-
-    return (
-        <div className="flex flex-col">
-            {conversations.map((conversation) => (
-                <Link
-                    key={conversation.id}
-                    href={`/chats/${conversation.id}`}
-                    className="flex items-center border-b border-black/10 px-5 py-4 active:bg-black/5"
-                >
-                    <div className="shrink-0">
-                        <Avatar
-                            src={conversation.otherUser.avatarUrl}
-                            name={conversation.otherUser.name}
-                            className="size-12"
-                        />
-                    </div>
-                    <div className="ml-3 min-w-0 flex-1">
-                        <div className="flex items-baseline justify-between gap-3">
-                            <span className="truncate font-semibold">
-                                {conversation.otherUser.name}
-                            </span>
-                            <span className="text-xs text-[#6b6b6b]">
-                                {relativeTime(conversation.updatedAt)}
-                            </span>
-                        </div>
-                        <p className="block truncate text-sm text-[#6b6b6b]">
-                            {conversation.lastMessage?.content ??
-                                'No messages yet.'}
-                        </p>
-                    </div>
-                </Link>
-            ))}
-            <LoadMoreRow
-                ref={loadMoreRef}
-                hasNextPage={hasNextPage}
-                isFetchingNextPage={isFetchingNextPage}
-                endLabel="No more chats"
-            />
-        </div>
     );
 }

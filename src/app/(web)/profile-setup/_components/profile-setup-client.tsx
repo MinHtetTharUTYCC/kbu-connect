@@ -92,7 +92,7 @@ export function ProfileSetupClient() {
         current?.nationality ?? UpdateProfileDtoNationality.THAI,
     );
     const [minPreferredAge, setMinPreferredAge] = useState(
-        current?.minPreferredAge ?? 18,
+        current?.minPreferredAge ?? 17,
     );
     const [maxPreferredAge, setMaxPreferredAge] = useState(
         current?.maxPreferredAge ?? 28,
@@ -141,7 +141,7 @@ export function ProfileSetupClient() {
 
     useTopBar({
         title: isEditMode ? 'Edit Profile' : 'UniMatch',
-        backHref: isEditMode ? '/profile/me' : '/login',
+        showBack: true,
         action: isEditMode ? (
             <a
                 href="/profile/me"
@@ -335,34 +335,26 @@ export function ProfileSetupClient() {
                             options={nationalities}
                         />
                         <div className="grid grid-cols-2 gap-3">
-                            <Field label="Min age" htmlFor="minPreferredAge">
-                                <input
-                                    id="minPreferredAge"
-                                    value={minPreferredAge}
-                                    onChange={(event) =>
-                                        setMinPreferredAge(
-                                            Number(event.target.value),
-                                        )
-                                    }
-                                    type="number"
-                                    min={18}
-                                    className="h-11 w-full rounded-xl border border-black/10 bg-[#f9f9f8] px-4 outline-none focus:border-primary"
-                                />
-                            </Field>
-                            <Field label="Max age" htmlFor="maxPreferredAge">
-                                <input
-                                    id="maxPreferredAge"
-                                    value={maxPreferredAge}
-                                    onChange={(event) =>
-                                        setMaxPreferredAge(
-                                            Number(event.target.value),
-                                        )
-                                    }
-                                    type="number"
-                                    min={18}
-                                    className="h-11 w-full rounded-xl border border-black/10 bg-[#f9f9f8] px-4 outline-none focus:border-primary"
-                                />
-                            </Field>
+                            <Select
+                                label="Min age"
+                                value={String(minPreferredAge)}
+                                onChange={(value) =>
+                                    setMinPreferredAge(Number(value))
+                                }
+                                options={Array.from({ length: 24 }, (_, i) =>
+                                    String(17 + i),
+                                )}
+                            />
+                            <Select
+                                label="Max age"
+                                value={String(maxPreferredAge)}
+                                onChange={(value) =>
+                                    setMaxPreferredAge(Number(value))
+                                }
+                                options={Array.from({ length: 24 }, (_, i) =>
+                                    String(17 + i),
+                                )}
+                            />
                         </div>
                     </section>
                 )}

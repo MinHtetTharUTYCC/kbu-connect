@@ -24,9 +24,11 @@ const TopBarContext = createContext<React.Dispatch<React.SetStateAction<TopBarCo
 export function TopBarProvider({ children }: { children: ReactNode }) {
     const [config, setConfig] = useState<TopBarConfig>({});
 
+    const hasConfig = config.title || config.showBack || config.action;
+
     return (
         <TopBarContext.Provider value={setConfig}>
-            <TopBar {...config} />
+            {hasConfig && <TopBar {...config} />}
             {children}
         </TopBarContext.Provider>
     );
@@ -42,10 +44,10 @@ export function useTopBar(config: TopBarConfig) {
     useLayoutEffect(() => {
         setConfig({
             title: config.title,
-            backHref: config.backHref,
+            showBack: config.showBack,
             action: actionRef.current,
             onBackClick: config.onBackClick,
         });
         return () => setConfig({});
-    }, [config.title, config.backHref, setConfig]);
+    }, [config.title, config.showBack, setConfig]);
 }

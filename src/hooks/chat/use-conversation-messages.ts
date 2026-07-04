@@ -20,7 +20,8 @@ export function useConversationMessages(
             enabled: Boolean(conversationId),
         },
     });
-    const messages = query.data?.pages.flatMap((page) => page.messages) ?? [];
+    const messages =
+        query.data?.pages.flatMap((page) => page.messages).reverse() ?? [];
 
     return { ...query, messages };
 }

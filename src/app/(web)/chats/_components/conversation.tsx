@@ -1,17 +1,26 @@
 'use client';
 
-import { PlusCircle, Send } from 'lucide-react';
+import { ArrowLeft, MoreVertical, PlusCircle, Send, Trash } from 'lucide-react';
+import Link from 'next/link';
 import { useEffect, useRef, useState } from 'react';
 import { useAuthContext } from '@/components/auth-provider';
 import { Avatar, EmptyState } from '@/components/mobile/app-chrome';
-import { useTopBar } from '@/components/mobile/top-bar-provider';
+import { DeleteConfirmSheet } from '@/components/mobile/delete-confirm-sheet';
 import { useConversationMessages } from '@/hooks/chat/use-conversation-messages';
 import { useMarkConversationSeen } from '@/hooks/chat/use-mark-conversation-seen';
 import { relativeTime } from '@/lib/profile-utils';
 import { cn } from '@/lib/utils';
-import { LoadMoreRow } from './chat-list';
 import { useConversation } from '@/hooks/chat/use-conversation';
 import { useSendMessage } from '@/hooks/chat/use-send-message';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuTrigger,
+} from '@/components/ui/dropdown-menu';
+import { useDeleteConversation } from '@/hooks/chat/use-delete-conversation';
+import { LoadMoreRow } from '@/components/load-more-row';
+import { ProfileSheet } from '@/components/mobile/profile-sheet';
 
 export function ChatClient({ chatId }: { chatId: string }) {
     const { user } = useAuthContext();
@@ -28,31 +37,37 @@ export function ChatClient({ chatId }: { chatId: string }) {
     const { mutate: markSeen } = useMarkConversationSeen();
 
     const loadMoreMessagesRef = useRef<HTMLDivElement | null>(null);
+    const messagesEndRef = useRef<HTMLDivElement | null>(null);
 
     const [draft, setDraft] = useState('');
+    const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+    const [selectedProfileId, setSelectedProfileId] = useState<string | null>(
+        null,
+    );
 
     const myId = user?.user?.id;
 
     const { mutateAsync: sendMessage, isPending: isSendingMessage } =
-        useSendMessage(chatId, myId, () => {});
+        useSendMessage(chatId, myId, () => setDraft(''));
 
-    useTopBar({
-        title: conversation?.participant.name ?? 'Messages',
-        backHref: '/chats',
-        action: conversation ? (
-            <Avatar
-                src={conversation.participant.avatarUrl}
-                name={conversation.participant.name}
-                className="size-10"
-            />
-        ) : undefined,
-    });
+    const { mutate: deleteConversation, isPending: isDeleting } =
+        useDeleteConversation();
+
+    function scrollToBottom(behavior: ScrollBehavior = 'auto') {
+        messagesEndRef.current?.scrollIntoView({ behavior });
+    }
 
     useEffect(() => {
         if (chatId && conversation) {
             markSeen({ conversationId: chatId });
         }
     }, [chatId, conversation, markSeen]);
+
+    useEffect(() => {
+        if (messages.length > 0) {
+            scrollToBottom();
+        }
+    }, [messages.length]);
 
     useEffect(() => {
         const target = loadMoreMessagesRef.current;
@@ -75,12 +90,13 @@ export function ChatClient({ chatId }: { chatId: string }) {
         isFetchingNextPageMessages,
     ]);
 
-    async function handleSubmit(e: React.FormEvent) {
+    async function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
         e.preventDefault();
         const content = draft.trim();
         if (!content || !myId) return;
 
         await sendMessage({ data: { conversationId: chatId, content } });
+        scrollToBottom();
     }
 
     if (conversationLoading || (!conversation && hasNextPageMessages)) {
@@ -110,63 +126,116 @@ export function ChatClient({ chatId }: { chatId: string }) {
         );
     }
 
+    const statusText = conversation.isOnline
+        ? 'Active now'
+        : conversation.lastOnline
+          ? `Active ${relativeTime(conversation.lastOnline)}`
+          : '';
+
     return (
-        <main className="flex flex-1 flex-col gap-3 overflow-y-auto bg-white px-5 py-6">
-            {isLoadingMessages ? (
-                <EmptyState
-                    title="Loading messages"
-                    body="Opening your messages."
-                />
-            ) : messages.length ? (
-                messages.map((message) => {
-                    const mine = message.senderId === myId;
-                    return (
-                        <div
-                            key={message.id}
-                            className={cn(
-                                'flex max-w-[85%] flex-col',
-                                mine ? 'self-end items-end' : 'items-start',
-                            )}
+        <div className="flex h-full flex-col overflow-hidden">
+            <header className="flex shrink-0 items-center gap-3 border-b border-black/10 bg-white px-5 py-3">
+                <Link
+                    href="/chats"
+                    className="-ml-2 grid place-items-center"
+                    aria-label="Go back"
+                >
+                    <ArrowLeft className="w-4 h-4" />
+                </Link>
+                <button
+                    onClick={() =>
+                        setSelectedProfileId(conversation.participant.id)
+                    }
+                    className="flex items-center gap-3 min-w-0 flex-1 text-left"
+                >
+                    <Avatar
+                        src={conversation.participant.avatarUrl}
+                        name={conversation.participant.name}
+                        className="size-10"
+                    />
+                    <div className="min-w-0 flex-1">
+                        <p className="truncate text-sm font-semibold">
+                            {conversation.participant.name}
+                        </p>
+                        {statusText && (
+                            <p className="text-xs text-muted-foreground">
+                                {statusText}
+                            </p>
+                        )}
+                    </div>
+                </button>
+                <DropdownMenu>
+                    <DropdownMenuTrigger className="grid size-10 place-items-center text-primary">
+                        <MoreVertical className="size-5" />
+                    </DropdownMenuTrigger>
+                    <DropdownMenuContent align="end">
+                        <DropdownMenuItem
+                            className="text-red-500"
+                            onClick={() => setShowDeleteConfirm(true)}
                         >
-                            <div
-                                className={cn(
-                                    'rounded-xl p-3 text-sm leading-6',
-                                    mine
-                                        ? 'rounded-tr-none bg-primary text-white'
-                                        : 'rounded-tl-none border border-black/10 bg-[#f9f9f8]',
-                                )}
-                            >
-                                {message.content}
-                            </div>
-                            <span className="mt-1 px-1 text-[10px] text-[#6b6b6b]">
-                                {relativeTime(message.timestamp)}
-                            </span>
-                        </div>
-                    );
-                })
-            ) : (
-                <EmptyState
-                    title="No messages yet"
-                    body="Send the first message to start the conversation."
-                />
-            )}
-            <LoadMoreRow
-                ref={loadMoreMessagesRef}
-                hasNextPage={hasNextPageMessages}
-                isFetchingNextPage={isFetchingNextPageMessages}
-                endLabel="No more messages"
-            />
+                            <Trash className="size-4" />
+                            Delete chat
+                        </DropdownMenuItem>
+                    </DropdownMenuContent>
+                </DropdownMenu>
+            </header>
+
+            <main className="min-h-0 flex-1 overflow-y-auto bg-white px-5 py-6">
+                {isLoadingMessages ? (
+                    <EmptyState
+                        title="Loading messages"
+                        body="Opening your messages."
+                    />
+                ) : messages.length ? (
+                    <div className="flex flex-col gap-3">
+                        <LoadMoreRow
+                            ref={loadMoreMessagesRef}
+                            hasNextPage={hasNextPageMessages}
+                            isFetchingNextPage={isFetchingNextPageMessages}
+                            endLabel=""
+                        />
+                        {messages.map((message) => {
+                            const mine = message.senderId === myId;
+                            return (
+                                <div
+                                    key={message.id}
+                                    className={cn(
+                                        'flex max-w-[85%] flex-col',
+                                        mine
+                                            ? 'self-end items-end'
+                                            : 'items-start',
+                                    )}
+                                >
+                                    <div
+                                        className={cn(
+                                            'rounded-xl p-3 text-sm leading-6',
+                                            mine
+                                                ? 'rounded-tr-none bg-primary text-white'
+                                                : 'rounded-tl-none border border-black/10 bg-[#f9f9f8]',
+                                        )}
+                                    >
+                                        {message.content}
+                                    </div>
+                                    <span className="mt-1 px-1 text-[10px] text-[#6b6b6b]">
+                                        {relativeTime(message.timestamp)}
+                                    </span>
+                                </div>
+                            );
+                        })}
+                        <div ref={messagesEndRef} />
+                    </div>
+                ) : (
+                    <EmptyState
+                        title="No messages yet"
+                        body="Send the first message to start the conversation."
+                    />
+                )}
+            </main>
+
             <form
                 onSubmit={handleSubmit}
                 className="flex shrink-0 items-center gap-3 border-t border-black/10 bg-white px-5 py-3"
             >
-                <button
-                    type="button"
-                    className="grid size-11 place-items-center text-primary"
-                    aria-label="Add attachment"
-                >
-                    <PlusCircle className="size-6" />
-                </button>
                 <input
                     value={draft}
                     onChange={(e) => setDraft(e.target.value)}
@@ -183,6 +252,25 @@ export function ChatClient({ chatId }: { chatId: string }) {
                     <Send className="size-5" />
                 </button>
             </form>
-        </main>
+
+            {showDeleteConfirm && (
+                <DeleteConfirmSheet
+                    title="Delete chat"
+                    message="Are you sure you want to delete this chat? This action cannot be undone."
+                    isPending={isDeleting}
+                    onClose={() => setShowDeleteConfirm(false)}
+                    onConfirm={() =>
+                        deleteConversation({ conversationId: chatId })
+                    }
+                />
+            )}
+            {selectedProfileId && (
+                <ProfileSheet
+                    userId={selectedProfileId}
+                    onClose={() => setSelectedProfileId(null)}
+                    from="visit"
+                />
+            )}
+        </div>
     );
 }
