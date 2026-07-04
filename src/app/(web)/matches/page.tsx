@@ -1,3 +1,5 @@
+import { MatchesClient } from './_components/matches-client';
+
 export default function MatchesPage() {
-  return <div>MatchesPage</div>;
+    return <MatchesClient />;
 }
