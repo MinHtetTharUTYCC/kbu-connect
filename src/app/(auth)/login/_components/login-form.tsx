@@ -2,6 +2,7 @@
 
 import { useForm } from '@tanstack/react-form';
 import { GraduationCap } from 'lucide-react';
+import Link from 'next/link';
 import { useState } from 'react';
 import { Button } from '@/components/ui/button';
 import {
@@ -192,12 +193,25 @@ export function LoginForm() {
 
             <p className="mt-auto px-4 text-center text-xs leading-5 text-[#a1a1a1]">
                 By continuing, you agree to our{' '}
-                <span className="font-medium text-primary">
+                <Link
+                    href="/terms-and-conditions"
+                    className="font-medium text-primary hover:underline"
+                >
                     Terms of Service
-                </span>{' '}
+                </Link>{' '}
                 and{' '}
-                <span className="font-medium text-primary">Privacy Policy</span>
+                <Link
+                    href="/privacy-policy"
+                    className="font-medium text-primary hover:underline"
+                >
+                    Privacy Policy
+                </Link>
                 .
+            </p>
+            <p className="mt-3 text-center text-xs text-[#a1a1a1]">
+                <Link href="/about" className="font-medium text-primary">
+                    About KBU Connect
+                </Link>
             </p>
         </main>
     );

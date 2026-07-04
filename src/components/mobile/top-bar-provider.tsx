@@ -13,12 +13,13 @@ import { TopBar } from './app-chrome';
 type TopBarConfig = {
     title?: string;
     action?: ReactNode;
-    showBack?: boolean;
+    backHref?: string;
+    onBackClick?: () => void;
 };
 
-const TopBarContext = createContext<React.Dispatch<
-    React.SetStateAction<TopBarConfig>
-> | null>(null);
+const TopBarContext = createContext<React.Dispatch<React.SetStateAction<TopBarConfig>> | null>(
+    null,
+);
 
 export function TopBarProvider({ children }: { children: ReactNode }) {
     const [config, setConfig] = useState<TopBarConfig>({});
@@ -35,8 +36,7 @@ export function TopBarProvider({ children }: { children: ReactNode }) {
 
 export function useTopBar(config: TopBarConfig) {
     const setConfig = useContext(TopBarContext);
-    if (!setConfig)
-        throw new Error('useTopBar must be used within TopBarProvider');
+    if (!setConfig) throw new Error('useTopBar must be used within TopBarProvider');
 
     const actionRef = useRef(config.action);
     actionRef.current = config.action;
@@ -46,6 +46,7 @@ export function useTopBar(config: TopBarConfig) {
             title: config.title,
             showBack: config.showBack,
             action: actionRef.current,
+            onBackClick: config.onBackClick,
         });
         return () => setConfig({});
     }, [config.title, config.showBack, setConfig]);
