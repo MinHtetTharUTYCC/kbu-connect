@@ -7,7 +7,7 @@ const publicRoutes = [
     '/terms-and-conditions',
 ];
 
-export async function middleware(req: NextRequest) {
+export async function proxy(req: NextRequest) {
     console.log('kmkl');
     const pathname = req.nextUrl.pathname;
 

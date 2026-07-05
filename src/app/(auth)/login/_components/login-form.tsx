@@ -211,7 +211,7 @@ export function LoginForm() {
                 .
             </p>
             <p className="mt-3 text-center text-xs text-muted-foreground">
-                <Link href="/about" className="font-medium text-primary">
+                <Link href="/" className="font-medium text-primary">
                     About KBU Connect
                 </Link>
             </p>
