@@ -2,6 +2,7 @@ import { Geist, Geist_Mono } from 'next/font/google';
 
 import './globals.css';
 import Providers from '@/components/providers';
+import { TopBarProvider } from '@/components/mobile/top-bar-provider';
 import { Toaster } from '@/components/ui/sonner';
 import BottomNav from '@/components/web/bottom-nav';
 import { cn } from '@/lib/utils';
@@ -31,9 +32,11 @@ export default function RootLayout({
         >
             <body className="flex flex-col h-dvh">
                 <Providers>
-                    <main className="flex-1 flex flex-col overflow-hidden min-h-0">
-                        {children}
-                    </main>
+                    <TopBarProvider>
+                        <main className="flex-1 flex flex-col min-h-0 overflow-y-auto">
+                            {children}
+                        </main>
+                    </TopBarProvider>
                     <BottomNav />
                 </Providers>
                 <Toaster />

@@ -54,7 +54,7 @@ export function AvatarUploadStep({
                     >
                         <Camera className="size-4" /> Upload avatar
                     </button>
-                    <p className="mt-2 text-xs leading-5 text-[#6b6b6b]">
+                    <p className="mt-2 text-xs leading-5 text-muted-foreground">
                         Use a clear campus-friendly profile photo.
                     </p>
                 </div>
@@ -133,10 +133,10 @@ export function GalleryUploadStep({
         <section>
             <div className="mb-3 flex items-center justify-between gap-3">
                 <div>
-                    <div className="text-xs font-semibold uppercase tracking-wide text-[#6b6b6b]">
+                    <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                         Gallery
                     </div>
-                    <p className="mt-1 text-xs text-[#6b6b6b]">
+                    <p className="mt-1 text-xs text-muted-foreground">
                         Drag photos to reorder. Add up to 10.
                     </p>
                 </div>
@@ -144,7 +144,7 @@ export function GalleryUploadStep({
                     type="button"
                     onClick={() => galleryInputRef.current?.click()}
                     disabled={uploadGallery.isPending || remainingSlots === 0}
-                    className="inline-flex h-10 shrink-0 items-center gap-2 rounded-xl border border-black/10 bg-[#f9f9f8] px-3 text-xs font-semibold disabled:opacity-50"
+                    className="inline-flex h-10 shrink-0 items-center gap-2 rounded-xl border border-black/10 bg-muted px-3 text-xs font-semibold disabled:opacity-50"
                 >
                     {uploadGallery.isPending ? (
                         <LoaderCircle className="size-4 animate-spin" />
@@ -176,7 +176,7 @@ export function GalleryUploadStep({
                     {items.map((item, index) => (
                         <div
                             key={item.id}
-                            className="relative aspect-square overflow-hidden rounded-xl border border-black/10 bg-[#f9f9f8]"
+                            className="relative aspect-square overflow-hidden rounded-xl border border-black/10 bg-muted"
                         >
                             <button
                                 type="button"
@@ -192,13 +192,13 @@ export function GalleryUploadStep({
                                     className="object-cover"
                                 />
                             </button>
-                            <div className="absolute left-1 top-1 grid size-7 place-items-center rounded-full bg-white/85 text-[#434655]">
+                            <div className="absolute left-1 top-1 grid size-7 place-items-center rounded-full bg-white/85 text-foreground">
                                 <GripVertical className="size-4" />
                             </div>
                             <button
                                 type="button"
                                 onClick={() => removeImage(item.id)}
-                                className="absolute right-1 top-1 grid size-7 place-items-center rounded-full bg-white/90 text-[#1c1b1b]"
+                                className="absolute right-1 top-1 grid size-7 place-items-center rounded-full bg-white/90 text-foreground"
                                 aria-label="Remove gallery photo"
                             >
                                 <X className="size-4" />
@@ -211,7 +211,7 @@ export function GalleryUploadStep({
                     type="button"
                     onClick={() => galleryInputRef.current?.click()}
                     disabled={uploadGallery.isPending}
-                    className="grid min-h-36 w-full place-items-center rounded-xl border border-dashed border-black/20 bg-[#f9f9f8] px-6 text-center text-sm text-[#6b6b6b] disabled:opacity-50"
+                    className="grid min-h-36 w-full place-items-center rounded-xl border border-dashed border-black/20 bg-muted px-6 text-center text-sm text-muted-foreground disabled:opacity-50"
                 >
                     {uploadGallery.isPending
                         ? 'Uploading gallery...'

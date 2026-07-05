@@ -17,7 +17,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const router = useRouter();
     const pathname = usePathname();
 
-    const { data: user, isLoading, error } = useMe(pathname === '/login');
+    const {
+        data: user,
+        isLoading,
+        error,
+    } = useMe(pathname === '/login' || pathname === '/');
 
     useEffect(() => {
         if (isLoading || error || !user) return;

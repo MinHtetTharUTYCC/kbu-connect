@@ -62,15 +62,15 @@ export function ReplyShoutoutSheet({
                     <button
                         type="button"
                         onClick={onClose}
-                        className="ml-2 grid size-9 shrink-0 place-items-center rounded-full bg-[#f9f9f8] text-[#6b6b6b]"
+                        className="ml-2 grid size-9 shrink-0 place-items-center rounded-full bg-muted text-muted-foreground"
                         aria-label="Close"
                     >
                         <X className="size-5" />
                     </button>
                 </div>
 
-                <div className="max-h-24 overflow-hidden rounded-lg border border-black/10 bg-[#f9f9f8]">
-                    <p className="p-3 text-sm leading-5 text-[#6b6b6b]">
+                <div className="max-h-24 overflow-hidden rounded-lg border border-black/10 bg-muted">
+                    <p className="p-3 text-sm leading-5 text-muted-foreground">
                         {shoutout.content}
                     </p>
                 </div>
@@ -83,7 +83,7 @@ export function ReplyShoutoutSheet({
                         }
                         onKeyDown={handleKeyDown}
                         placeholder="Write your reply..."
-                        className="min-h-[100px] resize-none rounded-lg border border-black/10 p-3 text-sm placeholder-[#a1a1a1] focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+                        className="min-h-[100px] resize-none rounded-lg border border-black/10 p-3 text-sm placeholder-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
                         disabled={isPending}
                     />
                     <div className="flex items-center justify-between">
@@ -91,7 +91,7 @@ export function ReplyShoutoutSheet({
                             className={`text-xs ${
                                 message.length > MAX_CHARS
                                     ? 'text-red-500'
-                                    : 'text-[#a1a1a1]'
+                                    : 'text-muted-foreground'
                             }`}
                         >
                             {message.length}/{MAX_CHARS}
@@ -104,7 +104,7 @@ export function ReplyShoutoutSheet({
                         type="button"
                         onClick={onClose}
                         disabled={isPending}
-                        className="flex-1 rounded-lg border border-black/10 py-2 text-sm font-semibold text-[#6b6b6b] hover:bg-[#f9f9f8] disabled:opacity-50"
+                        className="flex-1 rounded-lg border border-black/10 py-2 text-sm font-semibold text-muted-foreground hover:bg-muted disabled:opacity-50"
                     >
                         Cancel
                     </button>

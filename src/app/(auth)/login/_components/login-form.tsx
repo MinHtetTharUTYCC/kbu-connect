@@ -44,13 +44,15 @@ export function LoginForm() {
     });
 
     return (
-        <main className="mx-auto flex min-h-svh w-full max-w-[430px] flex-col bg-white px-5 pb-10 pt-24 text-[#1c1b1b]">
+        <main className="mx-auto flex min-h-svh w-full max-w-[430px] flex-col bg-white px-5 pb-10 pt-24 text-foreground">
             <section className="mb-16 flex flex-col items-center text-center">
                 <div className="mb-6 grid size-20 place-items-center rounded-xl bg-primary text-white shadow-sm">
                     <GraduationCap className="size-10" />
                 </div>
-                <h1 className="text-2xl font-bold tracking-normal">UniMatch</h1>
-                <p className="mt-2 text-sm text-[#6b6b6b]">
+                <h1 className="text-2xl font-bold tracking-normal">
+                    KBU Connect
+                </h1>
+                <p className="mt-2 text-sm text-muted-foreground">
                     Connect with your campus community
                 </p>
             </section>
@@ -67,7 +69,7 @@ export function LoginForm() {
                         <h2 className="text-xl font-semibold">
                             Check your email
                         </h2>
-                        <p className="mt-2 text-sm leading-6 text-[#6b6b6b]">
+                        <p className="mt-2 text-sm leading-6 text-muted-foreground">
                             We sent a 6-digit OTP to {emailInAction}.
                         </p>
                     </div>
@@ -98,7 +100,7 @@ export function LoginForm() {
                                                 )
                                             }
                                             aria-invalid={isInvalid}
-                                            className="h-11 rounded-xl border-black/10 bg-[#fff1ed] px-4 text-base focus-visible:ring-primary/25"
+                                            className="h-11 rounded-xl border-black/10 bg-primary/10 px-4 text-base focus-visible:ring-primary/25"
                                         />
                                         {isInvalid && (
                                             <FieldError
@@ -166,7 +168,7 @@ export function LoginForm() {
                                                 )
                                             }
                                             aria-invalid={isInvalid}
-                                            className="h-11 rounded-xl border-black/10 bg-[#fff1ed] px-4 text-base focus-visible:ring-primary/25"
+                                            className="h-11 rounded-xl border-black/10 bg-primary/10 px-4 text-base focus-visible:ring-primary/25"
                                         />
                                         {isInvalid && (
                                             <FieldError
@@ -184,14 +186,14 @@ export function LoginForm() {
                         >
                             {isLoggingIn ? 'Sending...' : 'Continue'}
                         </Button>
-                        <p className="text-center text-sm text-[#6b6b6b]">
+                        <p className="text-center text-sm text-muted-foreground">
                             OTP will be sent to your email
                         </p>
                     </FieldGroup>
                 </form>
             )}
 
-            <p className="mt-auto px-4 text-center text-xs leading-5 text-[#a1a1a1]">
+            <p className="mt-auto px-4 text-center text-xs leading-5 text-muted-foreground">
                 By continuing, you agree to our{' '}
                 <Link
                     href="/terms-and-conditions"
@@ -208,7 +210,7 @@ export function LoginForm() {
                 </Link>
                 .
             </p>
-            <p className="mt-3 text-center text-xs text-[#a1a1a1]">
+            <p className="mt-3 text-center text-xs text-muted-foreground">
                 <Link href="/about" className="font-medium text-primary">
                     About KBU Connect
                 </Link>

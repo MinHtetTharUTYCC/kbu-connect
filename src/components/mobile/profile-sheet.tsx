@@ -89,7 +89,7 @@ export function ProfileSheet({
                     <button
                         type="button"
                         onClick={onClose}
-                        className="grid size-9 place-items-center rounded-full bg-[#f9f9f8] text-[#6b6b6b]"
+                        className="grid size-9 place-items-center rounded-full bg-muted text-muted-foreground"
                         aria-label="Close profile"
                     >
                         <X className="size-5" />
@@ -102,7 +102,7 @@ export function ProfileSheet({
                             <LoaderCircle className="size-6 animate-spin text-primary" />
                         </div>
                     ) : !profile ? (
-                        <p className="py-16 text-center text-sm text-[#6b6b6b]">
+                        <p className="py-16 text-center text-sm text-muted-foreground">
                             Profile unavailable.
                         </p>
                     ) : (
@@ -110,7 +110,7 @@ export function ProfileSheet({
                             <section className="bg-white px-5 pb-5 pt-5">
                                 <div className="flex items-center gap-4">
                                     {profile.avatarUrl ? (
-                                        <div className="relative size-16 shrink-0 overflow-hidden rounded-full bg-[#f0eeee]">
+                                        <div className="relative size-16 shrink-0 overflow-hidden rounded-full bg-muted">
                                             <Image
                                                 src={profile.avatarUrl}
                                                 alt={profile.name}
@@ -121,7 +121,7 @@ export function ProfileSheet({
                                             />
                                         </div>
                                     ) : (
-                                        <div className="grid size-16 shrink-0 place-items-center rounded-full bg-[#fff1ed] text-lg font-bold text-primary">
+                                        <div className="grid size-16 shrink-0 place-items-center rounded-full bg-primary/10 text-lg font-bold text-primary">
                                             {profile.name?.[0]}
                                         </div>
                                     )}
@@ -147,7 +147,7 @@ export function ProfileSheet({
                                                 ))}
                                             </div>
                                         ) : (
-                                            <p className="mt-1 text-sm text-[#6b6b6b]">
+                                            <p className="mt-1 text-sm text-muted-foreground">
                                                 KBU student
                                             </p>
                                         )}
@@ -155,7 +155,7 @@ export function ProfileSheet({
                                 </div>
 
                                 {profile.bio && (
-                                    <p className="mt-4 text-sm leading-6 text-[#434655]">
+                                    <p className="mt-4 text-sm leading-6 text-foreground">
                                         {profile.bio}
                                     </p>
                                 )}
@@ -163,7 +163,7 @@ export function ProfileSheet({
 
                             {galleryImages.length > 0 && (
                                 <section className="bg-white px-5 py-4">
-                                    <h3 className="mb-3 text-xs font-semibold uppercase tracking-wide text-[#6b6b6b]">
+                                    <h3 className="mb-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                                         Photos
                                     </h3>
                                     <div className="grid grid-cols-3 gap-2">
@@ -177,8 +177,8 @@ export function ProfileSheet({
                                                     }
                                                     className={
                                                         index === 0
-                                                            ? 'relative col-span-2 aspect-square overflow-hidden rounded-lg bg-[#f0eeee]'
-                                                            : 'relative aspect-square overflow-hidden rounded-lg bg-[#f0eeee]'
+                                                            ? 'relative col-span-2 aspect-square overflow-hidden rounded-lg bg-muted'
+                                                            : 'relative aspect-square overflow-hidden rounded-lg bg-muted'
                                                     }
                                                 >
                                                     <Image
@@ -199,7 +199,7 @@ export function ProfileSheet({
                             {profile.interests &&
                                 profile.interests.length > 0 && (
                                     <section className="bg-white px-5 py-4">
-                                        <h3 className="mb-3 text-xs font-semibold uppercase tracking-wide text-[#6b6b6b]">
+                                        <h3 className="mb-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                                             Interests
                                         </h3>
                                         <div className="flex flex-wrap gap-2">
@@ -227,7 +227,7 @@ export function ProfileSheet({
                                         onDislike?.();
                                         onClose();
                                     }}
-                                    className="grid size-12 place-items-center rounded-full border border-black/10 bg-white text-[#737686] shadow-sm transition active:scale-90"
+                                    className="grid size-12 place-items-center rounded-full border border-black/10 bg-white text-muted-foreground shadow-sm transition active:scale-90"
                                     aria-label="Pass"
                                 >
                                     <X className="size-6" />
@@ -307,7 +307,7 @@ function ProfileMetaChip({ item }: { item: ProfileMetaItem }) {
     const Icon = item.icon;
 
     return (
-        <span className="inline-flex max-w-full items-center gap-1 rounded-full border border-black/10 bg-[#f9f9f8] px-2 py-0.5 text-xs font-medium text-[#434655]">
+        <span className="inline-flex max-w-full items-center gap-1 rounded-full border border-black/10 bg-muted px-2 py-0.5 text-xs font-medium text-foreground">
             <Icon className="size-3 shrink-0 text-primary" />
             <span className="truncate">{item.label}</span>
         </span>

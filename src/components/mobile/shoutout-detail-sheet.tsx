@@ -60,7 +60,7 @@ export function ShoutoutDetailSheet({
                     <button
                         type="button"
                         onClick={onClose}
-                        className="grid size-9 shrink-0 place-items-center rounded-full bg-[#f9f9f8] text-[#6b6b6b]"
+                        className="grid size-9 shrink-0 place-items-center rounded-full bg-muted text-muted-foreground"
                         aria-label="Close"
                     >
                         <X className="size-5" />
@@ -81,14 +81,14 @@ export function ShoutoutDetailSheet({
                         <p className="truncate text-sm font-semibold">
                             {shoutout.otherUser.name}
                         </p>
-                        <p className="text-xs text-[#6b6b6b]">
+                        <p className="text-xs text-muted-foreground">
                             {relativeTime(shoutout.createdAt)}
                         </p>
                     </div>
                 </button>
 
-                <div className="rounded-lg border border-black/10 bg-[#f9f9f8] p-3">
-                    <p className="text-sm leading-5 text-[#434655]">
+                <div className="rounded-lg border border-black/10 bg-muted p-3">
+                    <p className="text-sm leading-5 text-foreground">
                         {shoutout.type === 'sent'
                             ? `You: ${shoutout.content}`
                             : shoutout.content}
@@ -103,11 +103,11 @@ export function ShoutoutDetailSheet({
                                 setMessage(e.target.value.slice(0, MAX_CHARS))
                             }
                             placeholder="Write your reply..."
-                            className="min-h-[80px] resize-none rounded-lg border border-black/10 p-3 text-sm placeholder-[#a1a1a1] focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
+                            className="min-h-[80px] resize-none rounded-lg border border-black/10 p-3 text-sm placeholder-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
                             disabled={isReplying}
                         />
                         <div className="flex items-center justify-between">
-                            <span className="text-xs text-[#a1a1a1]">
+                            <span className="text-xs text-muted-foreground">
                                 {message.length}/{MAX_CHARS}
                             </span>
                         </div>

@@ -1,7 +1,7 @@
 import axios, { type AxiosError, type AxiosRequestConfig } from 'axios';
 import { useAuthStore } from '@/stores/auth-store';
 
-const RETRY_SKIP_ROUTES = ['/login'];
+const RETRY_SKIP_ROUTES = ['/auth/login', '/auth/verify', '/auth/refresh'];
 
 let isRefreshing = false;
 let refreshSubscribers: (() => void)[] = [];
