@@ -14,7 +14,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { handleBackendError } from '@/lib/error/error-util';
 
-export function useReplyShoutout() {
+export function useReplyShoutout(onSuccess: () => void) {
     const queryClient = useQueryClient();
 
     return useChatControllerReplyToShoutout({
@@ -66,7 +66,8 @@ export function useReplyShoutout() {
                     };
                 });
 
-                toast.success('Replied.');
+                toast.success('Replied to shoutout.');
+                onSuccess();
             },
         },
     });

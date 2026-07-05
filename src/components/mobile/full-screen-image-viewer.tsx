@@ -59,10 +59,11 @@ export function FullScreenImageViewer({
 
     return (
         <div
-            className="fixed inset-0 z-[100] flex flex-col bg-black"
+            className="fixed inset-0 z-100 flex flex-col bg-black"
             onTouchStart={handleTouchStart}
             onTouchEnd={handleTouchEnd}
             onClick={(e) => e.stopPropagation()}
+            role="presentation"
         >
             <div className="flex shrink-0 items-center justify-between px-4 py-3">
                 <span className="text-sm font-medium text-white">

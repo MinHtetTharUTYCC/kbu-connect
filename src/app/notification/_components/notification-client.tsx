@@ -6,11 +6,11 @@ import {
 } from '@services/model';
 import { Bell, Heart, Megaphone, MessageCircle } from 'lucide-react';
 import { useEffect, useRef } from 'react';
+import { LoadMoreRow } from '@/components/load-more-row';
 import { EmptyState } from '@/components/mobile/app-chrome';
 import { useTopBar } from '@/components/mobile/top-bar-provider';
 import { useMarkAllNotificationsRead } from '@/hooks/notifications/use-mark-all-notifications-read';
 import { useNotificationsList } from '@/hooks/notifications/use-notifications-list';
-import { LoadMoreRow } from '@/components/load-more-row';
 import { getFormattedDate } from '@/lib/date/format-date';
 
 export function NotificationClient() {

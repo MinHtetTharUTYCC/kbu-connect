@@ -1,8 +1,15 @@
 'use client';
 
 import { Send, Trash, X } from 'lucide-react';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Avatar } from '@/components/mobile/app-chrome';
+import {
+    Drawer,
+    DrawerContent,
+    DrawerHeader,
+    DrawerTitle,
+    DrawerClose,
+} from '@/components/ui/drawer';
 import type { ShoutoutItem } from '@/hooks/chat/use-shoutouts-list';
 import { getFormattedDate } from '@/lib/date/format-date';
 
@@ -28,13 +35,6 @@ export function ShoutoutDetailSheet({
     const [message, setMessage] = useState('');
     const isReceived = shoutout.type === 'received';
 
-    useEffect(() => {
-        document.body.style.overflow = 'hidden';
-        return () => {
-            document.body.style.overflow = '';
-        };
-    }, []);
-
     const handleReply = () => {
         if (message.trim()) {
             onReply(message);
@@ -43,34 +43,18 @@ export function ShoutoutDetailSheet({
     };
 
     return (
-        <div
-            className="fixed inset-0 z-70 flex items-end justify-center bg-black/35"
-            onClick={onClose}
-        >
-            <div
-                className="flex w-full max-w-[430px] flex-col gap-4 rounded-t-2xl bg-white p-5 shadow-xl"
-                onClick={(e) => e.stopPropagation()}
-                role="dialog"
-                aria-label="Shoutout details"
-            >
-                <div className="flex items-center justify-between">
-                    <h2 className="text-base font-semibold">
+        <Drawer open={!!shoutout} onOpenChange={(open) => !open && onClose()}>
+            <DrawerContent className="mx-auto max-w-[430px] px-4 pb-4 gap-4 rounded-t-2xl bg-white shadow-xl">
+                {/* <DrawerHeader className="flex items-center justify-between p-0">
+                    <DrawerTitle className="text-base font-semibold">
                         {isReceived ? 'Received shoutout' : 'Sent shoutout'}
-                    </h2>
-                    <button
-                        type="button"
-                        onClick={onClose}
-                        className="grid size-9 shrink-0 place-items-center rounded-full bg-muted text-muted-foreground"
-                        aria-label="Close"
-                    >
-                        <X className="size-5" />
-                    </button>
-                </div>
+                    </DrawerTitle>
+                </DrawerHeader> */}
 
                 <button
                     type="button"
                     onClick={() => onProfileClick(shoutout.otherUser.id)}
-                    className="flex items-center gap-3 text-left"
+                    className="flex items-center gap-3 text-left w-full"
                 >
                     <Avatar
                         src={shoutout.otherUser.avatarUrl}
@@ -78,7 +62,7 @@ export function ShoutoutDetailSheet({
                         className="size-12"
                     />
                     <div className="min-w-0 flex-1">
-                        <p className="truncate text-sm font-semibold">
+                        <p className="truncate text-sm font-semibold text-foreground">
                             {shoutout.otherUser.name}
                         </p>
                         <p className="text-xs text-muted-foreground">
@@ -114,12 +98,12 @@ export function ShoutoutDetailSheet({
                     </div>
                 )}
 
-                <div className="flex gap-2">
+                <div className="flex items-center justify-around gap-2 w-full">
                     <button
                         type="button"
                         onClick={onDelete}
                         disabled={isDeleting}
-                        className="flex items-center justify-center gap-2 rounded-lg border border-red-200 bg-red-50 py-2 text-sm font-semibold text-red-600 hover:bg-red-100 disabled:opacity-50"
+                        className="flex items-center justify-center gap-2 rounded-lg border border-red-200 bg-red-50 py-2 px-4 text-sm font-semibold text-red-600 hover:bg-red-100 disabled:opacity-50"
                     >
                         <Trash className="size-4" />
                         Delete
@@ -136,7 +120,7 @@ export function ShoutoutDetailSheet({
                         </button>
                     )}
                 </div>
-            </div>
-        </div>
+            </DrawerContent>
+        </Drawer>
     );
 }

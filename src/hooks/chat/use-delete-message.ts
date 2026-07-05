@@ -4,8 +4,8 @@ import {
 } from '@services/generated/chat/chat';
 import type { MessagesListResponseDto } from '@services/model';
 import { type InfiniteData, useQueryClient } from '@tanstack/react-query';
-import { handleBackendError } from '@/lib/error/error-util';
 import { toast } from 'sonner';
+import { handleBackendError } from '@/lib/error/error-util';
 
 export function useDeleteMessage(
     conversationId: string,

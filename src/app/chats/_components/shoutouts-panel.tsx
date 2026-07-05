@@ -24,13 +24,6 @@ export function ShoutoutsPanel() {
 
     const activeSubTab: ShoutoutType =
         searchParams.get('shoutouts') === 'sent' ? 'sent' : 'received';
-    const {
-        shoutouts,
-        isLoading,
-        fetchNextPage,
-        hasNextPage,
-        isFetchingNextPage,
-    } = useShoutoutsList({ type: activeSubTab });
     const loadMoreRef = useRef<HTMLDivElement | null>(null);
     const [selectedShoutoutId, setSelectedShoutoutId] = useState<string | null>(
         null,
@@ -39,10 +32,20 @@ export function ShoutoutsPanel() {
         null,
     );
     const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
-    const { mutate: replyToShoutout, isPending: isReplying } =
-        useReplyShoutout();
-    const { mutate: deleteShoutout, isPending: isDeleting } =
-        useDeleteShoutout();
+
+    const {
+        shoutouts,
+        isLoading,
+        fetchNextPage,
+        hasNextPage,
+        isFetchingNextPage,
+    } = useShoutoutsList({ type: activeSubTab });
+    const { mutate: replyToShoutout, isPending: isReplying } = useReplyShoutout(
+        () => setSelectedShoutoutId(null),
+    );
+    const { mutate: deleteShoutout, isPending: isDeleting } = useDeleteShoutout(
+        () => setDeleteTargetId(null),
+    );
 
     useEffect(() => {
         const target = loadMoreRef.current;
@@ -176,12 +179,7 @@ export function ShoutoutsPanel() {
                     isPending={isDeleting}
                     onClose={() => setDeleteTargetId(null)}
                     onConfirm={() =>
-                        deleteShoutout(
-                            { shoutoutId: deleteTargetId },
-                            {
-                                onSuccess: () => setDeleteTargetId(null),
-                            },
-                        )
+                        deleteShoutout({ shoutoutId: deleteTargetId })
                     }
                 />
             )}
@@ -197,7 +195,7 @@ function ShoutoutRow({
     onClick: () => void;
 }) {
     return (
-        <article
+        <div
             className="border-b border-black/10 bg-white p-5 active:bg-black/5"
             onClick={onClick}
         >
@@ -223,6 +221,6 @@ function ShoutoutRow({
                     </p>
                 </div>
             </div>
-        </article>
+        </div>
     );
 }

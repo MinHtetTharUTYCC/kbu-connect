@@ -4,8 +4,7 @@ import { ArrowLeft, GraduationCap } from 'lucide-react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import type { ReactNode } from 'react';
-import { initials } from '@/lib/utils';
-import { cn } from '@/lib/utils';
+import { cn, initials } from '@/lib/utils';
 
 export function MobileScreen({
     children,
@@ -51,6 +50,7 @@ export function TopBar({
             <div className="flex min-w-0 items-center gap-2">
                 {canBack ? (
                     <button
+                        type="button"
                         onClick={onBackClick}
                         className="-ml-2 grid size-10 place-items-center text-primary"
                         aria-label="Go back"

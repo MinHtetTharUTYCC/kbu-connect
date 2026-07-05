@@ -10,7 +10,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { handleBackendError } from '@/lib/error/error-util';
 
-export function useDeleteShoutout() {
+export function useDeleteShoutout(onSuccess: () => void) {
     const queryClient = useQueryClient();
 
     return useChatControllerDeleteShoutout({
@@ -50,6 +50,7 @@ export function useDeleteShoutout() {
                 }
 
                 toast.success('Shoutout deleted');
+                onSuccess();
             },
         },
     });

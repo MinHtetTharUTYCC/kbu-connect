@@ -54,5 +54,5 @@ export function useTopBar(config: TopBarConfig) {
             canBack: config.canBack,
         });
         return () => setConfig({});
-    }, [config.title, setConfig]);
+    }, [config.title, config.canBack, setConfig]);
 }

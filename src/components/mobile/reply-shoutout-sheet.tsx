@@ -46,12 +46,19 @@ export function ReplyShoutoutSheet({
         <div
             className="fixed inset-0 z-70 flex items-end justify-center bg-black/35"
             onClick={onClose}
+            onKeyDown={(e) => {
+                if (e.key === 'Escape') onClose();
+            }}
+            role="presentation"
+            tabIndex={-1}
         >
             <div
                 className="flex w-full max-w-[430px] flex-col gap-4 rounded-t-2xl bg-white p-5 shadow-xl"
                 onClick={(e) => e.stopPropagation()}
+                onKeyDown={(e) => e.stopPropagation()}
                 role="dialog"
                 aria-label="Reply to shoutout"
+                tabIndex={-1}
             >
                 <div className="flex items-start justify-between">
                     <div className="min-w-0 flex-1">

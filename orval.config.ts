@@ -4,8 +4,9 @@ import { defineConfig } from 'orval';
 dotenv.config();
 
 const API_URL = process.env.NEXT_PUBLIC_API_URL!;
-
-console.log('API_URL', API_URL);
+if (!API_URL) {
+    throw new Error('Missing env variable: NEXT_PUBLIC_API_URL');
+}
 
 export default defineConfig({
     KBUConnectApi: {

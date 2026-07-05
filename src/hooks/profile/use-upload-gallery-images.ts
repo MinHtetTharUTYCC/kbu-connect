@@ -1,10 +1,10 @@
 'use client';
 
+import { getUsersControllerGetMyProfileQueryKey } from '@services/generated/users/users';
 import type { UploadGalleryImagesResponseDto } from '@services/model';
 import { useMutation, useQueryClient } from '@tanstack/react-query';
 import axiosInstanceFn from '@/lib/axios/axios-instance';
 import { handleBackendError } from '@/lib/error/error-util';
-import { getUsersControllerGetMyProfileQueryKey } from '@services/generated/users/users';
 
 const validImageTypes = [
     'image/jpeg',

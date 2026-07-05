@@ -1,6 +1,14 @@
 import axios, { type AxiosError, type AxiosRequestConfig } from 'axios';
 import { useAuthStore } from '@/stores/auth-store';
 
+const baseURL = process.env.NEXT_PUBLIC_API_URL;
+
+if (!baseURL) {
+    throw new Error(
+        'NEXT_PUBLIC_API_URL is not defined in the environment variables.',
+    );
+}
+
 const RETRY_SKIP_ROUTES = ['/auth/login', '/auth/verify', '/auth/refresh'];
 
 let isRefreshing = false;
@@ -18,7 +26,7 @@ const subscribeToRefresh = (callback: () => void) => {
 };
 
 const axiosInstance = axios.create({
-    baseURL: process.env.NEXT_PUBLIC_API_URL!,
+    baseURL,
     withCredentials: true, // handles auth via httpOnly cookie automatically
     headers: {
         'Content-Type': 'application/json',
@@ -95,7 +103,7 @@ axiosInstance.interceptors.response.use(
                 try {
                     // httpOnly refresh cookie is auto-sent
                     const data = await axiosInstance.post<
-                        any,
+                        unknown,
                         { access_token: string }
                     >('/auth/refresh');
 

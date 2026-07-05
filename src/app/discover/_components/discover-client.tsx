@@ -10,7 +10,8 @@ import { ProfileSheet } from '@/components/mobile/profile-sheet';
 import { useSendShoutout } from '@/hooks/chat/use-send-shoutout';
 import { useDiscoveryProfiles } from '@/hooks/discovery/use-discovery-profiles';
 import { useSwipeProfile } from '@/hooks/swipes/use-swipe-profile';
-import { formatEnum, cn } from '@/lib/utils';
+import { cn, formatEnum } from '@/lib/utils';
+import { SendShoutoutSheet } from './send-shoutout-sheet';
 
 const SWIPE_THRESHOLD = 80;
 
@@ -282,8 +283,8 @@ export function DiscoverClient() {
                             </div>
                             <div className="flex items-center gap-2 text-primary font-medium">
                                 <GraduationCap className="size-4" />
-                                <p className="line-clamp-1">
-                                    {profile.faculty}
+                                <p className="line-clamp-1 font-semibold">
+                                    {formatEnum(profile.faculty)}
                                 </p>
                             </div>
                             {profile.bio && (
@@ -325,7 +326,7 @@ export function DiscoverClient() {
                 </section>
             </main>
             {isShoutoutOpen && (
-                <ShoutoutSheet
+                <SendShoutoutSheet
                     message={shoutoutMessage}
                     name={profile.name}
                     isSending={isSendingShoutout}
@@ -347,64 +348,6 @@ export function DiscoverClient() {
                     from="discovery"
                 />
             )}
-        </div>
-    );
-}
-
-function ShoutoutSheet({
-    name,
-    message,
-    isSending,
-    onChange,
-    onClose,
-    onSubmit,
-}: {
-    name: string;
-    message: string;
-    isSending: boolean;
-    onChange: (value: string) => void;
-    onClose: () => void;
-    onSubmit: (e: React.SubmitEvent<HTMLFormElement>) => void;
-}) {
-    return (
-        <div className="fixed inset-0 z-60 flex items-end justify-center bg-black/35 px-4 pb-4">
-            <form
-                onSubmit={onSubmit}
-                className="w-full max-w-[398px] rounded-t-2xl bg-white p-5 shadow-xl"
-            >
-                <div className="mb-4 flex items-start justify-between gap-4">
-                    <div>
-                        <h2 className="text-lg font-semibold">
-                            Send shoutout (Max 5 per day)
-                        </h2>
-                        <p className="mt-1 text-xs text-muted-foreground">
-                            Write to {name}.
-                        </p>
-                    </div>
-                    <button
-                        type="button"
-                        onClick={onClose}
-                        className="grid size-9 place-items-center rounded-full bg-muted text-muted-foreground"
-                        aria-label="Close shoutout"
-                    >
-                        <X className="size-5" />
-                    </button>
-                </div>
-                <textarea
-                    value={message}
-                    onChange={(e) => onChange(e.target.value)}
-                    placeholder="Say something short..."
-                    rows={4}
-                    className="w-full resize-none rounded-xl border border-black/10 bg-muted p-3 text-sm leading-6 outline-none focus:border-primary"
-                />
-                <button
-                    type="submit"
-                    disabled={!message.trim() || isSending}
-                    className="mt-4 h-11 w-full rounded-xl bg-primary text-sm font-semibold text-white transition active:scale-[0.99] disabled:opacity-50"
-                >
-                    {isSending ? 'Sending...' : 'Send'}
-                </button>
-            </form>
         </div>
     );
 }

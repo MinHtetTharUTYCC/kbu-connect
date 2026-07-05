@@ -5,8 +5,8 @@ import {
     useChatControllerSendShoutout,
 } from '@services/generated/chat/chat';
 import { useQueryClient } from '@tanstack/react-query';
-import { handleBackendError } from '@/lib/error/error-util';
 import { toast } from 'sonner';
+import { handleBackendError } from '@/lib/error/error-util';
 
 export function useSendShoutout() {
     const queryClient = useQueryClient();

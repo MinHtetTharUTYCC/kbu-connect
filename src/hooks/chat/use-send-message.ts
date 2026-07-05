@@ -3,8 +3,8 @@ import {
     getChatControllerGetConversationsInfiniteQueryKey,
     useChatControllerSendMessage,
 } from '@services/generated/chat/chat';
-import { MessageItemDto, MessagesListResponseDto } from '@services/model';
-import { InfiniteData, useQueryClient } from '@tanstack/react-query';
+import type { MessageItemDto, MessagesListResponseDto } from '@services/model';
+import { type InfiniteData, useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 
 export function useSendMessage(

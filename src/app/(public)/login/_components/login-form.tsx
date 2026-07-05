@@ -4,6 +4,7 @@ import { useForm } from '@tanstack/react-form';
 import { GraduationCap } from 'lucide-react';
 import Link from 'next/link';
 import { useState } from 'react';
+import { useTopBar } from '@/components/mobile/top-bar-provider';
 import { Button } from '@/components/ui/button';
 import {
     Field,
@@ -17,7 +18,6 @@ import { useLogin } from '@/hooks/auth/use-login';
 import { useVerify } from '@/hooks/auth/use-verify';
 import { LoginSchema } from '@/schema/login.schema';
 import { VerifySchema } from '@/schema/verify.schema';
-import { useTopBar } from '@/components/mobile/top-bar-provider';
 
 export function LoginForm() {
     const [emailInAction, setEmailInAction] = useState('');

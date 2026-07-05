@@ -12,9 +12,10 @@ import {
     X,
 } from 'lucide-react';
 import Image from 'next/image';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 import { Chip } from '@/components/mobile/app-chrome';
 import { FullScreenImageViewer } from '@/components/mobile/full-screen-image-viewer';
+import { Drawer, DrawerContent } from '@/components/ui/drawer';
 import { useVisitProfile } from '@/hooks/users/use-visit-profile';
 import { ageFromBirthYear, formatEnum } from '@/lib/utils';
 
@@ -37,13 +38,6 @@ export function ProfileSheet({
 }) {
     const { data: profile, isLoading } = useVisitProfile(userId);
     const [viewerIndex, setViewerIndex] = useState<number | null>(null);
-
-    useEffect(() => {
-        document.body.style.overflow = 'hidden';
-        return () => {
-            document.body.style.overflow = '';
-        };
-    }, []);
 
     const galleryImages = (profile?.gallery ?? [])
         .toSorted((a, b) => a.order - b.order)
@@ -70,32 +64,11 @@ export function ProfileSheet({
         : [];
 
     return (
-        <div
-            className="fixed inset-0 z-70 flex items-end justify-center bg-black/35"
-            onClick={onClose}
-            onKeyDown={(e) => e.key === 'Escape' && onClose()}
-        >
-            <div
-                className="flex max-h-[85vh] w-full max-w-[430px] flex-col overflow-hidden rounded-t-2xl bg-white shadow-xl"
-                onClick={(e) => e.stopPropagation()}
-                onKeyDown={(e) => e.stopPropagation()}
-                role="dialog"
-                aria-label="Profile"
-            >
-                <div className="flex shrink-0 items-center justify-between border-b border-black/10 px-5 py-3">
-                    <h2 className="text-base font-semibold">
-                        {profile?.name ?? 'Profile'}
-                    </h2>
-                    <button
-                        type="button"
-                        onClick={onClose}
-                        className="grid size-9 place-items-center rounded-full bg-muted text-muted-foreground"
-                        aria-label="Close profile"
-                    >
-                        <X className="size-5" />
-                    </button>
-                </div>
+        <Drawer open={!!userId} onOpenChange={(open) => !open && onClose()}>
+            <DrawerContent className="mx-auto max-h-[85vh] w-full max-w-[430px] flex-col overflow-hidden rounded-t-2xl bg-white shadow-xl">
+                {/* No Header Here*/}
 
+                {/* Main Content Area */}
                 <div className="flex-1 overflow-y-auto">
                     {isLoading ? (
                         <div className="flex items-center justify-center py-16">
@@ -170,7 +143,7 @@ export function ProfileSheet({
                                         {galleryImages.map(
                                             (imageUrl, index) => (
                                                 <button
-                                                    key={`${imageUrl}-${index}`} //TODO: can remove idex cuz index is tempo fix for development
+                                                    key={`${imageUrl}-${index}`}
                                                     type="button"
                                                     onClick={() =>
                                                         setViewerIndex(index)
@@ -217,6 +190,7 @@ export function ProfileSheet({
                     )}
                 </div>
 
+                {/* Footer Interaction Controls */}
                 {!isLoading && profile && (
                     <div className="flex shrink-0 items-center justify-center gap-6 border-t border-black/10 px-5 py-4">
                         {from === 'discovery' && (
@@ -285,8 +259,9 @@ export function ProfileSheet({
                         )}
                     </div>
                 )}
-            </div>
+            </DrawerContent>
 
+            {/* Floating Image Viewer portal completely decoupled from drawer layouts */}
             {viewerIndex !== null && galleryImages.length > 0 && (
                 <FullScreenImageViewer
                     images={galleryImages}
@@ -294,7 +269,7 @@ export function ProfileSheet({
                     onClose={() => setViewerIndex(null)}
                 />
             )}
-        </div>
+        </Drawer>
     );
 }
 

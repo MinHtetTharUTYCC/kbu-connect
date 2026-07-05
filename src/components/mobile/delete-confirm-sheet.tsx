@@ -11,6 +11,7 @@ import {
     AlertDialogHeader,
     AlertDialogTitle,
 } from '@/components/ui/alert-dialog';
+import { cn } from '@/lib/utils';
 
 export function DeleteConfirmSheet({
     title,
@@ -37,7 +38,9 @@ export function DeleteConfirmSheet({
                         Cancel
                     </AlertDialogCancel>
                     <AlertDialogAction
-                        variant="destructive"
+                        className={cn(
+                            'bg-destructive/10 text-destructive hover:bg-destructive/20 focus-visible:border-destructive/40 focus-visible:ring-destructive/20 dark:bg-destructive/20 dark:hover:bg-destructive/30 dark:focus-visible:ring-destructive/40',
+                        )}
                         disabled={isPending}
                         onClick={onConfirm}
                     >
