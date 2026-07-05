@@ -82,7 +82,7 @@ export default function Message({
                         isEditing && 'ring-2 ring-primary/50',
                     )}
                 >
-                    {mine ? `You: ${message.content}` : message.content}
+                    {message.content}
                 </div>
             </div>
             {showTimestamp && (

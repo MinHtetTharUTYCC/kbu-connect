@@ -13,6 +13,7 @@ import {
 } from 'lucide-react';
 import Image from 'next/image';
 import { useState } from 'react';
+import { createPortal } from 'react-dom';
 import { Chip } from '@/components/mobile/app-chrome';
 import { FullScreenImageViewer } from '@/components/mobile/full-screen-image-viewer';
 import { Drawer, DrawerContent } from '@/components/ui/drawer';
@@ -64,7 +65,10 @@ export function ProfileSheet({
         : [];
 
     return (
-        <Drawer open={!!userId} onOpenChange={(open) => !open && onClose()}>
+        <Drawer
+            open={!!userId}
+            onOpenChange={(open) => !open && viewerIndex === null && onClose()}
+        >
             <DrawerContent className="mx-auto max-h-[85vh] w-full max-w-[430px] flex-col overflow-hidden rounded-t-2xl bg-white shadow-xl">
                 {/* No Header Here*/}
 
@@ -262,13 +266,16 @@ export function ProfileSheet({
             </DrawerContent>
 
             {/* Floating Image Viewer portal completely decoupled from drawer layouts */}
-            {viewerIndex !== null && galleryImages.length > 0 && (
-                <FullScreenImageViewer
-                    images={galleryImages}
-                    initialIndex={viewerIndex}
-                    onClose={() => setViewerIndex(null)}
-                />
-            )}
+            {viewerIndex !== null &&
+                galleryImages.length > 0 &&
+                createPortal(
+                    <FullScreenImageViewer
+                        images={galleryImages}
+                        initialIndex={viewerIndex}
+                        onClose={() => setViewerIndex(null)}
+                    />,
+                    document.body,
+                )}
         </Drawer>
     );
 }

@@ -1,7 +1,7 @@
 'use client';
 
 import type { MessageItemDto } from '@services/model/messageItemDto';
-import { ArrowLeft, MoreVertical, Send, Trash, X } from 'lucide-react';
+import { ArrowLeft, Check, MoreVertical, Send, Trash, X } from 'lucide-react';
 import Link from 'next/link';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { useAuthContext } from '@/components/auth-provider';
@@ -42,7 +42,7 @@ export function ChatClient({ chatId }: { chatId: string }) {
 
     const loadMoreMessagesRef = useRef<HTMLDivElement | null>(null);
     const messagesEndRef = useRef<HTMLDivElement | null>(null);
-    const editInputRef = useRef<HTMLTextAreaElement | null>(null);
+    const inputRef = useRef<HTMLTextAreaElement | null>(null);
 
     const [draft, setDraft] = useState('');
     const {
@@ -115,6 +115,19 @@ export function ChatClient({ chatId }: { chatId: string }) {
         isFetchingNextPageMessages,
     ]);
 
+    useEffect(() => {
+        const el = inputRef.current;
+        if (!el) return;
+        el.style.height = 'auto';
+        el.style.height = `${Math.min(el.scrollHeight, 120)}px`;
+    }, [isEditing ? editingContent : draft]);
+
+    useEffect(() => {
+        const el = inputRef.current;
+        if (!el) return;
+        el.style.height = 'auto';
+    }, [isEditing]);
+
     async function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
         e.preventDefault();
         const content = draft.trim();
@@ -131,7 +144,7 @@ export function ChatClient({ chatId }: { chatId: string }) {
                 messageId: editingMessageId,
                 data: { content: editingContent.trim() },
             },
-            { onSuccess: () => handleCancelEdit(editInputRef) },
+            { onSuccess: () => handleCancelEdit() },
         );
     }
 
@@ -260,62 +273,68 @@ export function ChatClient({ chatId }: { chatId: string }) {
                 )}
             </main>
 
-            {isEditing && (
-                <div className="flex shrink-0 items-center gap-3 border-t border-primary/30 bg-primary/5 px-5 py-3">
-                    <textarea
-                        ref={editInputRef}
-                        value={editingContent}
-                        onChange={(e) => setEditingContent(e.target.value)}
-                        onKeyDown={(e) => {
-                            if (e.key === 'Enter' && !e.shiftKey) {
-                                e.preventDefault();
-                                handleSubmitEdit();
-                            }
-                            if (e.key === 'Escape')
-                                handleCancelEdit(editInputRef);
-                        }}
-                        placeholder="Edit message..."
-                        rows={1}
-                        className="h-11 min-w-0 flex-1 resize-none rounded-xl border border-primary/30 bg-white px-4 text-sm outline-none focus:border-primary"
-                    />
+            <form
+                onSubmit={
+                    isEditing
+                        ? (e) => {
+                              e.preventDefault();
+                              handleSubmitEdit();
+                          }
+                        : handleSubmit
+                }
+                className="flex shrink-0 items-center gap-3 border-t border-black/10 bg-white px-5 py-3"
+            >
+                {isEditing && (
                     <button
                         type="button"
-                        onClick={() => handleCancelEdit(editInputRef)}
-                        className="grid size-11 place-items-center rounded-xl border border-black/10 transition active:scale-95"
+                        onClick={handleCancelEdit}
+                        className="grid size-11 shrink-0 place-items-center rounded-xl border border-black/10 transition active:scale-95"
                         aria-label="Cancel edit"
                     >
                         <X className="size-5" />
                     </button>
-                    <button
-                        type="button"
-                        onClick={handleSubmitEdit}
-                        disabled={isEditingMessage || !editingContent.trim()}
-                        className="grid size-11 place-items-center rounded-xl bg-primary text-white transition active:scale-95"
-                        aria-label="Save edit"
-                    >
-                        <Send className="size-5" />
-                    </button>
-                </div>
-            )}
-
-            <form
-                onSubmit={handleSubmit}
-                className="flex shrink-0 items-center gap-3 border-t border-black/10 bg-white px-5 py-3"
-            >
-                <input
-                    value={draft}
-                    onChange={(e) => setDraft(e.target.value)}
-                    placeholder="Type here..."
-                    aria-label="Message"
-                    className="h-11 min-w-0 flex-1 rounded-xl border border-black/10 bg-[#f9f9f8] px-4 text-sm outline-none focus:border-primary"
+                )}
+                <textarea
+                    ref={inputRef}
+                    value={isEditing ? editingContent : draft}
+                    onChange={(e) =>
+                        isEditing
+                            ? setEditingContent(e.target.value)
+                            : setDraft(e.target.value)
+                    }
+                    onKeyDown={(e) => {
+                        if (e.key === 'Enter' && !e.shiftKey) {
+                            e.preventDefault();
+                            if (isEditing) {
+                                handleSubmitEdit();
+                            } else {
+                                handleSubmit(e as any);
+                            }
+                        }
+                        if (isEditing && e.key === 'Escape') {
+                            handleCancelEdit();
+                        }
+                    }}
+                    placeholder={isEditing ? 'Edit message...' : 'Type here...'}
+                    aria-label={isEditing ? 'Edit message' : 'Message'}
+                    rows={1}
+                    className="h-11 min-h-[44px] max-h-[120px] min-w-0 flex-1 resize-none overflow-y-auto rounded-xl border border-black/10 bg-[#f9f9f8] px-4 py-2.5 text-sm leading-6 outline-none focus:border-primary scrollbar-none [&::-webkit-scrollbar]:hidden"
                 />
                 <button
                     type="submit"
-                    disabled={isSendingMessage || !draft.trim()}
-                    className="grid size-11 place-items-center rounded-xl bg-primary text-white transition active:scale-95"
-                    aria-label="Send message"
+                    disabled={
+                        isEditing
+                            ? isEditingMessage || !editingContent.trim()
+                            : isSendingMessage || !draft.trim()
+                    }
+                    className="grid size-11 shrink-0 place-items-center rounded-xl bg-primary text-white transition active:scale-95"
+                    aria-label={isEditing ? 'Save edit' : 'Send message'}
                 >
-                    <Send className="size-5" />
+                    {isEditing ? (
+                        <Check className="size-5" />
+                    ) : (
+                        <Send className="size-5" />
+                    )}
                 </button>
             </form>
 

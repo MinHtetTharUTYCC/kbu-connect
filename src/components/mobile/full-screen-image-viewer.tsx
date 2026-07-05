@@ -35,12 +35,13 @@ export function FullScreenImageViewer({
 
     useEffect(() => {
         function handleKey(e: KeyboardEvent) {
+            e.stopPropagation();
             if (e.key === 'Escape') onClose();
             if (e.key === 'ArrowLeft') goPrev();
             if (e.key === 'ArrowRight') goNext();
         }
-        window.addEventListener('keydown', handleKey);
-        return () => window.removeEventListener('keydown', handleKey);
+        window.addEventListener('keydown', handleKey, true);
+        return () => window.removeEventListener('keydown', handleKey, true);
     }, [onClose, goPrev, goNext]);
 
     function handleTouchStart(e: React.TouchEvent) {
@@ -63,6 +64,8 @@ export function FullScreenImageViewer({
             onTouchStart={handleTouchStart}
             onTouchEnd={handleTouchEnd}
             onClick={(e) => e.stopPropagation()}
+            onPointerDown={(e) => e.stopPropagation()}
+            onKeyDown={(e) => e.stopPropagation()}
             role="presentation"
         >
             <div className="flex shrink-0 items-center justify-between px-4 py-3">

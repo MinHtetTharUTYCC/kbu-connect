@@ -22,12 +22,9 @@ export function useChatState() {
         setEditingContent(content);
     }
 
-    function handleCancelEdit(
-        focusRef?: React.RefObject<HTMLTextAreaElement | null>,
-    ) {
+    function handleCancelEdit() {
         setEditingMessageId(null);
         setEditingContent('');
-        focusRef?.current?.focus();
     }
 
     return {
