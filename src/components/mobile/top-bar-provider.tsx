@@ -13,22 +13,27 @@ import { TopBar } from './app-chrome';
 type TopBarConfig = {
     title?: string;
     action?: ReactNode;
-    backHref?: string;
-    onBackClick?: () => void;
+    canBack?: boolean;
 };
 
-const TopBarContext = createContext<React.Dispatch<React.SetStateAction<TopBarConfig>> | null>(
-    null,
-);
+const TopBarContext = createContext<React.Dispatch<
+    React.SetStateAction<TopBarConfig>
+> | null>(null);
 
 export function TopBarProvider({ children }: { children: ReactNode }) {
     const [config, setConfig] = useState<TopBarConfig>({});
 
-    const hasConfig = config.title || config.showBack || config.action;
+    const hasConfig = config.title || config.action || config.canBack;
 
     return (
         <TopBarContext.Provider value={setConfig}>
-            {hasConfig && <TopBar {...config} />}
+            {hasConfig && (
+                <TopBar
+                    title={config.title}
+                    action={config.action}
+                    canBack={config.canBack ?? true}
+                />
+            )}
             {children}
         </TopBarContext.Provider>
     );
@@ -36,7 +41,8 @@ export function TopBarProvider({ children }: { children: ReactNode }) {
 
 export function useTopBar(config: TopBarConfig) {
     const setConfig = useContext(TopBarContext);
-    if (!setConfig) throw new Error('useTopBar must be used within TopBarProvider');
+    if (!setConfig)
+        throw new Error('useTopBar must be used within TopBarProvider');
 
     const actionRef = useRef(config.action);
     actionRef.current = config.action;
@@ -44,10 +50,9 @@ export function useTopBar(config: TopBarConfig) {
     useLayoutEffect(() => {
         setConfig({
             title: config.title,
-            showBack: config.showBack,
             action: actionRef.current,
-            onBackClick: config.onBackClick,
+            canBack: config.canBack,
         });
         return () => setConfig({});
-    }, [config.title, config.showBack, setConfig]);
+    }, [config.title, setConfig]);
 }

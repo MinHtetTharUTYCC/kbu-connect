@@ -152,7 +152,7 @@ export default function PrivacyPolicyPage() {
                 </p>
             </section>
 
-            <div className="mt-auto flex flex-col items-center gap-1 pt-8">
+            <div className="mt-auto flex flex-col items-center gap-1 py-8">
                 <span className="text-xs text-muted-foreground">
                     Last updated: July 2026
                 </span>

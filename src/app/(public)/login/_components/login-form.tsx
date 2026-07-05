@@ -17,6 +17,7 @@ import { useLogin } from '@/hooks/auth/use-login';
 import { useVerify } from '@/hooks/auth/use-verify';
 import { LoginSchema } from '@/schema/login.schema';
 import { VerifySchema } from '@/schema/verify.schema';
+import { useTopBar } from '@/components/mobile/top-bar-provider';
 
 export function LoginForm() {
     const [emailInAction, setEmailInAction] = useState('');
@@ -25,6 +26,10 @@ export function LoginForm() {
         setEmailInAction(email),
     );
     const { mutateAsync: verify, isPending: isVerifying } = useVerify();
+
+    useTopBar({
+        title: 'Login',
+    });
 
     const emailForm = useForm({
         defaultValues: { email: '' },

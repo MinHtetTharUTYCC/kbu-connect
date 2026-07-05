@@ -52,7 +52,7 @@ const HOW_IT_WORKS = [
 export default function HomePage() {
     return (
         <>
-            <TopBarClient title="KBU Connect" />
+            <TopBarClient title="KBU Connect" canBack={false} />
             <main className="mx-auto flex min-h-svh w-full max-w-[430px] flex-col overflow-y-auto bg-background px-5 pb-10 text-foreground">
                 <section className="flex flex-col items-center py-8 text-center">
                     <div className="mb-5 grid size-[72px] place-items-center rounded-[18px] bg-primary text-primary-foreground">

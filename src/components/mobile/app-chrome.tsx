@@ -30,15 +30,15 @@ export function MobileScreen({
 export function TopBar({
     title = 'UniMatch',
     action,
-    onBackClick,
+    canBack = true,
 }: {
     title?: string;
     action?: ReactNode;
-    onBackClick?: () => void;
+    canBack: boolean;
 }) {
     const router = useRouter();
 
-    const handleBack = () => {
+    const onBackClick = () => {
         if (window.history.length > 1) {
             router.back();
         } else {
@@ -49,7 +49,7 @@ export function TopBar({
     return (
         <header className="sticky top-0 z-40 flex h-14 shrink-0 items-center justify-between border-b border-black/10 bg-white/90 px-5 backdrop-blur">
             <div className="flex min-w-0 items-center gap-2">
-                {onBackClick ? (
+                {canBack ? (
                     <button
                         onClick={onBackClick}
                         className="-ml-2 grid size-10 place-items-center text-primary"

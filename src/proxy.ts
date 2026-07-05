@@ -1,11 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-
-const publicRoutes = [
-    '/',
-    '/login',
-    '/privacy-policy',
-    '/terms-and-conditions',
-];
+import { publicRoutes } from './lib/constants/domain';
 
 export async function proxy(req: NextRequest) {
     console.log('kmkl');

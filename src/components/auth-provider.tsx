@@ -4,6 +4,7 @@ import type { ProfileStatusResponseDto } from '@services/model';
 import { usePathname, useRouter } from 'next/navigation';
 import { createContext, type ReactNode, useContext, useEffect } from 'react';
 import { useMe } from '@/hooks/users/use-me';
+import { publicRoutes } from '@/lib/constants/domain';
 
 interface AuthContextType {
     user: ProfileStatusResponseDto | null | undefined;
@@ -17,11 +18,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     const router = useRouter();
     const pathname = usePathname();
 
-    const {
-        data: user,
-        isLoading,
-        error,
-    } = useMe(pathname === '/login' || pathname === '/');
+    const skipAuth = publicRoutes.some((r) => r === pathname);
+
+    const { data: user, isLoading, error } = useMe(skipAuth);
 
     useEffect(() => {
         if (isLoading || error || !user) return;

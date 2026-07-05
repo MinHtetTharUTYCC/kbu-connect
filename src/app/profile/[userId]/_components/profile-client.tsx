@@ -30,7 +30,6 @@ export function ProfileClient({ userId }: { userId: string }) {
 
     useTopBar({
         title: profile?.name ?? 'Profile',
-        showBack: true,
     });
 
     useEffect(() => {

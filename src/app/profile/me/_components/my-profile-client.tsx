@@ -27,7 +27,6 @@ export function MyProfileClient() {
 
     useTopBar({
         title: profile?.name ?? 'My Profile',
-        showBack: true,
     });
 
     if (isLoading || !profile) {

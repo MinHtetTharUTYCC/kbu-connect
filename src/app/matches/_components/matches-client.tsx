@@ -8,7 +8,7 @@ import { useMatchesList } from '@/hooks/matches/use-matches-list';
 export function MatchesClient() {
     const { matches, isLoading: matchesLoading } = useMatchesList({});
 
-    useTopBar({});
+    useTopBar({ title: 'Matches' });
 
     return (
         <main className="flex-1 overflow-y-auto pb-5">
@@ -16,7 +16,7 @@ export function MatchesClient() {
                 <div className="mb-4 flex items-end justify-between px-5">
                     <h1 className="text-xl font-semibold">Matches</h1>
                 </div>
-                <div className="flex gap-4 overflow-x-auto px-5 pb-3 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                <div className="flex gap-4 overflow-x-auto px-5 pb-3 scrollbar-none [&::-webkit-scrollbar]:hidden">
                     {matchesLoading ? (
                         <p className="py-4 text-sm text-muted-foreground">
                             Loading matches...
