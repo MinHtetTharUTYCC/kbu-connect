@@ -2,7 +2,7 @@
 
 import {
     Cake,
-    Flag,
+    Globe,
     GraduationCap,
     Heart,
     LoaderCircle,
@@ -63,7 +63,7 @@ export function ProfileSheet({
                   label: formatEnum(profile.faculty),
               },
               profile.nationality && {
-                  icon: Flag,
+                  icon: Globe,
                   label: formatEnum(profile.nationality),
               },
           ].filter((item): item is ProfileMetaItem => Boolean(item))

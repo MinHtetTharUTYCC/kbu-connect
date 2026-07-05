@@ -2,12 +2,11 @@
 
 import { getUsersControllerGetUserProfileQueryOptions } from '@services/generated/users/users';
 import { useQueryClient } from '@tanstack/react-query';
-import { GraduationCap, Heart, MessageCircle, X } from 'lucide-react';
+import { GraduationCap, Heart, Megaphone, X } from 'lucide-react';
 import Image from 'next/image';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { Chip, EmptyState } from '@/components/mobile/app-chrome';
+import { EmptyState } from '@/components/mobile/app-chrome';
 import { ProfileSheet } from '@/components/mobile/profile-sheet';
-import { useTopBar } from '@/components/mobile/top-bar-provider';
 import { useSendShoutout } from '@/hooks/chat/use-send-shoutout';
 import { useDiscoveryProfiles } from '@/hooks/discovery/use-discovery-profiles';
 import { useSwipeProfile } from '@/hooks/swipes/use-swipe-profile';
@@ -259,10 +258,12 @@ export function DiscoverClient() {
                             )}
                         </div>
                         <div className="space-y-3 p-4">
+                            {/* TOOD:: remove '!' */}
                             {!profile.lastSeen && (
-                                <span className="h-7 text-center rounded-full border px-3 text-xs font-medium bg-green-500 text-white">
-                                    Active Recently
-                                </span>
+                                <div className="w-fit flex items-center gap-1 px-2 py-1 rounded-full bg-green-100 text-green-500 text-sm font-medium">
+                                    <div className="h-2 w-2 rounded-full bg-green-500" />
+                                    active recently
+                                </div>
                             )}
                             <div className="flex items-end gap-2">
                                 <button
@@ -312,7 +313,7 @@ export function DiscoverClient() {
                         onClick={() => setIsShoutoutOpen(true)}
                         disabled={isSendingShoutout}
                     >
-                        <MessageCircle className="size-6" />
+                        <Megaphone className="size-6" />
                     </ActionButton>
                     <ActionButton
                         label="Like"
