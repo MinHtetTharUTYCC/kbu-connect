@@ -15,10 +15,10 @@ import {
 } from '@/hooks/chat/use-shoutouts-list';
 import { useDeleteShoutout } from '@/hooks/chat/use-delete-shoutout';
 import { useReplyShoutout } from '@/hooks/chat/use-reply-shoutout';
-import { relativeTime } from '@/lib/profile-utils';
 import { cn } from '@/lib/utils';
 import { ProfileSheet } from '@/components/mobile/profile-sheet';
 import { LoadMoreRow } from '@/components/load-more-row';
+import { getFormattedDate } from '@/lib/date/format-date';
 
 type ChatTab = 'chats' | 'shoutouts';
 
@@ -261,7 +261,7 @@ function ShoutoutRow({
                             {shoutout.otherUser.name}
                         </span>
                         <span className="text-xs text-muted-foreground">
-                            {relativeTime(shoutout.createdAt)}
+                            {getFormattedDate(shoutout.createdAt)}
                         </span>
                     </div>
                     <p className="line-clamp-1 text-sm leading-6">
@@ -323,9 +323,9 @@ export function ChatListClient() {
 
     return (
         <div className="flex flex-col">
-            {conversations.map((conversation) => (
+            {conversations.map((conversation, idx) => (
                 <Link
-                    key={conversation.id}
+                    key={`${conversation.id}-${idx}`}
                     href={`/chats/${conversation.id}`}
                     className="flex items-center border-b border-black/10 px-5 py-4 active:bg-black/5"
                 >
@@ -342,7 +342,7 @@ export function ChatListClient() {
                                 {conversation.otherUser.name}
                             </span>
                             <span className="text-xs text-muted-foreground">
-                                {relativeTime(conversation.updatedAt)}
+                                {getFormattedDate(conversation.updatedAt)}
                             </span>
                         </div>
                         <p className="block truncate text-sm text-muted-foreground">

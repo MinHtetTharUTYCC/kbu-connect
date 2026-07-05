@@ -2,7 +2,7 @@
 
 import { getUsersControllerGetUserProfileQueryOptions } from '@services/generated/users/users';
 import { useQueryClient } from '@tanstack/react-query';
-import { Heart, MessageCircle, X } from 'lucide-react';
+import { GraduationCap, Heart, MessageCircle, X } from 'lucide-react';
 import Image from 'next/image';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { Chip, EmptyState } from '@/components/mobile/app-chrome';
@@ -11,8 +11,7 @@ import { useTopBar } from '@/components/mobile/top-bar-provider';
 import { useSendShoutout } from '@/hooks/chat/use-send-shoutout';
 import { useDiscoveryProfiles } from '@/hooks/discovery/use-discovery-profiles';
 import { useSwipeProfile } from '@/hooks/swipes/use-swipe-profile';
-import { formatEnum } from '@/lib/profile-utils';
-import { cn } from '@/lib/utils';
+import { formatEnum, cn } from '@/lib/utils';
 
 const SWIPE_THRESHOLD = 80;
 
@@ -42,8 +41,6 @@ export function DiscoverClient() {
         useSendShoutout();
     const profile = profiles[index];
     const remainingProfiles = profiles.length - index;
-
-    useTopBar({});
 
     const queryClient = useQueryClient();
 
@@ -247,7 +244,7 @@ export function DiscoverClient() {
                                 </>
                             )}
 
-                            <div className="absolute inset-x-0 bottom-0 h-36 bg-gradient-to-t from-black/50 to-transparent" />
+                            <div className="absolute inset-x-0 bottom-0 h-36 bg-linear-to-t from-black/50 to-transparent" />
                             {showLikeStamp && (
                                 <SwipeStamp
                                     label="LIKE"
@@ -262,6 +259,11 @@ export function DiscoverClient() {
                             )}
                         </div>
                         <div className="space-y-3 p-4">
+                            {!profile.lastSeen && (
+                                <span className="h-7 text-center rounded-full border px-3 text-xs font-medium bg-green-500 text-white">
+                                    Active Recently
+                                </span>
+                            )}
                             <div className="flex items-end gap-2">
                                 <button
                                     type="button"
@@ -271,20 +273,24 @@ export function DiscoverClient() {
                                     className="text-left text-xl font-semibold active:opacity-70"
                                 >
                                     {profile.name}
+                                    <span className="text-sm text-muted-foreground">
+                                        {' | '}
+                                        {formatEnum(profile.nationality)}
+                                    </span>
                                 </button>
-                                <span className="pb-0.5 text-sm text-muted-foreground">
-                                    {profile?.nationality
-                                        ? formatEnum(profile.nationality)
-                                        : 'KBU'}
-                                </span>
                             </div>
-                            <Chip>{profile.faculty}</Chip>
+                            <div className="flex items-center gap-2 text-primary font-medium">
+                                <GraduationCap className="size-4" />
+                                <p className="line-clamp-1">
+                                    {profile.faculty}
+                                </p>
+                            </div>
                             {profile.bio && (
                                 <p className="text-sm leading-6 text-foreground">
                                     {profile.bio}
                                 </p>
                             )}
-                            <div className="flex gap-2 overflow-x-auto pb-1 [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+                            <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none [&::-webkit-scrollbar]:hidden">
                                 {/* {profile.interests.map((interest) => (
                                     <Chip key={interest}>{interest}</Chip>
                                 ))} */}

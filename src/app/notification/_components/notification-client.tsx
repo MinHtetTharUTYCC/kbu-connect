@@ -10,8 +10,8 @@ import { EmptyState } from '@/components/mobile/app-chrome';
 import { useTopBar } from '@/components/mobile/top-bar-provider';
 import { useMarkAllNotificationsRead } from '@/hooks/notifications/use-mark-all-notifications-read';
 import { useNotificationsList } from '@/hooks/notifications/use-notifications-list';
-import { relativeTime } from '@/lib/profile-utils';
 import { LoadMoreRow } from '@/components/load-more-row';
+import { getFormattedDate } from '@/lib/date/format-date';
 
 export function NotificationClient() {
     const {
@@ -130,7 +130,7 @@ function NotificationRow({
                     <div className="mb-0.5 flex items-start justify-between gap-3">
                         <h3 className="font-semibold">{notification.title}</h3>
                         <span className="shrink-0 text-xs text-muted-foreground">
-                            {relativeTime(notification.createdAt)}
+                            {getFormattedDate(notification.createdAt)}
                         </span>
                     </div>
                     {notification.body && (

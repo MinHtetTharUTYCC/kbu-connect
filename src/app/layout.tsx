@@ -6,6 +6,7 @@ import { TopBarProvider } from '@/components/mobile/top-bar-provider';
 import { Toaster } from '@/components/ui/sonner';
 import BottomNav from '@/components/web/bottom-nav';
 import { cn } from '@/lib/utils';
+import { MobileScreen } from '@/components/mobile/app-chrome';
 
 const geist = Geist({ subsets: ['latin'], variable: '--font-sans' });
 
@@ -32,12 +33,14 @@ export default function RootLayout({
         >
             <body className="flex flex-col h-dvh">
                 <Providers>
-                    <TopBarProvider>
-                        <main className="flex-1 flex flex-col min-h-0 overflow-y-auto">
-                            {children}
-                        </main>
-                    </TopBarProvider>
-                    <BottomNav />
+                    <MobileScreen>
+                        <TopBarProvider>
+                            <main className="flex-1 flex flex-col min-h-0 overflow-y-auto">
+                                {children}
+                            </main>
+                        </TopBarProvider>
+                        <BottomNav />
+                    </MobileScreen>
                 </Providers>
                 <Toaster />
             </body>

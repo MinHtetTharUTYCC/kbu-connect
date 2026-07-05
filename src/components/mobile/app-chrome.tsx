@@ -4,7 +4,7 @@ import { ArrowLeft, GraduationCap } from 'lucide-react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import type { ReactNode } from 'react';
-import { initials } from '@/lib/profile-utils';
+import { initials } from '@/lib/utils';
 import { cn } from '@/lib/utils';
 
 export function MobileScreen({

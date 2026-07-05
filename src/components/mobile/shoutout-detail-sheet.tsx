@@ -4,7 +4,7 @@ import { Send, Trash, X } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { Avatar } from '@/components/mobile/app-chrome';
 import type { ShoutoutItem } from '@/hooks/chat/use-shoutouts-list';
-import { relativeTime } from '@/lib/profile-utils';
+import { getFormattedDate } from '@/lib/date/format-date';
 
 const MAX_CHARS = 500;
 
@@ -82,7 +82,7 @@ export function ShoutoutDetailSheet({
                             {shoutout.otherUser.name}
                         </p>
                         <p className="text-xs text-muted-foreground">
-                            {relativeTime(shoutout.createdAt)}
+                            {getFormattedDate(shoutout.createdAt)}
                         </p>
                     </div>
                 </button>

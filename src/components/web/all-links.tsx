@@ -11,10 +11,6 @@ const links: Array<{ href: string; label: string }> = [
         label: 'My Profile',
     },
     {
-        href: '/profile/123',
-        label: 'Profile Id Page',
-    },
-    {
         href: '/chats/123',
         label: 'Chat Id Page',
     },

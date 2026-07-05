@@ -2,18 +2,12 @@
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { publicRoutes } from '@/lib/constants/domain';
 import { userLinks } from '@/lib/constants/links';
 import { cn } from '@/lib/utils';
 import { useAuthContext } from '../auth-provider';
 
-const HIDDEN_ON_PATHS = [
-    '/',
-    '/login',
-    '/terms-and-conditions',
-    '/privacy-policy',
-    '/chats/',
-    '/profile-setup',
-];
+const HIDDEN_ON_PATHS = [...publicRoutes.slice(1), '/chats/', '/profile-setup'];
 
 export default function BottomNav() {
     const pathname = usePathname();
@@ -23,7 +17,9 @@ export default function BottomNav() {
 
     const navItems = !isLoading && user ? userLinks : [];
 
-    const isHidden = HIDDEN_ON_PATHS.some((path) => pathname.startsWith(path));
+    const isHidden = HIDDEN_ON_PATHS.some(
+        (path) => pathname.startsWith(path) || pathname === '/',
+    );
 
     if (isHidden || isLoading || !user) return null;
 

@@ -18,6 +18,7 @@ type MessageProps = {
     onEdit: (id: string, content: string) => void;
     onDeleteTrigger: (id: string) => void;
     showTimestamp: boolean;
+    isEditing?: boolean;
 };
 
 export default function Message({
@@ -26,6 +27,7 @@ export default function Message({
     onEdit,
     onDeleteTrigger,
     showTimestamp,
+    isEditing = false,
 }: MessageProps) {
     const mine = message.senderId === myId;
     const [menuOpen, setMenuOpen] = useState(false);
@@ -44,7 +46,10 @@ export default function Message({
         >
             <div className="flex items-end gap-1">
                 <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
-                    <DropdownMenuTrigger className="grid size-6 shrink-0 place-items-center rounded-full bg-white shadow-md hover:bg-black/5 mb-1">
+                    <DropdownMenuTrigger
+                        disabled={isEditing}
+                        className="grid size-6 shrink-0 place-items-center rounded-full bg-white shadow-md hover:bg-black/5 mb-1"
+                    >
                         <MoreVertical className="size-3" />
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="start">
@@ -53,6 +58,7 @@ export default function Message({
                                 onClick={() =>
                                     onEdit(message.id, message.content)
                                 }
+                                disabled={isEditing}
                             >
                                 <Pencil className="size-4" />
                                 Edit
@@ -73,9 +79,10 @@ export default function Message({
                         mine
                             ? 'rounded-tr-none bg-primary text-white'
                             : 'rounded-tl-none border border-black/10 bg-muted',
+                        isEditing && 'ring-2 ring-primary/50',
                     )}
                 >
-                    {message.content}
+                    {mine ? `You: ${message.content}` : message.content}
                 </div>
             </div>
             {showTimestamp && (

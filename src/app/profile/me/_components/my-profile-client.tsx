@@ -10,7 +10,7 @@ import { FullScreenImageViewer } from '@/components/mobile/full-screen-image-vie
 import { useTopBar } from '@/components/mobile/top-bar-provider';
 import { useLogout } from '@/hooks/auth/use-logout';
 import { useToggleDiscoverable } from '@/hooks/profile/use-toggle-discoverable';
-import { ageFromBirthYear, formatEnum } from '@/lib/profile-utils';
+import { ageFromBirthYear, formatEnum } from '@/lib/utils';
 
 export function MyProfileClient() {
     const { user, isLoading } = useAuthContext();

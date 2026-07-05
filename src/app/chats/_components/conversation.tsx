@@ -1,26 +1,30 @@
 'use client';
 
-import { ArrowLeft, MoreVertical, PlusCircle, Send, Trash } from 'lucide-react';
+import type { MessageItemDto } from '@services/model/messageItemDto';
+import { ArrowLeft, MoreVertical, Send, Trash, X } from 'lucide-react';
 import Link from 'next/link';
-import { useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 import { useAuthContext } from '@/components/auth-provider';
+import { LoadMoreRow } from '@/components/load-more-row';
 import { Avatar, EmptyState } from '@/components/mobile/app-chrome';
 import { DeleteConfirmSheet } from '@/components/mobile/delete-confirm-sheet';
-import { useConversationMessages } from '@/hooks/chat/use-conversation-messages';
-import { useMarkConversationSeen } from '@/hooks/chat/use-mark-conversation-seen';
-import { relativeTime } from '@/lib/profile-utils';
-import { cn } from '@/lib/utils';
-import { useConversation } from '@/hooks/chat/use-conversation';
-import { useSendMessage } from '@/hooks/chat/use-send-message';
+import { ProfileSheet } from '@/components/mobile/profile-sheet';
 import {
     DropdownMenu,
     DropdownMenuContent,
     DropdownMenuItem,
     DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
+import { useConversation } from '@/hooks/chat/use-conversation';
+import { useConversationMessages } from '@/hooks/chat/use-conversation-messages';
 import { useDeleteConversation } from '@/hooks/chat/use-delete-conversation';
-import { LoadMoreRow } from '@/components/load-more-row';
-import { ProfileSheet } from '@/components/mobile/profile-sheet';
+import { useDeleteMessage } from '@/hooks/chat/use-delete-message';
+import { useEditMessage } from '@/hooks/chat/use-edit-message';
+import { useMarkConversationSeen } from '@/hooks/chat/use-mark-conversation-seen';
+import { useSendMessage } from '@/hooks/chat/use-send-message';
+import { formatDateToNow } from '@/lib/date/format-date';
+import { useChatState } from '../[chatId]/_hooks/use-chat-state';
+import Message from './message';
 
 export function ChatClient({ chatId }: { chatId: string }) {
     const { user } = useAuthContext();
@@ -38,12 +42,26 @@ export function ChatClient({ chatId }: { chatId: string }) {
 
     const loadMoreMessagesRef = useRef<HTMLDivElement | null>(null);
     const messagesEndRef = useRef<HTMLDivElement | null>(null);
+    const editInputRef = useRef<HTMLTextAreaElement | null>(null);
 
     const [draft, setDraft] = useState('');
-    const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
-    const [selectedProfileId, setSelectedProfileId] = useState<string | null>(
-        null,
-    );
+    const {
+        showChatDeleteConfirm,
+        setShowChatDeleteConfirm,
+        selectedProfileId,
+        setSelectedProfileId,
+        editingMessageId,
+        editingContent,
+        setEditingContent,
+        deleteMessageTargetId,
+        setDeleteMessageTargetId,
+        isEditing,
+        handleStartEdit,
+        handleCancelEdit,
+    } = useChatState();
+
+    const [showDeleteMessageConfirm, setShowDeleteMessageConfirm] =
+        useState(false);
 
     const myId = user?.user?.id;
 
@@ -52,10 +70,17 @@ export function ChatClient({ chatId }: { chatId: string }) {
 
     const { mutate: deleteConversation, isPending: isDeleting } =
         useDeleteConversation();
+    const { mutate: editMessage, isPending: isEditingMessage } =
+        useEditMessage(chatId);
+    const { mutate: deleteMessage, isPending: isDeletingMessage } =
+        useDeleteMessage(chatId, () => {
+            setShowDeleteMessageConfirm(false);
+            setDeleteMessageTargetId(null);
+        });
 
-    function scrollToBottom(behavior: ScrollBehavior = 'auto') {
+    const scrollToBottom = useCallback((behavior: ScrollBehavior = 'auto') => {
         messagesEndRef.current?.scrollIntoView({ behavior });
-    }
+    }, []);
 
     useEffect(() => {
         if (chatId && conversation) {
@@ -67,7 +92,7 @@ export function ChatClient({ chatId }: { chatId: string }) {
         if (messages.length > 0) {
             scrollToBottom();
         }
-    }, [messages.length]);
+    }, [messages.length, scrollToBottom]);
 
     useEffect(() => {
         const target = loadMoreMessagesRef.current;
@@ -97,6 +122,17 @@ export function ChatClient({ chatId }: { chatId: string }) {
 
         await sendMessage({ data: { conversationId: chatId, content } });
         scrollToBottom();
+    }
+
+    function handleSubmitEdit() {
+        if (!editingMessageId || !editingContent.trim()) return;
+        editMessage(
+            {
+                messageId: editingMessageId,
+                data: { content: editingContent.trim() },
+            },
+            { onSuccess: () => handleCancelEdit(editInputRef) },
+        );
     }
 
     if (conversationLoading || (!conversation && hasNextPageMessages)) {
@@ -129,7 +165,7 @@ export function ChatClient({ chatId }: { chatId: string }) {
     const statusText = conversation.isOnline
         ? 'Active now'
         : conversation.lastOnline
-          ? `Active ${relativeTime(conversation.lastOnline)}`
+          ? `Active ${formatDateToNow(conversation.lastOnline)}`
           : '';
 
     return (
@@ -143,6 +179,7 @@ export function ChatClient({ chatId }: { chatId: string }) {
                     <ArrowLeft className="w-4 h-4" />
                 </Link>
                 <button
+                    type="button"
                     onClick={() =>
                         setSelectedProfileId(conversation.participant.id)
                     }
@@ -171,7 +208,7 @@ export function ChatClient({ chatId }: { chatId: string }) {
                     <DropdownMenuContent align="end">
                         <DropdownMenuItem
                             className="text-red-500"
-                            onClick={() => setShowDeleteConfirm(true)}
+                            onClick={() => setShowChatDeleteConfirm(true)}
                         >
                             <Trash className="size-4" />
                             Delete chat
@@ -195,31 +232,22 @@ export function ChatClient({ chatId }: { chatId: string }) {
                             endLabel=""
                         />
                         {messages.map((message) => {
-                            const mine = message.senderId === myId;
                             return (
-                                <div
+                                <Message
                                     key={message.id}
-                                    className={cn(
-                                        'flex max-w-[85%] flex-col',
-                                        mine
-                                            ? 'self-end items-end'
-                                            : 'items-start',
+                                    message={message}
+                                    myId={myId}
+                                    onEdit={handleStartEdit}
+                                    onDeleteTrigger={(id) => {
+                                        setDeleteMessageTargetId(id);
+                                        setShowDeleteMessageConfirm(true);
+                                    }}
+                                    showTimestamp={shouldShowTimestamp(
+                                        messages,
+                                        messages.indexOf(message),
                                     )}
-                                >
-                                    <div
-                                        className={cn(
-                                            'rounded-xl p-3 text-sm leading-6',
-                                            mine
-                                                ? 'rounded-tr-none bg-primary text-white'
-                                                : 'rounded-tl-none border border-black/10 bg-muted',
-                                        )}
-                                    >
-                                        {message.content}
-                                    </div>
-                                    <span className="mt-1 px-1 text-[10px] text-muted-foreground">
-                                        {relativeTime(message.timestamp)}
-                                    </span>
-                                </div>
+                                    isEditing={editingMessageId === message.id}
+                                />
                             );
                         })}
                         <div ref={messagesEndRef} />
@@ -232,6 +260,44 @@ export function ChatClient({ chatId }: { chatId: string }) {
                 )}
             </main>
 
+            {isEditing && (
+                <div className="flex shrink-0 items-center gap-3 border-t border-primary/30 bg-primary/5 px-5 py-3">
+                    <textarea
+                        ref={editInputRef}
+                        value={editingContent}
+                        onChange={(e) => setEditingContent(e.target.value)}
+                        onKeyDown={(e) => {
+                            if (e.key === 'Enter' && !e.shiftKey) {
+                                e.preventDefault();
+                                handleSubmitEdit();
+                            }
+                            if (e.key === 'Escape')
+                                handleCancelEdit(editInputRef);
+                        }}
+                        placeholder="Edit message..."
+                        rows={1}
+                        className="h-11 min-w-0 flex-1 resize-none rounded-xl border border-primary/30 bg-white px-4 text-sm outline-none focus:border-primary"
+                    />
+                    <button
+                        type="button"
+                        onClick={() => handleCancelEdit(editInputRef)}
+                        className="grid size-11 place-items-center rounded-xl border border-black/10 transition active:scale-95"
+                        aria-label="Cancel edit"
+                    >
+                        <X className="size-5" />
+                    </button>
+                    <button
+                        type="button"
+                        onClick={handleSubmitEdit}
+                        disabled={isEditingMessage || !editingContent.trim()}
+                        className="grid size-11 place-items-center rounded-xl bg-primary text-white transition active:scale-95"
+                        aria-label="Save edit"
+                    >
+                        <Send className="size-5" />
+                    </button>
+                </div>
+            )}
+
             <form
                 onSubmit={handleSubmit}
                 className="flex shrink-0 items-center gap-3 border-t border-black/10 bg-white px-5 py-3"
@@ -241,7 +307,7 @@ export function ChatClient({ chatId }: { chatId: string }) {
                     onChange={(e) => setDraft(e.target.value)}
                     placeholder="Type here..."
                     aria-label="Message"
-                    className="h-11 min-w-0 flex-1 rounded-xl border border-black/10 bg-muted px-4 text-sm outline-none focus:border-primary"
+                    className="h-11 min-w-0 flex-1 rounded-xl border border-black/10 bg-[#f9f9f8] px-4 text-sm outline-none focus:border-primary"
                 />
                 <button
                     type="submit"
@@ -253,12 +319,12 @@ export function ChatClient({ chatId }: { chatId: string }) {
                 </button>
             </form>
 
-            {showDeleteConfirm && (
+            {showChatDeleteConfirm && (
                 <DeleteConfirmSheet
                     title="Delete chat"
                     message="Are you sure you want to delete this chat? This action cannot be undone."
                     isPending={isDeleting}
-                    onClose={() => setShowDeleteConfirm(false)}
+                    onClose={() => setShowChatDeleteConfirm(false)}
                     onConfirm={() =>
                         deleteConversation({ conversationId: chatId })
                     }
@@ -271,6 +337,32 @@ export function ChatClient({ chatId }: { chatId: string }) {
                     from="visit"
                 />
             )}
+            {showDeleteMessageConfirm && deleteMessageTargetId && (
+                <DeleteConfirmSheet
+                    title="Delete message"
+                    message="Are you sure you want to delete this message? This action cannot be undone."
+                    isPending={isDeletingMessage}
+                    onClose={() => {
+                        setShowDeleteMessageConfirm(false);
+                        setDeleteMessageTargetId(null);
+                    }}
+                    onConfirm={() =>
+                        deleteMessage({ messageId: deleteMessageTargetId })
+                    }
+                />
+            )}
         </div>
     );
+}
+
+function shouldShowTimestamp(
+    messages: MessageItemDto[],
+    index: number,
+): boolean {
+    if (index === messages.length - 1) return true; // always show on last
+    if (index % 5 === 0) return true; // every 5 messages
+
+    const current = new Date(messages[index].timestamp).getTime();
+    const next = new Date(messages[index + 1].timestamp).getTime();
+    return next - current > 5 * 60 * 1000; // 5 min gap
 }

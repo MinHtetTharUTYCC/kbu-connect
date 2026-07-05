@@ -16,7 +16,7 @@ import { useEffect, useState } from 'react';
 import { Chip } from '@/components/mobile/app-chrome';
 import { FullScreenImageViewer } from '@/components/mobile/full-screen-image-viewer';
 import { useVisitProfile } from '@/hooks/users/use-visit-profile';
-import { ageFromBirthYear, formatEnum } from '@/lib/profile-utils';
+import { ageFromBirthYear, formatEnum } from '@/lib/utils';
 
 export function ProfileSheet({
     userId,
