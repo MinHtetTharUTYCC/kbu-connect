@@ -9,6 +9,7 @@ import { useTopBar } from '@/components/mobile/top-bar-provider';
 import { useMarkAllNotificationsRead } from '@/hooks/notifications/use-mark-all-notifications-read';
 import { useNotificationsList } from '@/hooks/notifications/use-notifications-list';
 import { getFormattedDate } from '@/lib/date/format-date';
+import { cn } from '@/lib/utils';
 
 export function NotificationClient() {
     const { notifications, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } = useNotificationsList({});
@@ -51,7 +52,7 @@ export function NotificationClient() {
             {isLoading ? (
                 <EmptyState title="Loading notifications" body="Checking for new activity." />
             ) : notifications.length ? (
-                <Section title="Latest">
+                <Section title="">
                     {notifications.map((item, index) => (
                         <NotificationRow key={`${item.id}-${index}`} notification={item} />
                     ))}
@@ -77,7 +78,12 @@ function NotificationRow({ notification }: { notification: NotificationItemDto }
     const Icon = getNotificationIcon(notification.type);
 
     return (
-        <div className={notification.isRead ? 'border-b border-black/10 bg-white' : 'border-b border-black/10 bg-primary/10'}>
+        <div
+            className={cn(
+                'rounded-md',
+                notification.isRead ? 'border-b border-black/10 bg-white' : 'border-b border-black/10 bg-primary/10'
+            )}
+        >
             <div className="flex gap-4 px-5 py-4">
                 <div className="grid size-10 shrink-0 place-items-center rounded-full bg-primary/20 text-primary">
                     <Icon className="size-5" />

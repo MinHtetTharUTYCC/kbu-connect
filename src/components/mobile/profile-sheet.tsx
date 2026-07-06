@@ -1,6 +1,6 @@
 'use client';
 
-import { Cake, Globe, GraduationCap, Heart, LoaderCircle, type LucideIcon, MessageCircle, UserRound, X } from 'lucide-react';
+import { Cake, Globe, GraduationCap, Heart, LoaderCircle, type LucideIcon, MessageCircle, Search, UserRound, X } from 'lucide-react';
 import Image from 'next/image';
 import { useState } from 'react';
 import { createPortal } from 'react-dom';
@@ -48,6 +48,10 @@ export function ProfileSheet({
               profile.nationality && {
                   icon: Globe,
                   label: formatEnum(profile.nationality)
+              },
+              profile.lookingFor && {
+                  icon: Search,
+                  label: `Looking for: ${formatEnum(profile.lookingFor)}`
               }
           ].filter((item): item is ProfileMetaItem => Boolean(item))
         : [];

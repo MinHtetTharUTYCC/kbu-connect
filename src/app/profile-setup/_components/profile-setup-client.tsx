@@ -5,6 +5,7 @@ import {
     UpdateProfileDtoFaculty,
     UpdateProfileDtoGender,
     UpdateProfileDtoInterestsItem,
+    UpdateProfileDtoLookingFor,
     UpdateProfileDtoNationality,
     UpdateProfileDtoPreferredGender
 } from '@services/model';
@@ -17,10 +18,12 @@ import { AvatarUploadStep, GalleryUploadStep } from '@/components/mobile/profile
 import { useTopBar } from '@/components/mobile/top-bar-provider';
 import { Button } from '@/components/ui/button';
 import { useUpdateMyProfile } from '@/hooks/profile/use-update-my-profile';
+import { formatEnum } from '@/lib/utils';
 
 const faculties = Object.values(UpdateProfileDtoFaculty);
 const interests = Object.values(UpdateProfileDtoInterestsItem);
 const nationalities = Object.values(UpdateProfileDtoNationality);
+const lookingForOptions = Object.values(UpdateProfileDtoLookingFor);
 
 type SetupStep = 'basic' | 'academic' | 'preferences' | 'avatar' | 'gallery' | 'review';
 
@@ -72,12 +75,15 @@ export function ProfileSetupClient() {
         current?.preferredGender ?? UpdateProfileDtoPreferredGender.ALL
     );
     const [nationality, setNationality] = useState<UpdateProfileDtoNationality>(current?.nationality ?? UpdateProfileDtoNationality.THAI);
-    const [minPreferredAge, setMinPreferredAge] = useState(current?.minPreferredAge ?? 17);
-    const [maxPreferredAge, setMaxPreferredAge] = useState(current?.maxPreferredAge ?? 28);
+    const [minPreferredAge, setMinPreferredAge] = useState(current?.minPreferredAge ?? 18);
+    const [maxPreferredAge, setMaxPreferredAge] = useState(current?.maxPreferredAge ?? 30);
     const [selectedInterests, setSelectedInterests] = useState<UpdateProfileDtoInterestsItem[]>(() =>
         current?.interests?.length
             ? (current.interests as UpdateProfileDtoInterestsItem[])
             : [UpdateProfileDtoInterestsItem.MUSIC, UpdateProfileDtoInterestsItem.SPORTS]
+    );
+    const [lookingFor, setLookingFor] = useState<UpdateProfileDtoLookingFor>(
+        current?.lookingFor ?? UpdateProfileDtoLookingFor.OPEN_TO_ANYTHING
     );
 
     useTopBar({
@@ -138,6 +144,7 @@ export function ProfileSetupClient() {
                 maxPreferredAge,
                 preferredGender,
                 nationality,
+                lookingFor,
                 preferredFaculties: [faculty],
                 preferredNationalities: [nationality],
                 gallery: gallery.map((item, order) => ({ ...item, order }))
@@ -211,7 +218,7 @@ export function ProfileSetupClient() {
                                                 : 'h-8 rounded-full border border-black/10 bg-white px-2 text-[10px] font-semibold text-muted-foreground'
                                         }
                                     >
-                                        {item}
+                                        {formatEnum(item)}
                                     </button>
                                 ))}
                             </div>
@@ -221,7 +228,7 @@ export function ProfileSetupClient() {
                             <div className="flex flex-wrap gap-2">
                                 {interests.map((interest) => (
                                     <button type="button" key={interest} onClick={() => toggleInterest(interest)}>
-                                        <Chip active={selectedInterests.includes(interest)}>{interest}</Chip>
+                                        <Chip active={selectedInterests.includes(interest)}>{formatEnum(interest)}</Chip>
                                     </button>
                                 ))}
                             </div>
@@ -244,6 +251,12 @@ export function ProfileSetupClient() {
                             options={Object.values(UpdateProfileDtoPreferredGender)}
                         />
                         <Select
+                            label="Looking for"
+                            value={lookingFor}
+                            onChange={(value) => setLookingFor(value as UpdateProfileDtoLookingFor)}
+                            options={lookingForOptions}
+                        />
+                        <Select
                             label="Nationality"
                             value={nationality}
                             onChange={(value) => setNationality(value as UpdateProfileDtoNationality)}
@@ -254,13 +267,13 @@ export function ProfileSetupClient() {
                                 label="Min age"
                                 value={String(minPreferredAge)}
                                 onChange={(value) => setMinPreferredAge(Number(value))}
-                                options={Array.from({ length: 24 }, (_, i) => String(17 + i))}
+                                options={Array.from({ length: 23 }, (_, i) => String(18 + i))}
                             />
                             <Select
                                 label="Max age"
                                 value={String(maxPreferredAge)}
                                 onChange={(value) => setMaxPreferredAge(Number(value))}
-                                options={Array.from({ length: 24 }, (_, i) => String(17 + i))}
+                                options={Array.from({ length: 23 }, (_, i) => String(18 + i))}
                             />
                         </div>
                     </section>
@@ -280,6 +293,7 @@ export function ProfileSetupClient() {
                         <ReviewRow label="Faculty" value={faculty} />
                         <ReviewRow label="Identity" value={gender} />
                         <ReviewRow label="Interested in" value={preferredGender} />
+                        <ReviewRow label="Looking for" value={lookingFor} />
                         <ReviewRow label="Age range" value={`${minPreferredAge} - ${maxPreferredAge}`} />
                         <ReviewRow label="Avatar" value={avatarUrl ? 'Uploaded' : 'Missing'} />
                         <ReviewRow label="Gallery" value={`${gallery.length} photo${gallery.length === 1 ? '' : 's'}`} />
@@ -288,7 +302,7 @@ export function ProfileSetupClient() {
                             <div className="flex flex-wrap gap-2">
                                 {selectedInterests.map((interest) => (
                                     <Chip key={interest} active>
-                                        {interest}
+                                        {formatEnum(interest)}
                                     </Chip>
                                 ))}
                             </div>
@@ -361,7 +375,7 @@ function Select({
             >
                 {options.map((option) => (
                     <option key={option} value={option}>
-                        {option}
+                        {formatEnum(option)}
                     </option>
                 ))}
             </select>
@@ -373,7 +387,7 @@ function ReviewRow({ label, value }: { label: string; value: string }) {
     return (
         <div className="flex items-center justify-between gap-4 rounded-xl border border-black/10 bg-muted p-4">
             <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{label}</span>
-            <span className="truncate text-sm font-semibold">{value}</span>
+            <span className="truncate text-sm font-semibold">{formatEnum(value)}</span>
         </div>
     );
 }

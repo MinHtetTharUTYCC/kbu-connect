@@ -206,32 +206,33 @@ export function DiscoverClient() {
                                 <SwipeStamp label="PASS" className="left-8 -rotate-12 border-muted-foreground text-muted-foreground" />
                             )}
                         </div>
-                        <div className="space-y-3 p-4">
+                        <div className="space-y-2 px-4 py-2">
                             {/* TOOD:: remove '!' */}
                             {!profile.lastSeen && (
                                 <div className="w-fit flex items-center gap-1 px-2 py-1 rounded-full bg-green-100 text-green-500 text-sm font-medium">
                                     <div className="h-2 w-2 rounded-full bg-green-500" />
-                                    active recently
+                                    <p>active recently</p>
                                 </div>
                             )}
+
                             <div className="flex items-end gap-2">
                                 <button
                                     type="button"
                                     onClick={() => setSelectedProfileId(profile.id)}
-                                    className="text-left text-xl font-semibold active:opacity-70"
+                                    className="text-left text-xl line-clamp-2 font-semibold active:opacity-70 cursor-pointer"
                                 >
                                     {profile.name}
-                                    <span className="text-sm text-muted-foreground">
-                                        {' | '}
-                                        {formatEnum(profile.nationality)}
-                                    </span>
                                 </button>
+                                <p className="text-sm text-muted-foreground">
+                                    {' | '}
+                                    {formatEnum(profile.nationality)}
+                                </p>
                             </div>
                             <div className="flex items-center gap-2 text-primary font-medium">
                                 <GraduationCap className="size-4" />
                                 <p className="line-clamp-1 font-semibold">{formatEnum(profile.faculty)}</p>
                             </div>
-                            {profile.bio && <p className="text-sm leading-6 text-foreground">{profile.bio}</p>}
+
                             <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none [&::-webkit-scrollbar]:hidden">
                                 {(profile.interests ?? []).map((interest) => (
                                     <Chip key={interest}>{formatEnum(interest)}</Chip>

@@ -1,15 +1,17 @@
 'use client';
 
-import { LogOut, Pencil } from 'lucide-react';
+import { Cake, Globe, GraduationCap, LogOut, Pencil, Search, UserRound } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useState } from 'react';
 import { useAuthContext } from '@/components/auth-provider';
 import { Avatar, EmptyState } from '@/components/mobile/app-chrome';
+import { DeleteConfirmSheet } from '@/components/mobile/delete-confirm-sheet';
 import { FullScreenImageViewer } from '@/components/mobile/full-screen-image-viewer';
 import { useTopBar } from '@/components/mobile/top-bar-provider';
 import { useLogout } from '@/hooks/auth/use-logout';
 import { useToggleDiscoverable } from '@/hooks/profile/use-toggle-discoverable';
+import { useResetSwipeHistory } from '@/hooks/swipes/use-reset-swipe-history';
 import { ageFromBirthYear, formatEnum } from '@/lib/utils';
 
 export function MyProfileClient() {
@@ -19,8 +21,10 @@ export function MyProfileClient() {
     const { mutate: logout } = useLogout();
 
     const { mutate: toggleDiscoverable, isPending: isToggleDiscoverablePending } = useToggleDiscoverable();
+    const { mutate: resetSwipeHistory, isPending: isResetSwipeHistoryPending } = useResetSwipeHistory();
 
     const [viewerIndex, setViewerIndex] = useState<number | null>(null);
+    const [showResetHistoryConfirm, setShowResetHistoryConfirm] = useState(false);
 
     useTopBar({
         title: profile?.name ?? 'My Profile'
@@ -30,7 +34,7 @@ export function MyProfileClient() {
         return <EmptyState title="Loading profile" body="Setting up your account..." />;
     }
 
-    const { avatarUrl, name, bio, faculty, birthYear, gallery, isDiscoverable } = profile;
+    const { avatarUrl, name, bio, faculty, birthYear, gallery, isDiscoverable, lookingFor } = profile;
     const galleryImages = gallery.map((item) => item.imageUrl);
 
     return (
@@ -47,11 +51,27 @@ export function MyProfileClient() {
                     </Link>
                 </div>
                 <h1 className="text-xl font-semibold">{name}</h1>
-                <p className="mt-1 max-w-[300px] text-sm leading-6 text-muted-foreground">
-                    {faculty ? `${formatEnum(faculty as string)} student` : 'KBU student'}
-                    {birthYear ? ` • ${ageFromBirthYear(birthYear)}` : ''}
-                    {bio ? ` • ${bio}` : ''}
-                </p>
+                <div className="mt-2 flex flex-wrap justify-center gap-1.5">
+                    {faculty && (
+                        <span className="inline-flex items-center gap-1 rounded-full border border-black/10 bg-muted px-2 py-0.5 text-xs font-medium text-foreground">
+                            <GraduationCap className="size-3 shrink-0 text-primary" />
+                            {formatEnum(faculty as string)}
+                        </span>
+                    )}
+                    {birthYear && (
+                        <span className="inline-flex items-center gap-1 rounded-full border border-black/10 bg-muted px-2 py-0.5 text-xs font-medium text-foreground">
+                            <Cake className="size-3 shrink-0 text-primary" />
+                            {ageFromBirthYear(birthYear)}
+                        </span>
+                    )}
+                    {lookingFor && (
+                        <span className="inline-flex items-center gap-1 rounded-full border border-black/10 bg-muted px-2 py-0.5 text-xs font-medium text-foreground">
+                            <Search className="size-3 shrink-0 text-primary" />
+                            {formatEnum(lookingFor)}
+                        </span>
+                    )}
+                </div>
+                {bio && <p className="mt-3 max-w-[300px] text-sm leading-6 text-muted-foreground">{bio}</p>}
             </section>
 
             <section className="px-5 pb-6">
@@ -133,6 +153,40 @@ export function MyProfileClient() {
                     </div>
                 </div>
             </SettingsSection>
+
+            <SettingsSection title="Discovery">
+                <div className="px-5 py-4">
+                    <div className="flex items-center justify-between">
+                        <div className="min-w-0 flex-1">
+                            <span className="text-sm font-medium">Reset Swipe History</span>
+                            <p className="mt-0.5 text-xs leading-5 text-muted-foreground">
+                                Make previously swiped profiles reappear in your feed.
+                            </p>
+                        </div>
+                        <button
+                            type="button"
+                            disabled={isResetSwipeHistoryPending}
+                            onClick={() => setShowResetHistoryConfirm(true)}
+                            className="shrink-0 rounded-lg bg-primary px-4 py-1.5 text-xs font-semibold text-white transition active:scale-[0.98]"
+                        >
+                            Reset
+                        </button>
+                    </div>
+                </div>
+            </SettingsSection>
+
+            {showResetHistoryConfirm && (
+                <DeleteConfirmSheet
+                    title="Reset Swipe History?"
+                    message="This will make all previously swiped profiles reappear in your feed. This action cannot be undone."
+                    onConfirm={() => {
+                        resetSwipeHistory();
+                        setShowResetHistoryConfirm(false);
+                    }}
+                    onClose={() => setShowResetHistoryConfirm(false)}
+                    isPending={isResetSwipeHistoryPending}
+                />
+            )}
 
             <SettingsSection title="Account">
                 <div className="flex items-center justify-between border-b border-black/10 px-5 py-4">
