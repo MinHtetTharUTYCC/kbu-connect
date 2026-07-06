@@ -1,13 +1,6 @@
 'use client';
 
-import {
-    createContext,
-    type ReactNode,
-    useContext,
-    useLayoutEffect,
-    useRef,
-    useState,
-} from 'react';
+import { createContext, type ReactNode, useContext, useLayoutEffect, useRef, useState } from 'react';
 import { TopBar } from './app-chrome';
 
 type TopBarConfig = {
@@ -16,9 +9,7 @@ type TopBarConfig = {
     canBack?: boolean;
 };
 
-const TopBarContext = createContext<React.Dispatch<
-    React.SetStateAction<TopBarConfig>
-> | null>(null);
+const TopBarContext = createContext<React.Dispatch<React.SetStateAction<TopBarConfig>> | null>(null);
 
 export function TopBarProvider({ children }: { children: ReactNode }) {
     const [config, setConfig] = useState<TopBarConfig>({});
@@ -27,13 +18,7 @@ export function TopBarProvider({ children }: { children: ReactNode }) {
 
     return (
         <TopBarContext.Provider value={setConfig}>
-            {hasConfig && (
-                <TopBar
-                    title={config.title}
-                    action={config.action}
-                    canBack={config.canBack ?? true}
-                />
-            )}
+            {hasConfig && <TopBar title={config.title} action={config.action} canBack={config.canBack ?? true} />}
             {children}
         </TopBarContext.Provider>
     );
@@ -41,8 +26,7 @@ export function TopBarProvider({ children }: { children: ReactNode }) {
 
 export function useTopBar(config: TopBarConfig) {
     const setConfig = useContext(TopBarContext);
-    if (!setConfig)
-        throw new Error('useTopBar must be used within TopBarProvider');
+    if (!setConfig) throw new Error('useTopBar must be used within TopBarProvider');
 
     const actionRef = useRef(config.action);
     actionRef.current = config.action;
@@ -51,7 +35,7 @@ export function useTopBar(config: TopBarConfig) {
         setConfig({
             title: config.title,
             action: actionRef.current,
-            canBack: config.canBack,
+            canBack: config.canBack
         });
         return () => setConfig({});
     }, [config.title, config.canBack, setConfig]);

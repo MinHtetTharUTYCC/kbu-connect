@@ -15,8 +15,7 @@ type ChatTab = 'chats' | 'shoutouts';
 
 export function ChatHomeClient() {
     const searchParams = useSearchParams();
-    const activeTab: ChatTab =
-        searchParams.get('tab') === 'shoutouts' ? 'shoutouts' : 'chats';
+    const activeTab: ChatTab = searchParams.get('tab') === 'shoutouts' ? 'shoutouts' : 'chats';
 
     useTopBar({ title: 'Chats' });
 
@@ -28,9 +27,7 @@ export function ChatHomeClient() {
                         href="/chats"
                         className={cn(
                             'flex-1 rounded-lg py-2 text-center text-xs font-semibold',
-                            activeTab === 'chats'
-                                ? 'border border-primary bg-white text-primary shadow-sm'
-                                : 'text-muted-foreground',
+                            activeTab === 'chats' ? 'border border-primary bg-white text-primary shadow-sm' : 'text-muted-foreground'
                         )}
                     >
                         Chats
@@ -39,32 +36,22 @@ export function ChatHomeClient() {
                         href="/chats?tab=shoutouts"
                         className={cn(
                             'flex-1 rounded-lg py-2 text-center text-xs font-semibold',
-                            activeTab === 'shoutouts'
-                                ? 'border border-primary bg-white text-primary shadow-sm'
-                                : 'text-muted-foreground',
+                            activeTab === 'shoutouts' ? 'border border-primary bg-white text-primary shadow-sm' : 'text-muted-foreground'
                         )}
                     >
                         Shoutouts
                     </Link>
                 </div>
             </div>
-            {activeTab === 'shoutouts' ? (
-                <ShoutoutsPanel />
-            ) : (
-                <ChatListClient />
-            )}
+            {activeTab === 'shoutouts' ? <ShoutoutsPanel /> : <ChatListClient />}
         </main>
     );
 }
 
 export function ChatListClient() {
-    const {
-        conversations,
-        isLoading,
-        fetchNextPage,
-        hasNextPage,
-        isFetchingNextPage,
-    } = useConversationsList({ cursor: null });
+    const { conversations, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } = useConversationsList({
+        cursor: null
+    });
     const loadMoreRef = useRef<HTMLDivElement | null>(null);
 
     useEffect(() => {
@@ -77,7 +64,7 @@ export function ChatListClient() {
                     fetchNextPage();
                 }
             },
-            { rootMargin: '180px 0px' },
+            { rootMargin: '180px 0px' }
         );
 
         observer.observe(target);
@@ -85,21 +72,11 @@ export function ChatListClient() {
     }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
 
     if (isLoading) {
-        return (
-            <EmptyState
-                title="Loading chats"
-                body="Checking your conversations."
-            />
-        );
+        return <EmptyState title="Loading chats" body="Checking your conversations." />;
     }
 
     if (!conversations.length) {
-        return (
-            <EmptyState
-                title="No chats"
-                body="After you match and start a conversation, it will show here."
-            />
-        );
+        return <EmptyState title="No chats" body="After you match and start a conversation, it will show here." />;
     }
 
     return (
@@ -111,34 +88,20 @@ export function ChatListClient() {
                     className="flex items-center border-b border-black/10 px-5 py-4 active:bg-black/5"
                 >
                     <div className="shrink-0">
-                        <Avatar
-                            src={conversation.otherUser.avatarUrl}
-                            name={conversation.otherUser.name}
-                            className="size-12"
-                        />
+                        <Avatar src={conversation.otherUser.avatarUrl} name={conversation.otherUser.name} className="size-12" />
                     </div>
                     <div className="ml-3 min-w-0 flex-1">
                         <div className="flex items-baseline justify-between gap-3">
-                            <span className="truncate font-semibold">
-                                {conversation.otherUser.name}
-                            </span>
-                            <span className="text-xs text-muted-foreground">
-                                {getFormattedDate(conversation.updatedAt)}
-                            </span>
+                            <span className="truncate font-semibold">{conversation.otherUser.name}</span>
+                            <span className="text-xs text-muted-foreground">{getFormattedDate(conversation.updatedAt)}</span>
                         </div>
                         <p className="block truncate text-sm text-muted-foreground">
-                            {conversation.lastMessage?.content ??
-                                'No messages yet.'}
+                            {conversation.lastMessage?.content ?? 'No messages yet.'}
                         </p>
                     </div>
                 </Link>
             ))}
-            <LoadMoreRow
-                ref={loadMoreRef}
-                hasNextPage={hasNextPage}
-                isFetchingNextPage={isFetchingNextPage}
-                endLabel="No more chats"
-            />
+            <LoadMoreRow ref={loadMoreRef} hasNextPage={hasNextPage} isFetchingNextPage={isFetchingNextPage} endLabel="No more chats" />
         </div>
     );
 }

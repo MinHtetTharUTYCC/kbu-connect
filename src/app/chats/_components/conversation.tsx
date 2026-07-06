@@ -9,12 +9,7 @@ import { LoadMoreRow } from '@/components/load-more-row';
 import { Avatar, EmptyState } from '@/components/mobile/app-chrome';
 import { DeleteConfirmSheet } from '@/components/mobile/delete-confirm-sheet';
 import { ProfileSheet } from '@/components/mobile/profile-sheet';
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { useConversation } from '@/hooks/chat/use-conversation';
 import { useConversationMessages } from '@/hooks/chat/use-conversation-messages';
 import { useDeleteConversation } from '@/hooks/chat/use-delete-conversation';
@@ -34,10 +29,9 @@ export function ChatClient({ chatId }: { chatId: string }) {
         isLoading: isLoadingMessages,
         fetchNextPage: fetchNextPageMessages,
         hasNextPage: hasNextPageMessages,
-        isFetchingNextPage: isFetchingNextPageMessages,
+        isFetchingNextPage: isFetchingNextPageMessages
     } = useConversationMessages(chatId);
-    const { data: conversation, isLoading: conversationLoading } =
-        useConversation(chatId);
+    const { data: conversation, isLoading: conversationLoading } = useConversation(chatId);
     const { mutate: markSeen } = useMarkConversationSeen();
 
     const loadMoreMessagesRef = useRef<HTMLDivElement | null>(null);
@@ -57,26 +51,21 @@ export function ChatClient({ chatId }: { chatId: string }) {
         setDeleteMessageTargetId,
         isEditing,
         handleStartEdit,
-        handleCancelEdit,
+        handleCancelEdit
     } = useChatState();
 
-    const [showDeleteMessageConfirm, setShowDeleteMessageConfirm] =
-        useState(false);
+    const [showDeleteMessageConfirm, setShowDeleteMessageConfirm] = useState(false);
 
     const myId = user?.user?.id;
 
-    const { mutateAsync: sendMessage, isPending: isSendingMessage } =
-        useSendMessage(chatId, myId, () => setDraft(''));
+    const { mutateAsync: sendMessage, isPending: isSendingMessage } = useSendMessage(chatId, myId, () => setDraft(''));
 
-    const { mutate: deleteConversation, isPending: isDeleting } =
-        useDeleteConversation();
-    const { mutate: editMessage, isPending: isEditingMessage } =
-        useEditMessage(chatId);
-    const { mutate: deleteMessage, isPending: isDeletingMessage } =
-        useDeleteMessage(chatId, () => {
-            setShowDeleteMessageConfirm(false);
-            setDeleteMessageTargetId(null);
-        });
+    const { mutate: deleteConversation, isPending: isDeleting } = useDeleteConversation();
+    const { mutate: editMessage, isPending: isEditingMessage } = useEditMessage(chatId);
+    const { mutate: deleteMessage, isPending: isDeletingMessage } = useDeleteMessage(chatId, () => {
+        setShowDeleteMessageConfirm(false);
+        setDeleteMessageTargetId(null);
+    });
 
     const scrollToBottom = useCallback((behavior: ScrollBehavior = 'auto') => {
         messagesEndRef.current?.scrollIntoView({ behavior });
@@ -104,29 +93,25 @@ export function ChatClient({ chatId }: { chatId: string }) {
                     fetchNextPageMessages();
                 }
             },
-            { rootMargin: '180px 0px' },
+            { rootMargin: '180px 0px' }
         );
 
         observer.observe(target);
         return () => observer.disconnect();
-    }, [
-        fetchNextPageMessages,
-        hasNextPageMessages,
-        isFetchingNextPageMessages,
-    ]);
+    }, [fetchNextPageMessages, hasNextPageMessages, isFetchingNextPageMessages]);
 
     useEffect(() => {
         const el = inputRef.current;
         if (!el) return;
         el.style.height = 'auto';
         el.style.height = `${Math.min(el.scrollHeight, 120)}px`;
-    }, [isEditing ? editingContent : draft]);
+    }, []);
 
     useEffect(() => {
         const el = inputRef.current;
         if (!el) return;
         el.style.height = 'auto';
-    }, [isEditing]);
+    }, []);
 
     async function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
         e.preventDefault();
@@ -142,37 +127,22 @@ export function ChatClient({ chatId }: { chatId: string }) {
         editMessage(
             {
                 messageId: editingMessageId,
-                data: { content: editingContent.trim() },
+                data: { content: editingContent.trim() }
             },
-            { onSuccess: () => handleCancelEdit() },
+            { onSuccess: () => handleCancelEdit() }
         );
     }
 
     if (conversationLoading || (!conversation && hasNextPageMessages)) {
-        return (
-            <EmptyState
-                title="Loading conversation"
-                body="Opening your conversation."
-            />
-        );
+        return <EmptyState title="Loading conversation" body="Opening your conversation." />;
     }
 
     if (!conversation) {
-        return (
-            <EmptyState
-                title="Conversation unavailable"
-                body="This chat may have been deleted or is no longer available."
-            />
-        );
+        return <EmptyState title="Conversation unavailable" body="This chat may have been deleted or is no longer available." />;
     }
 
     if (!myId) {
-        return (
-            <EmptyState
-                title="Authentication required"
-                body="Please sign in to view this conversation."
-            />
-        );
+        return <EmptyState title="Authentication required" body="Please sign in to view this conversation." />;
     }
 
     const statusText = conversation.isOnline
@@ -184,34 +154,18 @@ export function ChatClient({ chatId }: { chatId: string }) {
     return (
         <div className="flex h-full flex-col overflow-hidden">
             <header className="flex shrink-0 items-center gap-3 border-b border-black/10 bg-white px-5 py-3">
-                <Link
-                    href="/chats"
-                    className="-ml-2 grid place-items-center"
-                    aria-label="Go back"
-                >
+                <Link href="/chats" className="-ml-2 grid place-items-center" aria-label="Go back">
                     <ArrowLeft className="w-4 h-4" />
                 </Link>
                 <button
                     type="button"
-                    onClick={() =>
-                        setSelectedProfileId(conversation.participant.id)
-                    }
+                    onClick={() => setSelectedProfileId(conversation.participant.id)}
                     className="flex items-center gap-3 min-w-0 flex-1 text-left"
                 >
-                    <Avatar
-                        src={conversation.participant.avatarUrl}
-                        name={conversation.participant.name}
-                        className="size-10"
-                    />
+                    <Avatar src={conversation.participant.avatarUrl} name={conversation.participant.name} className="size-10" />
                     <div className="min-w-0 flex-1">
-                        <p className="truncate text-sm font-semibold">
-                            {conversation.participant.name}
-                        </p>
-                        {statusText && (
-                            <p className="text-xs text-muted-foreground">
-                                {statusText}
-                            </p>
-                        )}
+                        <p className="truncate text-sm font-semibold">{conversation.participant.name}</p>
+                        {statusText && <p className="text-xs text-muted-foreground">{statusText}</p>}
                     </div>
                 </button>
                 <DropdownMenu>
@@ -219,10 +173,7 @@ export function ChatClient({ chatId }: { chatId: string }) {
                         <MoreVertical className="size-5" />
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
-                        <DropdownMenuItem
-                            className="text-red-500"
-                            onClick={() => setShowChatDeleteConfirm(true)}
-                        >
+                        <DropdownMenuItem className="text-red-500" onClick={() => setShowChatDeleteConfirm(true)}>
                             <Trash className="size-4" />
                             Delete chat
                         </DropdownMenuItem>
@@ -232,10 +183,7 @@ export function ChatClient({ chatId }: { chatId: string }) {
 
             <main className="min-h-0 flex-1 overflow-y-auto bg-white px-5 py-6">
                 {isLoadingMessages ? (
-                    <EmptyState
-                        title="Loading messages"
-                        body="Opening your messages."
-                    />
+                    <EmptyState title="Loading messages" body="Opening your messages." />
                 ) : messages.length ? (
                     <div className="flex flex-col gap-3">
                         <LoadMoreRow
@@ -255,10 +203,7 @@ export function ChatClient({ chatId }: { chatId: string }) {
                                         setDeleteMessageTargetId(id);
                                         setShowDeleteMessageConfirm(true);
                                     }}
-                                    showTimestamp={shouldShowTimestamp(
-                                        messages,
-                                        messages.indexOf(message),
-                                    )}
+                                    showTimestamp={shouldShowTimestamp(messages, messages.indexOf(message))}
                                     isEditing={editingMessageId === message.id}
                                 />
                             );
@@ -266,10 +211,7 @@ export function ChatClient({ chatId }: { chatId: string }) {
                         <div ref={messagesEndRef} />
                     </div>
                 ) : (
-                    <EmptyState
-                        title="No messages yet"
-                        body="Send the first message to start the conversation."
-                    />
+                    <EmptyState title="No messages yet" body="Send the first message to start the conversation." />
                 )}
             </main>
 
@@ -297,18 +239,14 @@ export function ChatClient({ chatId }: { chatId: string }) {
                 <textarea
                     ref={inputRef}
                     value={isEditing ? editingContent : draft}
-                    onChange={(e) =>
-                        isEditing
-                            ? setEditingContent(e.target.value)
-                            : setDraft(e.target.value)
-                    }
-                    onKeyDown={(e) => {
+                    onChange={(e) => (isEditing ? setEditingContent(e.target.value) : setDraft(e.target.value))}
+                    onKeyDown={(e: React.KeyboardEvent<HTMLTextAreaElement>) => {
                         if (e.key === 'Enter' && !e.shiftKey) {
                             e.preventDefault();
                             if (isEditing) {
                                 handleSubmitEdit();
                             } else {
-                                handleSubmit(e as any);
+                                handleSubmit(e as unknown as React.SubmitEvent<HTMLFormElement>);
                             }
                         }
                         if (isEditing && e.key === 'Escape') {
@@ -322,19 +260,11 @@ export function ChatClient({ chatId }: { chatId: string }) {
                 />
                 <button
                     type="submit"
-                    disabled={
-                        isEditing
-                            ? isEditingMessage || !editingContent.trim()
-                            : isSendingMessage || !draft.trim()
-                    }
+                    disabled={isEditing ? isEditingMessage || !editingContent.trim() : isSendingMessage || !draft.trim()}
                     className="grid size-11 shrink-0 place-items-center rounded-xl bg-primary text-white transition active:scale-95"
                     aria-label={isEditing ? 'Save edit' : 'Send message'}
                 >
-                    {isEditing ? (
-                        <Check className="size-5" />
-                    ) : (
-                        <Send className="size-5" />
-                    )}
+                    {isEditing ? <Check className="size-5" /> : <Send className="size-5" />}
                 </button>
             </form>
 
@@ -344,18 +274,10 @@ export function ChatClient({ chatId }: { chatId: string }) {
                     message="Are you sure you want to delete this chat? This action cannot be undone."
                     isPending={isDeleting}
                     onClose={() => setShowChatDeleteConfirm(false)}
-                    onConfirm={() =>
-                        deleteConversation({ conversationId: chatId })
-                    }
+                    onConfirm={() => deleteConversation({ conversationId: chatId })}
                 />
             )}
-            {selectedProfileId && (
-                <ProfileSheet
-                    userId={selectedProfileId}
-                    onClose={() => setSelectedProfileId(null)}
-                    from="visit"
-                />
-            )}
+            {selectedProfileId && <ProfileSheet userId={selectedProfileId} onClose={() => setSelectedProfileId(null)} from="visit" />}
             {showDeleteMessageConfirm && deleteMessageTargetId && (
                 <DeleteConfirmSheet
                     title="Delete message"
@@ -365,19 +287,14 @@ export function ChatClient({ chatId }: { chatId: string }) {
                         setShowDeleteMessageConfirm(false);
                         setDeleteMessageTargetId(null);
                     }}
-                    onConfirm={() =>
-                        deleteMessage({ messageId: deleteMessageTargetId })
-                    }
+                    onConfirm={() => deleteMessage({ messageId: deleteMessageTargetId })}
                 />
             )}
         </div>
     );
 }
 
-function shouldShowTimestamp(
-    messages: MessageItemDto[],
-    index: number,
-): boolean {
+function shouldShowTimestamp(messages: MessageItemDto[], index: number): boolean {
     if (index === messages.length - 1) return true; // always show on last
     if (index % 5 === 0) return true; // every 5 messages
 

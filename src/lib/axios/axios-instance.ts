@@ -1,15 +1,7 @@
 import axios, { type AxiosError, type AxiosRequestConfig } from 'axios';
 import { useAuthStore } from '@/stores/auth-store';
-
-const baseURL = process.env.NEXT_PUBLIC_API_URL;
-
-if (!baseURL) {
-    throw new Error(
-        'NEXT_PUBLIC_API_URL is not defined in the environment variables.',
-    );
-}
-
-const RETRY_SKIP_ROUTES = ['/auth/login', '/auth/verify', '/auth/refresh'];
+import { baseUrl } from '../constants/app.config';
+import { retrySkipApiRoutes } from '../constants/routes';
 
 let isRefreshing = false;
 let refreshSubscribers: (() => void)[] = [];
@@ -26,11 +18,11 @@ const subscribeToRefresh = (callback: () => void) => {
 };
 
 const axiosInstance = axios.create({
-    baseURL,
+    baseURL: baseUrl,
     withCredentials: true, // handles auth via httpOnly cookie automatically
     headers: {
-        'Content-Type': 'application/json',
-    },
+        'Content-Type': 'application/json'
+    }
 });
 
 // ─── Request: attach JWT ───────────────────────────────────────────────────
@@ -45,12 +37,12 @@ axiosInstance.interceptors.request.use(
         const accessToken = useAuthStore.getState().accessToken;
 
         if (accessToken) {
-            config.headers['Authorization'] = `Bearer ${accessToken}`;
+            config.headers.Authorization = `Bearer ${accessToken}`;
         }
 
         return config;
     },
-    (error) => Promise.reject(error),
+    (error) => Promise.reject(error)
 );
 
 // ─── Response: unwrap axios layer ─────────────────────────────────────────
@@ -68,9 +60,7 @@ axiosInstance.interceptors.response.use(
             _retry?: boolean;
         };
 
-        const isAuthRoute = RETRY_SKIP_ROUTES.some((path) =>
-            originalRequest.url?.includes(path),
-        );
+        const isAuthRoute = retrySkipApiRoutes.some((path) => originalRequest.url?.includes(path));
 
         // if signin or refresh request itself failed, just reject with error message
         if (isAuthRoute) {
@@ -81,7 +71,7 @@ axiosInstance.interceptors.response.use(
                 url: originalRequest.url,
                 method: originalRequest.method,
                 status: error.response?.status,
-                responseData: err,
+                responseData: err
             });
 
             // 401 — try silent refresh first, then kick to login
@@ -102,10 +92,7 @@ axiosInstance.interceptors.response.use(
 
                 try {
                     // httpOnly refresh cookie is auto-sent
-                    const data = await axiosInstance.post<
-                        unknown,
-                        { access_token: string }
-                    >('/auth/refresh');
+                    const data = await axiosInstance.post<unknown, { access_token: string }>('/auth/refresh');
 
                     console.log('Token refreshed successfully', data);
 
@@ -128,7 +115,7 @@ axiosInstance.interceptors.response.use(
             }
         }
         return Promise.reject(err ?? error);
-    },
+    }
 );
 
 // ─── Orval-compatible export ───────────────────────────────────────────────

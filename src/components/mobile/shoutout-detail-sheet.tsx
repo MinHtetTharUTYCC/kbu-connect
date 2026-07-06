@@ -1,15 +1,9 @@
 'use client';
 
-import { Send, Trash, X } from 'lucide-react';
+import { Send, Trash } from 'lucide-react';
 import { useState } from 'react';
 import { Avatar } from '@/components/mobile/app-chrome';
-import {
-    Drawer,
-    DrawerContent,
-    DrawerHeader,
-    DrawerTitle,
-    DrawerClose,
-} from '@/components/ui/drawer';
+import { Drawer, DrawerContent } from '@/components/ui/drawer';
 import type { ShoutoutItem } from '@/hooks/chat/use-shoutouts-list';
 import { getFormattedDate } from '@/lib/date/format-date';
 
@@ -22,7 +16,7 @@ export function ShoutoutDetailSheet({
     onReply,
     onProfileClick,
     isDeleting,
-    isReplying,
+    isReplying
 }: {
     shoutout: ShoutoutItem;
     onClose: () => void;
@@ -56,26 +50,16 @@ export function ShoutoutDetailSheet({
                     onClick={() => onProfileClick(shoutout.otherUser.id)}
                     className="flex items-center gap-3 text-left w-full"
                 >
-                    <Avatar
-                        src={shoutout.otherUser.avatarUrl}
-                        name={shoutout.otherUser.name}
-                        className="size-12"
-                    />
+                    <Avatar src={shoutout.otherUser.avatarUrl} name={shoutout.otherUser.name} className="size-12" />
                     <div className="min-w-0 flex-1">
-                        <p className="truncate text-sm font-semibold text-foreground">
-                            {shoutout.otherUser.name}
-                        </p>
-                        <p className="text-xs text-muted-foreground">
-                            {getFormattedDate(shoutout.createdAt)}
-                        </p>
+                        <p className="truncate text-sm font-semibold text-foreground">{shoutout.otherUser.name}</p>
+                        <p className="text-xs text-muted-foreground">{getFormattedDate(shoutout.createdAt)}</p>
                     </div>
                 </button>
 
                 <div className="rounded-lg border border-black/10 bg-muted p-3">
                     <p className="text-sm leading-5 text-foreground">
-                        {shoutout.type === 'sent'
-                            ? `You: ${shoutout.content}`
-                            : shoutout.content}
+                        {shoutout.type === 'sent' ? `You: ${shoutout.content}` : shoutout.content}
                     </p>
                 </div>
 
@@ -83,9 +67,7 @@ export function ShoutoutDetailSheet({
                     <div className="flex flex-col gap-2">
                         <textarea
                             value={message}
-                            onChange={(e) =>
-                                setMessage(e.target.value.slice(0, MAX_CHARS))
-                            }
+                            onChange={(e) => setMessage(e.target.value.slice(0, MAX_CHARS))}
                             placeholder="Write your reply..."
                             className="min-h-[80px] resize-none rounded-lg border border-black/10 p-3 text-sm placeholder-muted-foreground focus:border-primary focus:outline-none focus:ring-1 focus:ring-primary"
                             disabled={isReplying}

@@ -1,9 +1,6 @@
 'use client';
 
-import {
-    getUsersControllerGetMyProfileQueryKey,
-    useUsersControllerToggleDiscoverable,
-} from '@services/generated/users/users';
+import { getUsersControllerGetMyProfileQueryKey, useUsersControllerToggleDiscoverable } from '@services/generated/users/users';
 import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { handleBackendError } from '@/lib/error/error-util';
@@ -16,11 +13,11 @@ export function useToggleDiscoverable() {
             onError: (error) => handleBackendError(error),
             onSuccess: (data) => {
                 queryClient.invalidateQueries({
-                    queryKey: getUsersControllerGetMyProfileQueryKey(),
+                    queryKey: getUsersControllerGetMyProfileQueryKey()
                 });
 
                 toast.success(data.message);
-            },
-        },
+            }
+        }
     });
 }

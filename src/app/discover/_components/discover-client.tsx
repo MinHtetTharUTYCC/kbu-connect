@@ -5,7 +5,7 @@ import { useQueryClient } from '@tanstack/react-query';
 import { GraduationCap, Heart, Megaphone, X } from 'lucide-react';
 import Image from 'next/image';
 import { useCallback, useEffect, useRef, useState } from 'react';
-import { EmptyState } from '@/components/mobile/app-chrome';
+import { Chip, EmptyState } from '@/components/mobile/app-chrome';
 import { ProfileSheet } from '@/components/mobile/profile-sheet';
 import { useSendShoutout } from '@/hooks/chat/use-send-shoutout';
 import { useDiscoveryProfiles } from '@/hooks/discovery/use-discovery-profiles';
@@ -20,25 +20,16 @@ export function DiscoverClient() {
     const [direction, setDirection] = useState<'left' | 'right' | null>(null);
     const [isShoutoutOpen, setIsShoutoutOpen] = useState(false);
     const [shoutoutMessage, setShoutoutMessage] = useState('');
-    const [selectedProfileId, setSelectedProfileId] = useState<string | null>(
-        null,
-    );
+    const [selectedProfileId, setSelectedProfileId] = useState<string | null>(null);
     const [imageIndex, setImageIndex] = useState(0);
     const [dragX, setDragX] = useState(0);
     const touchStartX = useRef(0);
     const touchStartY = useRef(0);
     const isDragging = useRef(false);
     const cardRef = useRef<HTMLDivElement>(null);
-    const {
-        profiles,
-        isLoading,
-        fetchNextPage,
-        hasNextPage,
-        isFetchingNextPage,
-    } = useDiscoveryProfiles({});
+    const { profiles, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } = useDiscoveryProfiles({});
     const { like, dislike, isPending: isSwipePending } = useSwipeProfile();
-    const { mutateAsync: sendShoutout, isPending: isSendingShoutout } =
-        useSendShoutout();
+    const { mutateAsync: sendShoutout, isPending: isSendingShoutout } = useSendShoutout();
     const profile = profiles[index];
     const remainingProfiles = profiles.length - index;
 
@@ -49,8 +40,8 @@ export function DiscoverClient() {
         const timer = window.setTimeout(() => {
             queryClient.prefetchQuery(
                 getUsersControllerGetUserProfileQueryOptions(profile.id, {
-                    query: { staleTime: 1000 * 60 * 5 },
-                }),
+                    query: { staleTime: 1000 * 60 * 5 }
+                })
             );
         }, 3000);
         return () => clearTimeout(timer);
@@ -80,7 +71,7 @@ export function DiscoverClient() {
                 setDirection(null);
             }, 260);
         },
-        [profile, direction, like, dislike],
+        [profile, direction, like, dislike]
     );
 
     function handleTouchStart(e: React.TouchEvent) {
@@ -119,46 +110,29 @@ export function DiscoverClient() {
         await sendShoutout({
             data: {
                 receiverId: profile.id,
-                message: shoutoutMessage.trim(),
-            },
+                message: shoutoutMessage.trim()
+            }
         });
         setShoutoutMessage('');
         setIsShoutoutOpen(false);
     }
 
     if (isLoading) {
-        return (
-            <EmptyState
-                title="Loading profiles"
-                body="Finding people you may want to meet."
-            />
-        );
+        return <EmptyState title="Loading profiles" body="Finding people you may want to meet." />;
     }
 
     if (!profile) {
         if (isFetchingNextPage) {
-            return (
-                <EmptyState
-                    title="Loading more profiles"
-                    body="Looking for more people from the campus."
-                />
-            );
+            return <EmptyState title="Loading more profiles" body="Looking for more people from the campus." />;
         }
 
-        return (
-            <EmptyState
-                title="No profiles nearby"
-                body="Check back later as more KBU students complete their profiles."
-            />
-        );
+        return <EmptyState title="No profiles nearby" body="Check back later as more KBU students complete their profiles." />;
     }
 
     const dragRotation = dragX * 0.06;
     const dragOpacity = Math.max(0, 1 - Math.abs(dragX) / 300);
-    const showLikeStamp =
-        direction === 'right' || (!direction && dragX > SWIPE_THRESHOLD * 0.5);
-    const showPassStamp =
-        direction === 'left' || (!direction && dragX < -SWIPE_THRESHOLD * 0.5);
+    const showLikeStamp = direction === 'right' || (!direction && dragX > SWIPE_THRESHOLD * 0.5);
+    const showPassStamp = direction === 'left' || (!direction && dragX < -SWIPE_THRESHOLD * 0.5);
 
     return (
         <div className="flex flex-1 flex-col overflow-hidden bg-background">
@@ -169,16 +143,12 @@ export function DiscoverClient() {
                         className={cn(
                             'relative flex h-full min-h-[400px] w-full max-w-full flex-col overflow-hidden rounded-xl border border-black/10 bg-white shadow-sm',
                             !dragX && 'transition duration-300',
-                            direction === 'left' &&
-                                '-translate-x-24 -rotate-6 opacity-0',
-                            direction === 'right' &&
-                                'translate-x-24 rotate-6 opacity-0',
+                            direction === 'left' && '-translate-x-24 -rotate-6 opacity-0',
+                            direction === 'right' && 'translate-x-24 rotate-6 opacity-0'
                         )}
                         style={{
-                            transform: direction
-                                ? undefined
-                                : `translateX(${dragX}px) rotate(${dragRotation}deg)`,
-                            opacity: direction ? undefined : dragOpacity,
+                            transform: direction ? undefined : `translateX(${dragX}px) rotate(${dragRotation}deg)`,
+                            opacity: direction ? undefined : dragOpacity
                         }}
                         onTouchStart={handleTouchStart}
                         onTouchMove={handleTouchMove}
@@ -205,11 +175,7 @@ export function DiscoverClient() {
                                         {profile.gallery.map((image, i) => (
                                             <div
                                                 key={`${image.imageUrl}-${i}`}
-                                                className={`h-1 rounded-full transition-all ${
-                                                    i === imageIndex
-                                                        ? 'w-6 bg-white'
-                                                        : 'w-1.5 bg-white/50'
-                                                }`}
+                                                className={`h-1 rounded-full transition-all ${i === imageIndex ? 'w-6 bg-white' : 'w-1.5 bg-white/50'}`}
                                             />
                                         ))}
                                     </div>
@@ -219,12 +185,7 @@ export function DiscoverClient() {
                                         aria-label="Previous photo"
                                         onClick={(e) => {
                                             e.stopPropagation();
-                                            setImageIndex((prev) =>
-                                                prev > 0
-                                                    ? prev - 1
-                                                    : profile.gallery.length -
-                                                      1,
-                                            );
+                                            setImageIndex((prev) => (prev > 0 ? prev - 1 : profile.gallery.length - 1));
                                         }}
                                     />
                                     <button
@@ -233,29 +194,16 @@ export function DiscoverClient() {
                                         aria-label="Next photo"
                                         onClick={(e) => {
                                             e.stopPropagation();
-                                            setImageIndex((prev) =>
-                                                prev <
-                                                profile.gallery.length - 1
-                                                    ? prev + 1
-                                                    : 0,
-                                            );
+                                            setImageIndex((prev) => (prev < profile.gallery.length - 1 ? prev + 1 : 0));
                                         }}
                                     />
                                 </>
                             )}
 
                             <div className="absolute inset-x-0 bottom-0 h-36 bg-linear-to-t from-black/50 to-transparent" />
-                            {showLikeStamp && (
-                                <SwipeStamp
-                                    label="LIKE"
-                                    className="right-8 rotate-12 border-primary text-primary"
-                                />
-                            )}
+                            {showLikeStamp && <SwipeStamp label="LIKE" className="right-8 rotate-12 border-primary text-primary" />}
                             {showPassStamp && (
-                                <SwipeStamp
-                                    label="PASS"
-                                    className="left-8 -rotate-12 border-muted-foreground text-muted-foreground"
-                                />
+                                <SwipeStamp label="PASS" className="left-8 -rotate-12 border-muted-foreground text-muted-foreground" />
                             )}
                         </div>
                         <div className="space-y-3 p-4">
@@ -269,9 +217,7 @@ export function DiscoverClient() {
                             <div className="flex items-end gap-2">
                                 <button
                                     type="button"
-                                    onClick={() =>
-                                        setSelectedProfileId(profile.id)
-                                    }
+                                    onClick={() => setSelectedProfileId(profile.id)}
                                     className="text-left text-xl font-semibold active:opacity-70"
                                 >
                                     {profile.name}
@@ -283,44 +229,25 @@ export function DiscoverClient() {
                             </div>
                             <div className="flex items-center gap-2 text-primary font-medium">
                                 <GraduationCap className="size-4" />
-                                <p className="line-clamp-1 font-semibold">
-                                    {formatEnum(profile.faculty)}
-                                </p>
+                                <p className="line-clamp-1 font-semibold">{formatEnum(profile.faculty)}</p>
                             </div>
-                            {profile.bio && (
-                                <p className="text-sm leading-6 text-foreground">
-                                    {profile.bio}
-                                </p>
-                            )}
+                            {profile.bio && <p className="text-sm leading-6 text-foreground">{profile.bio}</p>}
                             <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none [&::-webkit-scrollbar]:hidden">
-                                {/* {profile.interests.map((interest) => (
-                                    <Chip key={interest}>{interest}</Chip>
-                                ))} */}
+                                {(profile.interests ?? []).map((interest) => (
+                                    <Chip key={interest}>{formatEnum(interest)}</Chip>
+                                ))}
                             </div>
                         </div>
                     </div>
                 </section>
                 <section className="mt-4 flex shrink-0 items-center justify-center gap-8 pb-2">
-                    <ActionButton
-                        label="Pass"
-                        onClick={() => handleSwipe('DISLIKE')}
-                        disabled={isSwipePending}
-                    >
+                    <ActionButton label="Pass" onClick={() => handleSwipe('DISLIKE')} disabled={isSwipePending}>
                         <X className="size-7" />
                     </ActionButton>
-                    <ActionButton
-                        label="Send shoutout"
-                        compact
-                        onClick={() => setIsShoutoutOpen(true)}
-                        disabled={isSendingShoutout}
-                    >
+                    <ActionButton label="Send shoutout" compact onClick={() => setIsShoutoutOpen(true)} disabled={isSendingShoutout}>
                         <Megaphone className="size-6" />
                     </ActionButton>
-                    <ActionButton
-                        label="Like"
-                        onClick={() => handleSwipe('LIKE')}
-                        disabled={isSwipePending}
-                    >
+                    <ActionButton label="Like" onClick={() => handleSwipe('LIKE')} disabled={isSwipePending}>
                         <Heart className="size-7 fill-primary" />
                     </ActionButton>
                 </section>
@@ -352,23 +279,8 @@ export function DiscoverClient() {
     );
 }
 
-function SwipeStamp({
-    label,
-    className,
-}: {
-    label: string;
-    className?: string;
-}) {
-    return (
-        <div
-            className={cn(
-                'absolute top-8 z-10 rounded-xl border-4 px-4 py-1 text-xl font-bold',
-                className,
-            )}
-        >
-            {label}
-        </div>
-    );
+function SwipeStamp({ label, className }: { label: string; className?: string }) {
+    return <div className={cn('absolute top-8 z-10 rounded-xl border-4 px-4 py-1 text-xl font-bold', className)}>{label}</div>;
 }
 
 function ActionButton({
@@ -376,7 +288,7 @@ function ActionButton({
     label,
     onClick,
     disabled,
-    compact = false,
+    compact = false
 }: {
     children: React.ReactNode;
     label: string;
@@ -392,7 +304,7 @@ function ActionButton({
             disabled={disabled}
             className={cn(
                 'grid place-items-center rounded-full border border-black/10 bg-white text-primary shadow-sm transition active:scale-90 disabled:opacity-50',
-                compact ? 'size-12' : 'size-14',
+                compact ? 'size-12' : 'size-14'
             )}
         >
             {children}

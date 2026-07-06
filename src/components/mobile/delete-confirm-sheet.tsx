@@ -9,7 +9,7 @@ import {
     AlertDialogDescription,
     AlertDialogFooter,
     AlertDialogHeader,
-    AlertDialogTitle,
+    AlertDialogTitle
 } from '@/components/ui/alert-dialog';
 import { cn } from '@/lib/utils';
 
@@ -18,7 +18,7 @@ export function DeleteConfirmSheet({
     message,
     onConfirm,
     onClose,
-    isPending,
+    isPending
 }: {
     title: string;
     message: string;
@@ -28,18 +28,16 @@ export function DeleteConfirmSheet({
 }) {
     return (
         <AlertDialog open onOpenChange={(open) => !open && onClose()}>
-            <AlertDialogContent>
+            <AlertDialogContent aria-describedby={undefined}>
                 <AlertDialogHeader>
                     <AlertDialogTitle>{title}</AlertDialogTitle>
                     <AlertDialogDescription>{message}</AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
-                    <AlertDialogCancel disabled={isPending}>
-                        Cancel
-                    </AlertDialogCancel>
+                    <AlertDialogCancel disabled={isPending}>Cancel</AlertDialogCancel>
                     <AlertDialogAction
                         className={cn(
-                            'bg-destructive/10 text-destructive hover:bg-destructive/20 focus-visible:border-destructive/40 focus-visible:ring-destructive/20 dark:bg-destructive/20 dark:hover:bg-destructive/30 dark:focus-visible:ring-destructive/40',
+                            'bg-destructive/10 text-destructive hover:bg-destructive/20 focus-visible:border-destructive/40 focus-visible:ring-destructive/20 dark:bg-destructive/20 dark:hover:bg-destructive/30 dark:focus-visible:ring-destructive/40'
                         )}
                         disabled={isPending}
                         onClick={onConfirm}

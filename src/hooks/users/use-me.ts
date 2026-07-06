@@ -5,7 +5,7 @@ export function useMe(skip = false) {
         query: {
             staleTime: 5 * 60 * 1000, // 5 minutes
             retry: false,
-            enabled: !skip,
-        },
+            enabled: !skip
+        }
     });
 }

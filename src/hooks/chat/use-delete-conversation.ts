@@ -1,7 +1,4 @@
-import {
-    getChatControllerGetConversationsInfiniteQueryKey,
-    useChatControllerDeleteConversation,
-} from '@services/generated/chat/chat';
+import { getChatControllerGetConversationsInfiniteQueryKey, useChatControllerDeleteConversation } from '@services/generated/chat/chat';
 import { useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
@@ -16,12 +13,11 @@ export function useDeleteConversation() {
             onError: (error) => handleBackendError(error),
             onSuccess: () => {
                 queryClient.invalidateQueries({
-                    queryKey:
-                        getChatControllerGetConversationsInfiniteQueryKey(),
+                    queryKey: getChatControllerGetConversationsInfiniteQueryKey()
                 });
                 toast.success('Conversation deleted');
                 router.replace('/chats');
-            },
-        },
+            }
+        }
     });
 }

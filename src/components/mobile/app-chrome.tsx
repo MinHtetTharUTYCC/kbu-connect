@@ -6,35 +6,15 @@ import { useRouter } from 'next/navigation';
 import type { ReactNode } from 'react';
 import { cn, initials } from '@/lib/utils';
 
-export function MobileScreen({
-    children,
-    className,
-}: {
-    children: ReactNode;
-    className?: string;
-}) {
+export function MobileScreen({ children, className }: { children: ReactNode; className?: string }) {
     return (
-        <div
-            className={cn(
-                'mx-auto flex w-full max-w-[430px] flex-col bg-white text-foreground',
-                'flex-1 min-h-0',
-                className,
-            )}
-        >
+        <div className={cn('mx-auto flex w-full max-w-[430px] flex-col bg-white text-foreground', 'flex-1 min-h-0', className)}>
             {children}
         </div>
     );
 }
 
-export function TopBar({
-    title = 'UniMatch',
-    action,
-    canBack = true,
-}: {
-    title?: string;
-    action?: ReactNode;
-    canBack: boolean;
-}) {
+export function TopBar({ title = 'UniMatch', action, canBack = true }: { title?: string; action?: ReactNode; canBack: boolean }) {
     const router = useRouter();
 
     const onBackClick = () => {
@@ -60,64 +40,32 @@ export function TopBar({
                 ) : (
                     <GraduationCap className="size-6 text-primary" />
                 )}
-                <span className="truncate text-xl font-bold text-primary">
-                    {title}
-                </span>
+                <span className="truncate text-xl font-bold text-primary">{title}</span>
             </div>
             {action && action}
         </header>
     );
 }
 
-export function Avatar({
-    src,
-    name,
-    className,
-}: {
-    src?: string | null;
-    name?: string | null;
-    className?: string;
-}) {
+export function Avatar({ src, name, className }: { src?: string | null; name?: string | null; className?: string }) {
     return (
         <div
             className={cn(
                 'relative grid shrink-0 place-items-center overflow-hidden rounded-full border border-black/10 bg-primary/10 text-sm font-bold text-primary',
-                className,
+                className
             )}
         >
-            {src ? (
-                <Image
-                    src={src}
-                    alt={name || 'Profile'}
-                    fill
-                    sizes="96px"
-                    unoptimized
-                    className="object-cover"
-                />
-            ) : (
-                initials(name)
-            )}
+            {src ? <Image src={src} alt={name || 'Profile'} fill sizes="96px" unoptimized className="object-cover" /> : initials(name)}
         </div>
     );
 }
 
-export function Chip({
-    children,
-    active = false,
-    onClick,
-}: {
-    children: ReactNode;
-    active?: boolean;
-    onClick?: () => void;
-}) {
+export function Chip({ children, active = false }: { children: ReactNode; active?: boolean }) {
     return (
         <span
-            onClick={() => onClick?.()}
             className={cn(
                 'inline-flex h-7 shrink-0 items-center rounded-full border px-3 text-xs font-medium',
-                active
-                    ? 'border-primary bg-primary text-white'
-                    : 'border-black/10 bg-muted text-muted-foreground',
+                active ? 'border-primary bg-primary text-white' : 'border-black/10 bg-muted text-muted-foreground'
             )}
         >
             {children}
@@ -132,9 +80,7 @@ export function EmptyState({ title, body }: { title: string; body: string }) {
                 <GraduationCap className="size-7" />
             </div>
             <h2 className="text-lg font-semibold">{title}</h2>
-            <p className="mt-2 text-sm leading-6 text-muted-foreground">
-                {body}
-            </p>
+            <p className="mt-2 text-sm leading-6 text-muted-foreground">{body}</p>
         </div>
     );
 }

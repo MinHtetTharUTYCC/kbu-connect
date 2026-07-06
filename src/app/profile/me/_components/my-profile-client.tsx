@@ -18,35 +18,19 @@ export function MyProfileClient() {
 
     const { mutate: logout } = useLogout();
 
-    const {
-        mutate: toggleDiscoverable,
-        isPending: isToggleDiscoverablePending,
-    } = useToggleDiscoverable();
+    const { mutate: toggleDiscoverable, isPending: isToggleDiscoverablePending } = useToggleDiscoverable();
 
     const [viewerIndex, setViewerIndex] = useState<number | null>(null);
 
     useTopBar({
-        title: profile?.name ?? 'My Profile',
+        title: profile?.name ?? 'My Profile'
     });
 
     if (isLoading || !profile) {
-        return (
-            <EmptyState
-                title="Loading profile"
-                body="Setting up your account..."
-            />
-        );
+        return <EmptyState title="Loading profile" body="Setting up your account..." />;
     }
 
-    const {
-        avatarUrl,
-        name,
-        bio,
-        faculty,
-        birthYear,
-        gallery,
-        isDiscoverable,
-    } = profile;
+    const { avatarUrl, name, bio, faculty, birthYear, gallery, isDiscoverable } = profile;
     const galleryImages = gallery.map((item) => item.imageUrl);
 
     return (
@@ -64,9 +48,7 @@ export function MyProfileClient() {
                 </div>
                 <h1 className="text-xl font-semibold">{name}</h1>
                 <p className="mt-1 max-w-[300px] text-sm leading-6 text-muted-foreground">
-                    {faculty
-                        ? `${formatEnum(faculty as string)} student`
-                        : 'KBU student'}
+                    {faculty ? `${formatEnum(faculty as string)} student` : 'KBU student'}
                     {birthYear ? ` • ${ageFromBirthYear(birthYear)}` : ''}
                     {bio ? ` • ${bio}` : ''}
                 </p>
@@ -87,7 +69,8 @@ export function MyProfileClient() {
                     <div className="grid grid-cols-3 gap-2 p-4">
                         {galleryImages.map((imageUrl, index) => (
                             <button
-                                key={imageUrl}
+                                // biome-ignore lint/suspicious/noArrayIndexKey: <>
+                                key={`${imageUrl}-${index}`}
                                 type="button"
                                 onClick={() => setViewerIndex(index)}
                                 className={
@@ -111,20 +94,14 @@ export function MyProfileClient() {
             )}
 
             {viewerIndex !== null && (
-                <FullScreenImageViewer
-                    images={galleryImages}
-                    initialIndex={viewerIndex}
-                    onClose={() => setViewerIndex(null)}
-                />
+                <FullScreenImageViewer images={galleryImages} initialIndex={viewerIndex} onClose={() => setViewerIndex(null)} />
             )}
 
             <SettingsSection title="Privacy">
                 <div className="border-b border-black/10 px-5 py-4">
                     <div className="flex items-center justify-between">
                         <div className="min-w-0 flex-1">
-                            <span className="text-sm font-medium">
-                                Discoverable
-                            </span>
+                            <span className="text-sm font-medium">Discoverable</span>
                             <p className="mt-0.5 text-xs leading-5 text-muted-foreground">
                                 {isDiscoverable
                                     ? 'Your profile is visible to others on the feed.'
@@ -139,8 +116,8 @@ export function MyProfileClient() {
                             onClick={() =>
                                 toggleDiscoverable({
                                     data: {
-                                        isDiscoverable: !isDiscoverable,
-                                    },
+                                        isDiscoverable: !isDiscoverable
+                                    }
                                 })
                             }
                             className={`relative inline-flex h-6 w-11 shrink-0 cursor-pointer items-center rounded-full transition-colors ${
@@ -149,9 +126,7 @@ export function MyProfileClient() {
                         >
                             <span
                                 className={`inline-block size-4 rounded-full bg-white shadow-sm transition-transform ${
-                                    isDiscoverable
-                                        ? 'translate-x-6'
-                                        : 'translate-x-1'
+                                    isDiscoverable ? 'translate-x-6' : 'translate-x-1'
                                 }`}
                             />
                         </button>
@@ -162,9 +137,7 @@ export function MyProfileClient() {
             <SettingsSection title="Account">
                 <div className="flex items-center justify-between border-b border-black/10 px-5 py-4">
                     <span className="text-sm">Email address</span>
-                    <span className="max-w-[190px] truncate text-sm text-muted-foreground">
-                        {profile?.email ?? 'student@ms.kbu.ac.th'}
-                    </span>
+                    <span className="max-w-[190px] truncate text-sm text-muted-foreground">{profile?.email ?? 'student@ms.kbu.ac.th'}</span>
                 </div>
                 <button
                     type="button"
@@ -182,16 +155,10 @@ export function MyProfileClient() {
                     About KBU Connect
                 </Link>
                 <div className="mt-2 flex gap-3">
-                    <Link
-                        href="/privacy-policy"
-                        className="font-medium text-primary"
-                    >
+                    <Link href="/privacy-policy" className="font-medium text-primary">
                         Privacy Policy
                     </Link>
-                    <Link
-                        href="/terms-and-conditions"
-                        className="font-medium text-primary"
-                    >
+                    <Link href="/terms-and-conditions" className="font-medium text-primary">
                         Terms & Conditions
                     </Link>
                 </div>
@@ -200,18 +167,10 @@ export function MyProfileClient() {
     );
 }
 
-function SettingsSection({
-    title,
-    children,
-}: {
-    title: string;
-    children: React.ReactNode;
-}) {
+function SettingsSection({ title, children }: { title: string; children: React.ReactNode }) {
     return (
         <section className="mb-6">
-            <h2 className="mb-2 px-5 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                {title}
-            </h2>
+            <h2 className="mb-2 px-5 text-xs font-semibold uppercase tracking-wide text-muted-foreground">{title}</h2>
             <div className="border-y border-black/10 bg-white">{children}</div>
         </section>
     );

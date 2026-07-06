@@ -4,16 +4,10 @@ import { useState } from 'react';
 
 export function useChatState() {
     const [showChatDeleteConfirm, setShowChatDeleteConfirm] = useState(false);
-    const [selectedProfileId, setSelectedProfileId] = useState<string | null>(
-        null,
-    );
-    const [editingMessageId, setEditingMessageId] = useState<string | null>(
-        null,
-    );
+    const [selectedProfileId, setSelectedProfileId] = useState<string | null>(null);
+    const [editingMessageId, setEditingMessageId] = useState<string | null>(null);
     const [editingContent, setEditingContent] = useState('');
-    const [deleteMessageTargetId, setDeleteMessageTargetId] = useState<
-        string | null
-    >(null);
+    const [deleteMessageTargetId, setDeleteMessageTargetId] = useState<string | null>(null);
 
     const isEditing = editingMessageId !== null;
 
@@ -39,6 +33,6 @@ export function useChatState() {
         setDeleteMessageTargetId,
         isEditing,
         handleStartEdit,
-        handleCancelEdit,
+        handleCancelEdit
     };
 }

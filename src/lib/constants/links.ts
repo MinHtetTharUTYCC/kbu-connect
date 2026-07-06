@@ -1,28 +1,18 @@
-import {
-    Bell,
-    Heart,
-    Home,
-    type LucideIcon,
-    MessageCircle,
-    Search,
-    User,
-} from 'lucide-react';
-
 export type NavItem = {
     href: string;
     label: string;
-    icon: LucideIcon;
+    icon: 'search' | 'heart' | 'message' | 'bell' | 'user' | 'home';
 };
 
 export const userLinks: NavItem[] = [
-    { href: '/discover', label: 'Discover', icon: Search },
-    { href: '/matches', label: 'Matches', icon: Heart },
-    { href: '/chats', label: 'Chats', icon: MessageCircle },
-    { href: '/notification', label: 'Notifications', icon: Bell },
-    { href: '/profile/me', label: 'Profile', icon: User },
+    { href: '/discover', label: 'Discover', icon: 'search' },
+    { href: '/matches', label: 'Matches', icon: 'heart' },
+    { href: '/chats', label: 'Chats', icon: 'message' },
+    { href: '/notification', label: 'Notifications', icon: 'bell' },
+    { href: '/profile/me', label: 'Profile', icon: 'user' }
 ];
 
 export const adminLinks: NavItem[] = [
-    { href: '/admin', label: 'Dashboard', icon: Home },
-    { href: '/admin/users', label: 'Users', icon: User },
+    { href: '/admin', label: 'Dashboard', icon: 'home' },
+    { href: '/admin/users', label: 'Users', icon: 'user' }
 ];

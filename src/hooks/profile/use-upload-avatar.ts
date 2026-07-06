@@ -6,13 +6,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query';
 import axiosInstanceFn from '@/lib/axios/axios-instance';
 import { handleBackendError } from '@/lib/error/error-util';
 
-const validImageTypes = [
-    'image/jpeg',
-    'image/png',
-    'image/heic',
-    'image/heif',
-    'image/webp',
-];
+const validImageTypes = ['image/jpeg', 'image/png', 'image/heic', 'image/heif', 'image/webp'];
 const maxImageSize = 20 * 1024 * 1024;
 
 export function useUploadAvatar() {
@@ -21,9 +15,7 @@ export function useUploadAvatar() {
     return useMutation({
         mutationFn: async (file: File) => {
             if (!validImageTypes.includes(file.type)) {
-                throw new Error(
-                    'Invalid file type. Only images are supported.',
-                );
+                throw new Error('Invalid file type. Only images are supported.');
             }
 
             if (file.size > maxImageSize) {
@@ -36,14 +28,14 @@ export function useUploadAvatar() {
             return axiosInstanceFn<UploadAvatarResponseDto>({
                 url: '/users/avatar',
                 method: 'POST',
-                data: formData,
+                data: formData
             });
         },
         onSuccess: () => {
             queryClient.invalidateQueries({
-                queryKey: getUsersControllerGetMyProfileQueryKey(),
+                queryKey: getUsersControllerGetMyProfileQueryKey()
             });
         },
-        onError: (error) => handleBackendError(error),
+        onError: (error) => handleBackendError(error)
     });
 }

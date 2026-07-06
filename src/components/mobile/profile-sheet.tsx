@@ -1,16 +1,6 @@
 'use client';
 
-import {
-    Cake,
-    Globe,
-    GraduationCap,
-    Heart,
-    LoaderCircle,
-    type LucideIcon,
-    MessageCircle,
-    UserRound,
-    X,
-} from 'lucide-react';
+import { Cake, Globe, GraduationCap, Heart, LoaderCircle, type LucideIcon, MessageCircle, UserRound, X } from 'lucide-react';
 import Image from 'next/image';
 import { useState } from 'react';
 import { createPortal } from 'react-dom';
@@ -27,7 +17,7 @@ export function ProfileSheet({
     onDislike,
     onShoutout,
     onMessage,
-    from,
+    from
 }: {
     userId: string;
     onClose: () => void;
@@ -40,9 +30,7 @@ export function ProfileSheet({
     const { data: profile, isLoading } = useVisitProfile(userId);
     const [viewerIndex, setViewerIndex] = useState<number | null>(null);
 
-    const galleryImages = (profile?.gallery ?? [])
-        .toSorted((a, b) => a.order - b.order)
-        .map((item) => item.imageUrl);
+    const galleryImages = (profile?.gallery ?? []).toSorted((a, b) => a.order - b.order).map((item) => item.imageUrl);
 
     const age = profile?.birthYear ? ageFromBirthYear(profile.birthYear) : null;
 
@@ -50,25 +38,22 @@ export function ProfileSheet({
         ? [
               profile.gender && {
                   icon: UserRound,
-                  label: formatEnum(profile.gender),
+                  label: formatEnum(profile.gender)
               },
               age && { icon: Cake, label: String(age) },
               profile.faculty && {
                   icon: GraduationCap,
-                  label: formatEnum(profile.faculty),
+                  label: formatEnum(profile.faculty)
               },
               profile.nationality && {
                   icon: Globe,
-                  label: formatEnum(profile.nationality),
-              },
+                  label: formatEnum(profile.nationality)
+              }
           ].filter((item): item is ProfileMetaItem => Boolean(item))
         : [];
 
     return (
-        <Drawer
-            open={!!userId}
-            onOpenChange={(open) => !open && viewerIndex === null && onClose()}
-        >
+        <Drawer open={!!userId} onOpenChange={(open) => !open && viewerIndex === null && onClose()}>
             <DrawerContent className="mx-auto max-h-[85vh] w-full max-w-[430px] flex-col overflow-hidden rounded-t-2xl bg-white shadow-xl">
                 {/* No Header Here*/}
 
@@ -79,9 +64,7 @@ export function ProfileSheet({
                             <LoaderCircle className="size-6 animate-spin text-primary" />
                         </div>
                     ) : !profile ? (
-                        <p className="py-16 text-center text-sm text-muted-foreground">
-                            Profile unavailable.
-                        </p>
+                        <p className="py-16 text-center text-sm text-muted-foreground">Profile unavailable.</p>
                     ) : (
                         <>
                             <section className="bg-white px-5 pb-5 pt-5">
@@ -104,9 +87,7 @@ export function ProfileSheet({
                                     )}
                                     <div className="min-w-0 flex-1">
                                         <div className="flex items-center gap-2">
-                                            <h1 className="truncate text-xl font-bold">
-                                                {profile.name}
-                                            </h1>
+                                            <h1 className="truncate text-xl font-bold">{profile.name}</h1>
                                             {profile.isMatched && (
                                                 <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-xs font-semibold text-primary">
                                                     <Heart className="size-3 fill-primary" />
@@ -117,79 +98,58 @@ export function ProfileSheet({
                                         {metadataItems.length > 0 ? (
                                             <div className="mt-2 flex flex-wrap gap-1.5">
                                                 {metadataItems.map((item) => (
-                                                    <ProfileMetaChip
-                                                        key={item.label}
-                                                        item={item}
-                                                    />
+                                                    <ProfileMetaChip key={item.label} item={item} />
                                                 ))}
                                             </div>
                                         ) : (
-                                            <p className="mt-1 text-sm text-muted-foreground">
-                                                KBU student
-                                            </p>
+                                            <p className="mt-1 text-sm text-muted-foreground">KBU student</p>
                                         )}
                                     </div>
                                 </div>
 
-                                {profile.bio && (
-                                    <p className="mt-4 text-sm leading-6 text-foreground">
-                                        {profile.bio}
-                                    </p>
-                                )}
+                                {profile.bio && <p className="mt-4 text-sm leading-6 text-foreground">{profile.bio}</p>}
                             </section>
 
                             {galleryImages.length > 0 && (
                                 <section className="bg-white px-5 py-4">
-                                    <h3 className="mb-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                                        Photos
-                                    </h3>
+                                    <h3 className="mb-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Photos</h3>
                                     <div className="grid grid-cols-3 gap-2">
-                                        {galleryImages.map(
-                                            (imageUrl, index) => (
-                                                <button
-                                                    key={`${imageUrl}-${index}`}
-                                                    type="button"
-                                                    onClick={() =>
-                                                        setViewerIndex(index)
-                                                    }
-                                                    className={
-                                                        index === 0
-                                                            ? 'relative col-span-2 aspect-square overflow-hidden rounded-lg bg-muted'
-                                                            : 'relative aspect-square overflow-hidden rounded-lg bg-muted'
-                                                    }
-                                                >
-                                                    <Image
-                                                        src={imageUrl}
-                                                        alt={`Photo ${index + 1}`}
-                                                        fill
-                                                        sizes="(max-width: 430px) 33vw, 140px"
-                                                        unoptimized
-                                                        className="object-cover"
-                                                    />
-                                                </button>
-                                            ),
-                                        )}
+                                        {galleryImages.map((imageUrl, index) => (
+                                            <button
+                                                // biome-ignore lint/suspicious/noArrayIndexKey: <>
+                                                key={`${imageUrl}-${index}`}
+                                                type="button"
+                                                onClick={() => setViewerIndex(index)}
+                                                className={
+                                                    index === 0
+                                                        ? 'relative col-span-2 aspect-square overflow-hidden rounded-lg bg-muted'
+                                                        : 'relative aspect-square overflow-hidden rounded-lg bg-muted'
+                                                }
+                                            >
+                                                <Image
+                                                    src={imageUrl}
+                                                    alt={`Photo ${index + 1}`}
+                                                    fill
+                                                    sizes="(max-width: 430px) 33vw, 140px"
+                                                    unoptimized
+                                                    className="object-cover"
+                                                />
+                                            </button>
+                                        ))}
                                     </div>
                                 </section>
                             )}
 
-                            {profile.interests &&
-                                profile.interests.length > 0 && (
-                                    <section className="bg-white px-5 py-4">
-                                        <h3 className="mb-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                                            Interests
-                                        </h3>
-                                        <div className="flex flex-wrap gap-2">
-                                            {profile.interests.map(
-                                                (interest) => (
-                                                    <Chip key={interest}>
-                                                        {formatEnum(interest)}
-                                                    </Chip>
-                                                ),
-                                            )}
-                                        </div>
-                                    </section>
-                                )}
+                            {profile.interests && profile.interests.length > 0 && (
+                                <section className="bg-white px-5 py-4">
+                                    <h3 className="mb-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Interests</h3>
+                                    <div className="flex flex-wrap gap-2">
+                                        {profile.interests.map((interest) => (
+                                            <Chip key={interest}>{formatEnum(interest)}</Chip>
+                                        ))}
+                                    </div>
+                                </section>
+                            )}
                         </>
                     )}
                 </div>
@@ -269,12 +229,8 @@ export function ProfileSheet({
             {viewerIndex !== null &&
                 galleryImages.length > 0 &&
                 createPortal(
-                    <FullScreenImageViewer
-                        images={galleryImages}
-                        initialIndex={viewerIndex}
-                        onClose={() => setViewerIndex(null)}
-                    />,
-                    document.body,
+                    <FullScreenImageViewer images={galleryImages} initialIndex={viewerIndex} onClose={() => setViewerIndex(null)} />,
+                    document.body
                 )}
         </Drawer>
     );

@@ -13,7 +13,7 @@ export function useLogout() {
             onSuccess: () => {
                 logout();
                 router.replace('/login');
-            },
-        },
+            }
+        }
     });
 }

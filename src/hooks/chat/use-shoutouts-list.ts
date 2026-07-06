@@ -5,23 +5,19 @@ import type {
     ChatControllerGetShoutoutsParams,
     ChatControllerGetShoutoutsType,
     ShoutoutItemDto,
-    ShoutoutsListResponseDto,
+    ShoutoutsListResponseDto
 } from '@services/model';
 import type { InfiniteData } from '@tanstack/react-query';
 
 export type ShoutoutType = ChatControllerGetShoutoutsType;
 export type ShoutoutItem = ShoutoutItemDto;
 
-export function useShoutoutsList(
-    params: ChatControllerGetShoutoutsParams = {},
-) {
-    const query = useChatControllerGetShoutoutsInfinite<
-        InfiniteData<ShoutoutsListResponseDto, string | undefined>
-    >(params, {
+export function useShoutoutsList(params: ChatControllerGetShoutoutsParams = {}) {
+    const query = useChatControllerGetShoutoutsInfinite<InfiniteData<ShoutoutsListResponseDto, string | undefined>>(params, {
         query: {
             initialPageParam: undefined,
-            getNextPageParam: (lastPage) => lastPage.nextCursor,
-        },
+            getNextPageParam: (lastPage) => lastPage.nextCursor
+        }
     });
 
     const shoutouts = query.data?.pages.flatMap((page) => page.shoutouts) ?? [];

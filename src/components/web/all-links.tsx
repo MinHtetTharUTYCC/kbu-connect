@@ -4,40 +4,40 @@ import { Button } from '../ui/button';
 const links: Array<{ href: string; label: string }> = [
     {
         href: '/login',
-        label: 'Login',
+        label: 'Login'
     },
     {
         href: '/profile/me',
-        label: 'My Profile',
+        label: 'My Profile'
     },
     {
         href: '/chats/123',
-        label: 'Chat Id Page',
+        label: 'Chat Id Page'
     },
     {
         href: '/chats',
-        label: 'Chat Page',
+        label: 'Chat Page'
     },
     {
         href: '/discover',
-        label: 'Discover Page',
+        label: 'Discover Page'
     },
     {
         href: '/profile-setup',
-        label: 'Profile Setup Page',
+        label: 'Profile Setup Page'
     },
     {
         href: '/matches',
-        label: 'Matches Page',
+        label: 'Matches Page'
     },
     {
         href: '/notification',
-        label: 'Notification Page',
+        label: 'Notification Page'
     },
     {
         href: '/demo',
-        label: 'Demo Page',
-    },
+        label: 'Demo Page'
+    }
 ];
 
 export default function AllLinks() {

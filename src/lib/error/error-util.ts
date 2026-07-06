@@ -16,26 +16,16 @@ type BackendErrorLike = {
     };
 };
 
-export const getBackendErrorMessage = (
-    err: unknown,
-    fallback = 'An unexpected error occurred',
-): string => {
-    const error =
-        typeof err === 'object' && err !== null
-            ? (err as BackendErrorLike)
-            : undefined;
+export const getBackendErrorMessage = (err: unknown, fallback = 'An unexpected error occurred'): string => {
+    const error = typeof err === 'object' && err !== null ? (err as BackendErrorLike) : undefined;
 
     if (!error) {
         return fallback;
     }
 
     const code = typeof error.code === 'string' ? error.code : undefined;
-    const status =
-        typeof error.response?.status === 'number'
-            ? error.response.status
-            : undefined;
-    const rawErrorMessage =
-        typeof error.message === 'string' ? error.message.toLowerCase() : '';
+    const status = typeof error.response?.status === 'number' ? error.response.status : undefined;
+    const rawErrorMessage = typeof error.message === 'string' ? error.message.toLowerCase() : '';
 
     if (
         code === 'ECONNREFUSED' ||
@@ -63,11 +53,7 @@ export const getBackendErrorMessage = (
         const firstError = rawMessage[0];
 
         // class-validator format
-        if (
-            firstError &&
-            typeof firstError === 'object' &&
-            firstError.constraints
-        ) {
+        if (firstError && typeof firstError === 'object' && firstError.constraints) {
             const firstConstraint = Object.values(firstError.constraints)[0];
 
             if (typeof firstConstraint === 'string') {
@@ -89,10 +75,7 @@ export const getBackendErrorMessage = (
     return fallback;
 };
 
-export const handleBackendError = (
-    err: unknown,
-    fallback = 'An unexpected error occurred',
-) => {
+export const handleBackendError = (err: unknown, fallback = 'An unexpected error occurred') => {
     const displayMessage = getBackendErrorMessage(err, fallback);
 
     toast.error(displayMessage);

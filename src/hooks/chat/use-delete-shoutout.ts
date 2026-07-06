@@ -1,9 +1,6 @@
 'use client';
 
-import {
-    getChatControllerGetShoutoutsInfiniteQueryKey,
-    useChatControllerDeleteShoutout,
-} from '@services/generated/chat/chat';
+import { getChatControllerGetShoutoutsInfiniteQueryKey, useChatControllerDeleteShoutout } from '@services/generated/chat/chat';
 import type { ShoutoutsListResponseDto } from '@services/model';
 import type { InfiniteData } from '@tanstack/react-query';
 import { useQueryClient } from '@tanstack/react-query';
@@ -18,32 +15,22 @@ export function useDeleteShoutout(onSuccess: () => void) {
             onError: (error) => handleBackendError(error),
             onSuccess: (_data, variables) => {
                 const { shoutoutId } = variables;
-                const queryKey =
-                    getChatControllerGetShoutoutsInfiniteQueryKey();
+                const queryKey = getChatControllerGetShoutoutsInfiniteQueryKey();
 
-                const previousData =
-                    queryClient.getQueryData<
-                        InfiniteData<ShoutoutsListResponseDto>
-                    >(queryKey);
+                const previousData = queryClient.getQueryData<InfiniteData<ShoutoutsListResponseDto>>(queryKey);
 
-                queryClient.setQueryData<
-                    InfiniteData<ShoutoutsListResponseDto>
-                >(queryKey, (old) => {
+                queryClient.setQueryData<InfiniteData<ShoutoutsListResponseDto>>(queryKey, (old) => {
                     if (!old) return old;
                     return {
                         ...old,
                         pages: old.pages.map((page) => ({
                             ...page,
-                            shoutouts: page.shoutouts.filter(
-                                (s) => s.id !== shoutoutId,
-                            ),
-                        })),
+                            shoutouts: page.shoutouts.filter((s) => s.id !== shoutoutId)
+                        }))
                     };
                 });
 
-                const wasFound = previousData?.pages.some((p) =>
-                    p.shoutouts.some((s) => s.id === shoutoutId),
-                );
+                const wasFound = previousData?.pages.some((p) => p.shoutouts.some((s) => s.id === shoutoutId));
 
                 if (!wasFound) {
                     queryClient.invalidateQueries({ queryKey });
@@ -51,7 +38,7 @@ export function useDeleteShoutout(onSuccess: () => void) {
 
                 toast.success('Shoutout deleted');
                 onSuccess();
-            },
-        },
+            }
+        }
     });
 }

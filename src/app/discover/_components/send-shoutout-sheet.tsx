@@ -1,14 +1,7 @@
 'use client';
 
-import { X } from 'lucide-react';
 import type { SubmitEvent } from 'react';
-import {
-    Drawer,
-    DrawerContent,
-    DrawerHeader,
-    DrawerTitle,
-    DrawerClose,
-} from '@/components/ui/drawer';
+import { Drawer, DrawerContent, DrawerHeader, DrawerTitle } from '@/components/ui/drawer';
 
 export function SendShoutoutSheet({
     name,
@@ -16,7 +9,7 @@ export function SendShoutoutSheet({
     isSending,
     onChange,
     onClose,
-    onSubmit,
+    onSubmit
 }: {
     name: string;
     message: string;
@@ -30,18 +23,11 @@ export function SendShoutoutSheet({
     return (
         <Drawer open={isOpen} onOpenChange={(open) => !open && onClose()}>
             <DrawerContent className="mx-auto w-full max-w-[398px]">
-                <form
-                    onSubmit={onSubmit}
-                    className="rounded-t-2xl bg-white p-5 shadow-xl flex flex-col"
-                >
+                <form onSubmit={onSubmit} className="rounded-t-2xl bg-white p-5 shadow-xl flex flex-col">
                     <DrawerHeader className="mb-4 flex items-start justify-between gap-4 p-0">
                         <DrawerTitle className="text-left">
-                            <span className="block text-xs font-medium text-primary tracking-widest mb-0.5">
-                                Write to
-                            </span>
-                            <span className="block text-lg font-semibold text-foreground">
-                                {name}
-                            </span>
+                            <span className="block text-xs font-medium text-primary tracking-widest mb-0.5">Write to</span>
+                            <span className="block text-lg font-semibold text-foreground">{name}</span>
                         </DrawerTitle>
                     </DrawerHeader>
 

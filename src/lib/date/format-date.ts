@@ -1,12 +1,4 @@
-import {
-    format,
-    formatDistanceToNow,
-    isThisMonth,
-    isThisWeek,
-    isThisYear,
-    isToday,
-    isYesterday,
-} from 'date-fns';
+import { format, formatDistanceToNow, isThisMonth, isThisWeek, isThisYear, isToday, isYesterday } from 'date-fns';
 
 export function getFormattedDate(dateStr: string): string {
     const date = new Date(dateStr);

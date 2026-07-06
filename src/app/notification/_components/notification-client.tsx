@@ -1,9 +1,6 @@
 'use client';
 
-import {
-    type NotificationItemDto,
-    NotificationItemDtoType,
-} from '@services/model';
+import { type NotificationItemDto, NotificationItemDtoType } from '@services/model';
 import { Bell, Heart, Megaphone, MessageCircle } from 'lucide-react';
 import { useEffect, useRef } from 'react';
 import { LoadMoreRow } from '@/components/load-more-row';
@@ -14,13 +11,7 @@ import { useNotificationsList } from '@/hooks/notifications/use-notifications-li
 import { getFormattedDate } from '@/lib/date/format-date';
 
 export function NotificationClient() {
-    const {
-        notifications,
-        isLoading,
-        fetchNextPage,
-        hasNextPage,
-        isFetchingNextPage,
-    } = useNotificationsList({});
+    const { notifications, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } = useNotificationsList({});
     const markAllRead = useMarkAllNotificationsRead();
     const loadMoreRef = useRef<HTMLDivElement | null>(null);
     const hasUnread = notifications.some((item) => !item.isRead);
@@ -33,13 +24,9 @@ export function NotificationClient() {
                 disabled={!hasUnread || markAllRead.isPending}
                 onClick={() => markAllRead.mutate()}
             >
-                {markAllRead.isPending
-                    ? 'Marking...'
-                    : hasUnread
-                      ? 'Mark all as read'
-                      : 'All read'}
+                {markAllRead.isPending ? 'Marking...' : hasUnread ? 'Mark all as read' : 'All read'}
             </button>
-        ),
+        )
     });
 
     useEffect(() => {
@@ -52,7 +39,7 @@ export function NotificationClient() {
                     fetchNextPage();
                 }
             },
-            { rootMargin: '160px 0px' },
+            { rootMargin: '160px 0px' }
         );
 
         observer.observe(target);
@@ -62,66 +49,35 @@ export function NotificationClient() {
     return (
         <main className="flex-1 overflow-y-auto bg-background pb-8">
             {isLoading ? (
-                <EmptyState
-                    title="Loading notifications"
-                    body="Checking for new activity."
-                />
+                <EmptyState title="Loading notifications" body="Checking for new activity." />
             ) : notifications.length ? (
                 <Section title="Latest">
                     {notifications.map((item, index) => (
-                        <NotificationRow
-                            key={`${item.id}-${index}`}
-                            notification={item}
-                        />
+                        <NotificationRow key={`${item.id}-${index}`} notification={item} />
                     ))}
-                    <LoadMoreRow
-                        ref={loadMoreRef}
-                        hasNextPage={hasNextPage}
-                        isFetchingNextPage={isFetchingNextPage}
-                    />
+                    <LoadMoreRow ref={loadMoreRef} hasNextPage={hasNextPage} isFetchingNextPage={isFetchingNextPage} />
                 </Section>
             ) : (
-                <EmptyState
-                    title="No notifications"
-                    body="You are all caught up. New matches, messages, and updates will show here."
-                />
+                <EmptyState title="No notifications" body="You are all caught up. New matches, messages, and updates will show here." />
             )}
         </main>
     );
 }
 
-function Section({
-    title,
-    children,
-}: {
-    title: string;
-    children: React.ReactNode;
-}) {
+function Section({ title, children }: { title: string; children: React.ReactNode }) {
     return (
         <section className="mb-6">
-            <h2 className="mb-2 px-5 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                {title}
-            </h2>
+            <h2 className="mb-2 px-5 text-xs font-semibold uppercase tracking-wide text-muted-foreground">{title}</h2>
             {children}
         </section>
     );
 }
 
-function NotificationRow({
-    notification,
-}: {
-    notification: NotificationItemDto;
-}) {
+function NotificationRow({ notification }: { notification: NotificationItemDto }) {
     const Icon = getNotificationIcon(notification.type);
 
     return (
-        <div
-            className={
-                notification.isRead
-                    ? 'border-b border-black/10 bg-white'
-                    : 'border-b border-black/10 bg-primary/10'
-            }
-        >
+        <div className={notification.isRead ? 'border-b border-black/10 bg-white' : 'border-b border-black/10 bg-primary/10'}>
             <div className="flex gap-4 px-5 py-4">
                 <div className="grid size-10 shrink-0 place-items-center rounded-full bg-primary/20 text-primary">
                     <Icon className="size-5" />
@@ -129,15 +85,9 @@ function NotificationRow({
                 <div className="min-w-0 flex-1">
                     <div className="mb-0.5 flex items-start justify-between gap-3">
                         <h3 className="font-semibold">{notification.title}</h3>
-                        <span className="shrink-0 text-xs text-muted-foreground">
-                            {getFormattedDate(notification.createdAt)}
-                        </span>
+                        <span className="shrink-0 text-xs text-muted-foreground">{getFormattedDate(notification.createdAt)}</span>
                     </div>
-                    {notification.body && (
-                        <p className="text-sm leading-6 text-foreground">
-                            {notification.body}
-                        </p>
-                    )}
+                    {notification.body && <p className="text-sm leading-6 text-foreground">{notification.body}</p>}
                 </div>
             </div>
         </div>
@@ -147,10 +97,7 @@ function NotificationRow({
 function getNotificationIcon(type: NotificationItemDto['type']) {
     if (type === NotificationItemDtoType.NEW_MATCH) return Heart;
     if (type === NotificationItemDtoType.NEW_MESSAGE) return MessageCircle;
-    if (
-        type === NotificationItemDtoType.SHOUTOUT_RECEIVED ||
-        type === NotificationItemDtoType.SHOUTOUT_REPLIED
-    ) {
+    if (type === NotificationItemDtoType.SHOUTOUT_RECEIVED || type === NotificationItemDtoType.SHOUTOUT_REPLIED) {
         return Megaphone;
     }
     return Bell;

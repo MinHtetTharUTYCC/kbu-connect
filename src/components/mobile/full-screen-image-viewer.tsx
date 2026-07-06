@@ -7,7 +7,7 @@ import { useCallback, useEffect, useRef, useState } from 'react';
 export function FullScreenImageViewer({
     images,
     initialIndex = 0,
-    onClose,
+    onClose
 }: {
     images: string[];
     initialIndex?: number;
@@ -21,17 +21,11 @@ export function FullScreenImageViewer({
         (index: number) => {
             setCurrentIndex(Math.max(0, Math.min(index, images.length - 1)));
         },
-        [images.length],
+        [images.length]
     );
 
-    const goPrev = useCallback(
-        () => goTo(currentIndex - 1),
-        [currentIndex, goTo],
-    );
-    const goNext = useCallback(
-        () => goTo(currentIndex + 1),
-        [currentIndex, goTo],
-    );
+    const goPrev = useCallback(() => goTo(currentIndex - 1), [currentIndex, goTo]);
+    const goNext = useCallback(() => goTo(currentIndex + 1), [currentIndex, goTo]);
 
     useEffect(() => {
         function handleKey(e: KeyboardEvent) {
@@ -66,7 +60,7 @@ export function FullScreenImageViewer({
             onClick={(e) => e.stopPropagation()}
             onPointerDown={(e) => e.stopPropagation()}
             onKeyDown={(e) => e.stopPropagation()}
-            role="presentation"
+            role="dialog"
         >
             <div className="flex shrink-0 items-center justify-between px-4 py-3">
                 <span className="text-sm font-medium text-white">
@@ -122,14 +116,11 @@ export function FullScreenImageViewer({
                 <div className="flex shrink-0 justify-center gap-1.5 px-4 pb-4 pt-2">
                     {images.map((img, index) => (
                         <button
-                            key={img}
+                            // biome-ignore lint/suspicious/noArrayIndexKey: <>
+                            key={`${img}-${index}`}
                             type="button"
                             onClick={() => goTo(index)}
-                            className={`size-2 rounded-full transition-colors ${
-                                index === currentIndex
-                                    ? 'bg-white'
-                                    : 'bg-white/40'
-                            }`}
+                            className={`size-2 rounded-full transition-colors ${index === currentIndex ? 'bg-white' : 'bg-white/40'}`}
                             aria-label={`Go to image ${index + 1}`}
                         />
                     ))}

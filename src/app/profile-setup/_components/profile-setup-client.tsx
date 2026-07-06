@@ -6,17 +6,14 @@ import {
     UpdateProfileDtoGender,
     UpdateProfileDtoInterestsItem,
     UpdateProfileDtoNationality,
-    UpdateProfileDtoPreferredGender,
+    UpdateProfileDtoPreferredGender
 } from '@services/model';
 import { ArrowLeft, ArrowRight, Check, X } from 'lucide-react';
 import { useMemo, useState } from 'react';
 import { useAuthContext } from '@/components/auth-provider';
 import { Chip, EmptyState } from '@/components/mobile/app-chrome';
 import { FullScreenImageViewer } from '@/components/mobile/full-screen-image-viewer';
-import {
-    AvatarUploadStep,
-    GalleryUploadStep,
-} from '@/components/mobile/profile-media-upload';
+import { AvatarUploadStep, GalleryUploadStep } from '@/components/mobile/profile-media-upload';
 import { useTopBar } from '@/components/mobile/top-bar-provider';
 import { Button } from '@/components/ui/button';
 import { useUpdateMyProfile } from '@/hooks/profile/use-update-my-profile';
@@ -25,33 +22,27 @@ const faculties = Object.values(UpdateProfileDtoFaculty);
 const interests = Object.values(UpdateProfileDtoInterestsItem);
 const nationalities = Object.values(UpdateProfileDtoNationality);
 
-type SetupStep =
-    | 'basic'
-    | 'academic'
-    | 'preferences'
-    | 'avatar'
-    | 'gallery'
-    | 'review';
+type SetupStep = 'basic' | 'academic' | 'preferences' | 'avatar' | 'gallery' | 'review';
 
 const steps: Array<{ id: SetupStep; eyebrow: string; title: string }> = [
     { id: 'basic', eyebrow: 'Step 1 of 6', title: 'Start with the essentials' },
     {
         id: 'academic',
         eyebrow: 'Step 2 of 6',
-        title: 'Tell us about your campus life',
+        title: 'Tell us about your campus life'
     },
     {
         id: 'preferences',
         eyebrow: 'Step 3 of 6',
-        title: 'Set your matching preferences',
+        title: 'Set your matching preferences'
     },
     { id: 'avatar', eyebrow: 'Step 4 of 6', title: 'Add your avatar' },
     { id: 'gallery', eyebrow: 'Step 5 of 6', title: 'Add your gallery' },
     {
         id: 'review',
         eyebrow: 'Step 6 of 6',
-        title: 'Review your profile setup',
-    },
+        title: 'Review your profile setup'
+    }
 ];
 
 export function ProfileSetupClient() {
@@ -60,84 +51,34 @@ export function ProfileSetupClient() {
 
     const isEditMode = Boolean(user?.isComplete);
 
-    const { mutate: updateProfile, isPending: isProfileUpdating } =
-        useUpdateMyProfile(isEditMode ? '/profile/me' : '/discover');
+    const { mutate: updateProfile, isPending: isProfileUpdating } = useUpdateMyProfile(isEditMode ? '/profile/me' : '/discover');
 
     const [stepIndex, setStepIndex] = useState(0);
     const [name, setName] = useState(current?.name ?? '');
     const [bio, setBio] = useState(current?.bio ?? '');
-    const [birthYear, setBirthYear] = useState(
-        current?.birthYear ? Number(current.birthYear) : 2003,
-    );
+    const [birthYear, setBirthYear] = useState(current?.birthYear ? Number(current.birthYear) : 2003);
     const [avatarUrl, setAvatarUrl] = useState(current?.avatarUrl ?? '');
     const [gallery, setGallery] = useState<NewGalleryImageDto[]>(() =>
         (current?.gallery ?? []).map((item, index) => ({
             key: item.id,
             imageUrl: item.imageUrl,
-            order: item.order ?? index,
-        })),
+            order: item.order ?? index
+        }))
     );
     const [viewerIndex, setViewerIndex] = useState<number | null>(null);
-    const [faculty, setFaculty] = useState<UpdateProfileDtoFaculty>(
-        current?.faculty ?? UpdateProfileDtoFaculty.CIVIL,
+    const [faculty, setFaculty] = useState<UpdateProfileDtoFaculty>(current?.faculty ?? UpdateProfileDtoFaculty.CIVIL);
+    const [gender, setGender] = useState<UpdateProfileDtoGender>(current?.gender ?? UpdateProfileDtoGender.OTHER);
+    const [preferredGender, setPreferredGender] = useState<UpdateProfileDtoPreferredGender>(
+        current?.preferredGender ?? UpdateProfileDtoPreferredGender.ALL
     );
-    const [gender, setGender] = useState<UpdateProfileDtoGender>(
-        current?.gender ?? UpdateProfileDtoGender.OTHER,
-    );
-    const [preferredGender, setPreferredGender] =
-        useState<UpdateProfileDtoPreferredGender>(
-            current?.preferredGender ?? UpdateProfileDtoPreferredGender.ALL,
-        );
-    const [nationality, setNationality] = useState<UpdateProfileDtoNationality>(
-        current?.nationality ?? UpdateProfileDtoNationality.THAI,
-    );
-    const [minPreferredAge, setMinPreferredAge] = useState(
-        current?.minPreferredAge ?? 17,
-    );
-    const [maxPreferredAge, setMaxPreferredAge] = useState(
-        current?.maxPreferredAge ?? 28,
-    );
-    const [selectedInterests, setSelectedInterests] = useState<
-        UpdateProfileDtoInterestsItem[]
-    >(() =>
+    const [nationality, setNationality] = useState<UpdateProfileDtoNationality>(current?.nationality ?? UpdateProfileDtoNationality.THAI);
+    const [minPreferredAge, setMinPreferredAge] = useState(current?.minPreferredAge ?? 17);
+    const [maxPreferredAge, setMaxPreferredAge] = useState(current?.maxPreferredAge ?? 28);
+    const [selectedInterests, setSelectedInterests] = useState<UpdateProfileDtoInterestsItem[]>(() =>
         current?.interests?.length
             ? (current.interests as UpdateProfileDtoInterestsItem[])
-            : [
-                  UpdateProfileDtoInterestsItem.MUSIC,
-                  UpdateProfileDtoInterestsItem.SPORTS,
-              ],
+            : [UpdateProfileDtoInterestsItem.MUSIC, UpdateProfileDtoInterestsItem.SPORTS]
     );
-
-    if (isLoading || !current) {
-        return (
-            <EmptyState
-                title="Loading profile"
-                body="Setting up your account."
-            />
-        );
-    }
-
-    const activeStep = steps[stepIndex];
-    const isLastStep = stepIndex === steps.length - 1;
-    const canGoNext = useMemo(() => {
-        if (activeStep.id === 'basic')
-            return Boolean(name.trim()) && birthYear >= 1900;
-        if (activeStep.id === 'academic') return selectedInterests.length > 0;
-        if (activeStep.id === 'preferences')
-            return minPreferredAge <= maxPreferredAge;
-        if (activeStep.id === 'avatar') return Boolean(avatarUrl);
-        if (activeStep.id === 'gallery') return gallery.length > 0;
-        return true;
-    }, [
-        activeStep.id,
-        avatarUrl,
-        birthYear,
-        gallery.length,
-        maxPreferredAge,
-        minPreferredAge,
-        name,
-        selectedInterests.length,
-    ]);
 
     useTopBar({
         title: isEditMode ? 'Edit Profile' : 'UniMatch',
@@ -151,15 +92,26 @@ export function ProfileSetupClient() {
             </a>
         ) : (
             <div className="w-10" />
-        ),
+        )
     });
 
+    const activeStep = steps[stepIndex];
+    const isLastStep = stepIndex === steps.length - 1;
+    const canGoNext = useMemo(() => {
+        if (activeStep.id === 'basic') return Boolean(name.trim()) && birthYear >= 1900;
+        if (activeStep.id === 'academic') return selectedInterests.length > 0;
+        if (activeStep.id === 'preferences') return minPreferredAge <= maxPreferredAge;
+        if (activeStep.id === 'avatar') return Boolean(avatarUrl);
+        if (activeStep.id === 'gallery') return gallery.length > 0;
+        return true;
+    }, [activeStep.id, avatarUrl, birthYear, gallery.length, maxPreferredAge, minPreferredAge, name, selectedInterests.length]);
+
+    if (isLoading || !current) {
+        return <EmptyState title="Loading profile" body="Setting up your account." />;
+    }
+
     function toggleInterest(value: UpdateProfileDtoInterestsItem) {
-        setSelectedInterests((items) =>
-            items.includes(value)
-                ? items.filter((item) => item !== value)
-                : [...items, value],
-        );
+        setSelectedInterests((items) => (items.includes(value) ? items.filter((item) => item !== value) : [...items, value]));
     }
 
     function handleNext() {
@@ -175,11 +127,9 @@ export function ProfileSetupClient() {
         if (!canGoNext) return;
         updateProfile({
             data: {
-                name: name.trim() || current!.name || 'KBU Student',
+                name: name.trim() || current?.name || 'KBU Student',
                 avatarUrl,
-                bio:
-                    bio.trim() ||
-                    'KBU student looking to meet people on campus.',
+                bio: bio.trim() || 'KBU student looking to meet people on campus.',
                 faculty,
                 interests: selectedInterests,
                 gender,
@@ -190,8 +140,8 @@ export function ProfileSetupClient() {
                 nationality,
                 preferredFaculties: [faculty],
                 preferredNationalities: [nationality],
-                gallery: gallery.map((item, order) => ({ ...item, order })),
-            },
+                gallery: gallery.map((item, order) => ({ ...item, order }))
+            }
         });
     }
 
@@ -201,18 +151,14 @@ export function ProfileSetupClient() {
                 <div
                     className="h-full bg-primary transition-all"
                     style={{
-                        width: `${((stepIndex + 1) / steps.length) * 100}%`,
+                        width: `${((stepIndex + 1) / steps.length) * 100}%`
                     }}
                 />
             </div>
             <main className="flex flex-1 flex-col overflow-y-auto px-5 pb-28 pt-8">
                 <section className="mb-8">
-                    <p className="mb-1 text-xs font-semibold text-primary">
-                        {activeStep.eyebrow}
-                    </p>
-                    <h1 className="text-xl font-medium leading-7">
-                        {activeStep.title}
-                    </h1>
+                    <p className="mb-1 text-xs font-semibold text-primary">{activeStep.eyebrow}</p>
+                    <h1 className="text-xl font-medium leading-7">{activeStep.title}</h1>
                 </section>
 
                 {activeStep.id === 'basic' && (
@@ -221,9 +167,7 @@ export function ProfileSetupClient() {
                             <input
                                 id="name"
                                 value={name}
-                                onChange={(event) =>
-                                    setName(event.target.value)
-                                }
+                                onChange={(event) => setName(event.target.value)}
                                 placeholder="Your name"
                                 className="h-11 w-full rounded-xl border border-black/10 bg-muted px-4 outline-none focus:border-primary"
                             />
@@ -232,9 +176,7 @@ export function ProfileSetupClient() {
                             <input
                                 id="birthYear"
                                 value={birthYear}
-                                onChange={(event) =>
-                                    setBirthYear(Number(event.target.value))
-                                }
+                                onChange={(event) => setBirthYear(Number(event.target.value))}
                                 type="number"
                                 min={1900}
                                 max={new Date().getFullYear()}
@@ -256,9 +198,7 @@ export function ProfileSetupClient() {
                 {activeStep.id === 'academic' && (
                     <section className="grid gap-8">
                         <div>
-                            <div className="mb-4 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                                Select faculty
-                            </div>
+                            <div className="mb-4 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Select faculty</div>
                             <div className="grid grid-cols-3 gap-2">
                                 {faculties.map((item) => (
                                     <button
@@ -277,23 +217,11 @@ export function ProfileSetupClient() {
                             </div>
                         </div>
                         <div>
-                            <div className="mb-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                                Interests
-                            </div>
+                            <div className="mb-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Interests</div>
                             <div className="flex flex-wrap gap-2">
                                 {interests.map((interest) => (
-                                    <button
-                                        type="button"
-                                        key={interest}
-                                        onClick={() => toggleInterest(interest)}
-                                    >
-                                        <Chip
-                                            active={selectedInterests.includes(
-                                                interest,
-                                            )}
-                                        >
-                                            {interest}
-                                        </Chip>
+                                    <button type="button" key={interest} onClick={() => toggleInterest(interest)}>
+                                        <Chip active={selectedInterests.includes(interest)}>{interest}</Chip>
                                     </button>
                                 ))}
                             </div>
@@ -306,72 +234,44 @@ export function ProfileSetupClient() {
                         <Select
                             label="Your identity"
                             value={gender}
-                            onChange={(value) =>
-                                setGender(value as UpdateProfileDtoGender)
-                            }
+                            onChange={(value) => setGender(value as UpdateProfileDtoGender)}
                             options={Object.values(UpdateProfileDtoGender)}
                         />
                         <Select
                             label="Interested in"
                             value={preferredGender}
-                            onChange={(value) =>
-                                setPreferredGender(
-                                    value as UpdateProfileDtoPreferredGender,
-                                )
-                            }
-                            options={Object.values(
-                                UpdateProfileDtoPreferredGender,
-                            )}
+                            onChange={(value) => setPreferredGender(value as UpdateProfileDtoPreferredGender)}
+                            options={Object.values(UpdateProfileDtoPreferredGender)}
                         />
                         <Select
                             label="Nationality"
                             value={nationality}
-                            onChange={(value) =>
-                                setNationality(
-                                    value as UpdateProfileDtoNationality,
-                                )
-                            }
+                            onChange={(value) => setNationality(value as UpdateProfileDtoNationality)}
                             options={nationalities}
                         />
                         <div className="grid grid-cols-2 gap-3">
                             <Select
                                 label="Min age"
                                 value={String(minPreferredAge)}
-                                onChange={(value) =>
-                                    setMinPreferredAge(Number(value))
-                                }
-                                options={Array.from({ length: 24 }, (_, i) =>
-                                    String(17 + i),
-                                )}
+                                onChange={(value) => setMinPreferredAge(Number(value))}
+                                options={Array.from({ length: 24 }, (_, i) => String(17 + i))}
                             />
                             <Select
                                 label="Max age"
                                 value={String(maxPreferredAge)}
-                                onChange={(value) =>
-                                    setMaxPreferredAge(Number(value))
-                                }
-                                options={Array.from({ length: 24 }, (_, i) =>
-                                    String(17 + i),
-                                )}
+                                onChange={(value) => setMaxPreferredAge(Number(value))}
+                                options={Array.from({ length: 24 }, (_, i) => String(17 + i))}
                             />
                         </div>
                     </section>
                 )}
 
                 {activeStep.id === 'avatar' && (
-                    <AvatarUploadStep
-                        name={name || 'KBU Student'}
-                        avatarUrl={avatarUrl}
-                        onAvatarChange={setAvatarUrl}
-                    />
+                    <AvatarUploadStep name={name || 'KBU Student'} avatarUrl={avatarUrl} onAvatarChange={setAvatarUrl} />
                 )}
 
                 {activeStep.id === 'gallery' && (
-                    <GalleryUploadStep
-                        gallery={gallery}
-                        onGalleryChange={setGallery}
-                        onImageClick={(index) => setViewerIndex(index)}
-                    />
+                    <GalleryUploadStep gallery={gallery} onGalleryChange={setGallery} onImageClick={(index) => setViewerIndex(index)} />
                 )}
 
                 {activeStep.id === 'review' && (
@@ -379,26 +279,12 @@ export function ProfileSetupClient() {
                         <ReviewRow label="Name" value={name || 'KBU Student'} />
                         <ReviewRow label="Faculty" value={faculty} />
                         <ReviewRow label="Identity" value={gender} />
-                        <ReviewRow
-                            label="Interested in"
-                            value={preferredGender}
-                        />
-                        <ReviewRow
-                            label="Age range"
-                            value={`${minPreferredAge} - ${maxPreferredAge}`}
-                        />
-                        <ReviewRow
-                            label="Avatar"
-                            value={avatarUrl ? 'Uploaded' : 'Missing'}
-                        />
-                        <ReviewRow
-                            label="Gallery"
-                            value={`${gallery.length} photo${gallery.length === 1 ? '' : 's'}`}
-                        />
+                        <ReviewRow label="Interested in" value={preferredGender} />
+                        <ReviewRow label="Age range" value={`${minPreferredAge} - ${maxPreferredAge}`} />
+                        <ReviewRow label="Avatar" value={avatarUrl ? 'Uploaded' : 'Missing'} />
+                        <ReviewRow label="Gallery" value={`${gallery.length} photo${gallery.length === 1 ? '' : 's'}`} />
                         <div className="rounded-xl border border-black/10 bg-muted p-4">
-                            <div className="mb-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                                Interests
-                            </div>
+                            <div className="mb-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Interests</div>
                             <div className="flex flex-wrap gap-2">
                                 {selectedInterests.map((interest) => (
                                     <Chip key={interest} active>
@@ -427,18 +313,8 @@ export function ProfileSetupClient() {
                     onClick={isLastStep ? handleFinish : handleNext}
                     disabled={!canGoNext || isProfileUpdating}
                 >
-                    {isLastStep
-                        ? isProfileUpdating
-                            ? 'Saving...'
-                            : isEditMode
-                              ? 'Save'
-                              : 'Finish'
-                        : 'Next'}
-                    {isLastStep ? (
-                        <Check className="size-5" />
-                    ) : (
-                        <ArrowRight className="size-5" />
-                    )}
+                    {isLastStep ? (isProfileUpdating ? 'Saving...' : isEditMode ? 'Save' : 'Finish') : 'Next'}
+                    {isLastStep ? <Check className="size-5" /> : <ArrowRight className="size-5" />}
                 </Button>
             </footer>
 
@@ -453,21 +329,10 @@ export function ProfileSetupClient() {
     );
 }
 
-function Field({
-    label,
-    htmlFor,
-    children,
-}: {
-    label: string;
-    htmlFor: string;
-    children: React.ReactNode;
-}) {
+function Field({ label, htmlFor, children }: { label: string; htmlFor: string; children: React.ReactNode }) {
     return (
         <div>
-            <label
-                htmlFor={htmlFor}
-                className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground"
-            >
+            <label htmlFor={htmlFor} className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
                 {label}
             </label>
             {children}
@@ -479,7 +344,7 @@ function Select({
     label,
     value,
     options,
-    onChange,
+    onChange
 }: {
     label: string;
     value: string;
@@ -488,9 +353,7 @@ function Select({
 }) {
     return (
         <label>
-            <span className="mb-2 block text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                {label}
-            </span>
+            <span className="mb-2 block text-xs font-semibold uppercase tracking-wide text-muted-foreground">{label}</span>
             <select
                 value={value}
                 onChange={(event) => onChange(event.target.value)}
@@ -509,9 +372,7 @@ function Select({
 function ReviewRow({ label, value }: { label: string; value: string }) {
     return (
         <div className="flex items-center justify-between gap-4 rounded-xl border border-black/10 bg-muted p-4">
-            <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                {label}
-            </span>
+            <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{label}</span>
             <span className="truncate text-sm font-semibold">{value}</span>
         </div>
     );

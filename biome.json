@@ -7,25 +7,20 @@
     },
     "files": {
         "ignoreUnknown": true,
-        "includes": [
-            "**",
-            "!node_modules",
-            "!.next",
-            "!dist",
-            "!build",
-            "!src/components/ui"
-        ]
+        "includes": ["**", "!node_modules", "!.next", "!dist", "!build", "!src/components/ui"]
     },
     "formatter": {
         "enabled": true,
         "indentStyle": "space",
-        "indentWidth": 4
+        "indentWidth": 4,
+        "lineWidth": 140
     },
     "javascript": {
         "formatter": {
             "quoteStyle": "single",
             "jsxQuoteStyle": "double",
-            "semicolons": "always"
+            "semicolons": "always",
+            "trailingCommas": "none"
         }
     },
     "linter": {

@@ -14,15 +14,14 @@ type GalleryItem = NewGalleryImageDto & { id: string };
 export function AvatarUploadStep({
     name,
     avatarUrl,
-    onAvatarChange,
+    onAvatarChange
 }: {
     name: string;
     avatarUrl?: string;
     onAvatarChange: (avatarUrl: string) => void;
 }) {
     const avatarInputRef = useRef<HTMLInputElement | null>(null);
-    const { mutateAsync: uploadAvatar, isPending: isUploadingAvatar } =
-        useUploadAvatar();
+    const { mutateAsync: uploadAvatar, isPending: isUploadingAvatar } = useUploadAvatar();
 
     async function handleAvatarFile(file?: File) {
         if (!file) return;
@@ -54,18 +53,14 @@ export function AvatarUploadStep({
                     >
                         <Camera className="size-4" /> Upload avatar
                     </button>
-                    <p className="mt-2 text-xs leading-5 text-muted-foreground">
-                        Use a clear campus-friendly profile photo.
-                    </p>
+                    <p className="mt-2 text-xs leading-5 text-muted-foreground">Use a clear campus-friendly profile photo.</p>
                 </div>
                 <input
                     ref={avatarInputRef}
                     type="file"
                     accept="image/*"
                     className="hidden"
-                    onChange={(event) =>
-                        handleAvatarFile(event.target.files?.[0])
-                    }
+                    onChange={(event) => handleAvatarFile(event.target.files?.[0])}
                 />
             </div>
         </section>
@@ -75,7 +70,7 @@ export function AvatarUploadStep({
 export function GalleryUploadStep({
     gallery,
     onGalleryChange,
-    onImageClick,
+    onImageClick
 }: {
     gallery: NewGalleryImageDto[];
     onGalleryChange: (gallery: NewGalleryImageDto[]) => void;
@@ -93,13 +88,13 @@ export function GalleryUploadStep({
         const uploadedGallery = response.images.map((item, index) => ({
             key: item.key,
             imageUrl: item.url,
-            order: gallery.length + index,
+            order: gallery.length + index
         }));
         onGalleryChange(
             [...gallery, ...uploadedGallery].map((item, order) => ({
                 ...item,
-                order,
-            })),
+                order
+            }))
         );
         if (galleryInputRef.current) {
             galleryInputRef.current.value = '';
@@ -113,8 +108,8 @@ export function GalleryUploadStep({
                 .map((item, order) => ({
                     key: item.key,
                     imageUrl: item.imageUrl,
-                    order,
-                })),
+                    order
+                }))
         );
     }
 
@@ -124,8 +119,8 @@ export function GalleryUploadStep({
             newItems.map((item, order) => ({
                 key: item.key,
                 imageUrl: item.imageUrl,
-                order,
-            })),
+                order
+            }))
         );
     }
 
@@ -133,12 +128,8 @@ export function GalleryUploadStep({
         <section>
             <div className="mb-3 flex items-center justify-between gap-3">
                 <div>
-                    <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">
-                        Gallery
-                    </div>
-                    <p className="mt-1 text-xs text-muted-foreground">
-                        Drag photos to reorder. Add up to 10.
-                    </p>
+                    <div className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">Gallery</div>
+                    <p className="mt-1 text-xs text-muted-foreground">Drag photos to reorder. Add up to 10.</p>
                 </div>
                 <button
                     type="button"
@@ -146,11 +137,7 @@ export function GalleryUploadStep({
                     disabled={uploadGallery.isPending || remainingSlots === 0}
                     className="inline-flex h-10 shrink-0 items-center gap-2 rounded-xl border border-black/10 bg-muted px-3 text-xs font-semibold disabled:opacity-50"
                 >
-                    {uploadGallery.isPending ? (
-                        <LoaderCircle className="size-4 animate-spin" />
-                    ) : (
-                        <Plus className="size-4" />
-                    )}
+                    {uploadGallery.isPending ? <LoaderCircle className="size-4 animate-spin" /> : <Plus className="size-4" />}
                     Add
                 </button>
                 <input
@@ -166,23 +153,17 @@ export function GalleryUploadStep({
             {items.length > 0 ? (
                 <ReactSortable
                     list={items as (GalleryItem & ItemInterface)[]}
-                    setList={(newItems) =>
-                        handleSort(newItems as GalleryItem[])
-                    }
+                    setList={(newItems) => handleSort(newItems as GalleryItem[])}
                     disabled={uploadGallery.isPending}
                     animation={150}
                     className="grid grid-cols-3 gap-2"
                 >
                     {items.map((item, index) => (
                         <div
-                            key={item.id}
+                            key={`${item.id}-${index}`}
                             className="relative aspect-square overflow-hidden rounded-xl border border-black/10 bg-muted"
                         >
-                            <button
-                                type="button"
-                                onClick={() => onImageClick?.(index)}
-                                className="absolute inset-0"
-                            >
+                            <button type="button" onClick={() => onImageClick?.(index)} className="absolute inset-0">
                                 <Image
                                     src={item.imageUrl}
                                     alt={`Gallery photo ${index + 1}`}
@@ -213,9 +194,7 @@ export function GalleryUploadStep({
                     disabled={uploadGallery.isPending}
                     className="grid min-h-36 w-full place-items-center rounded-xl border border-dashed border-black/20 bg-muted px-6 text-center text-sm text-muted-foreground disabled:opacity-50"
                 >
-                    {uploadGallery.isPending
-                        ? 'Uploading gallery...'
-                        : 'Upload gallery photos'}
+                    {uploadGallery.isPending ? 'Uploading gallery...' : 'Upload gallery photos'}
                 </button>
             )}
         </section>
@@ -227,7 +206,7 @@ function toGalleryItems(gallery: NewGalleryImageDto[]): GalleryItem[] {
         .map((item, index) => ({
             ...item,
             id: item.key || item.imageUrl || `gallery-${index}`,
-            order: item.order ?? index,
+            order: item.order ?? index
         }))
         .sort((a, b) => a.order - b.order);
 }

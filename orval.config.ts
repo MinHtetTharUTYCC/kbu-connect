@@ -1,17 +1,10 @@
-import dotenv from 'dotenv';
 import { defineConfig } from 'orval';
-
-dotenv.config();
-
-const API_URL = process.env.NEXT_PUBLIC_API_URL!;
-if (!API_URL) {
-    throw new Error('Missing env variable: NEXT_PUBLIC_API_URL');
-}
+import { publicApiUrl } from './src/lib/constants/app.config'; // '@/' alias is only resolved by TypeScript/bundler, not plain Node
 
 export default defineConfig({
     KBUConnectApi: {
         input: {
-            target: `${API_URL}/api/json`,
+            target: `${publicApiUrl}/api/json`
         },
         output: {
             mode: 'tags-split', // one file per controller tag (auth, users, matches...)
@@ -23,47 +16,47 @@ export default defineConfig({
             override: {
                 mutator: {
                     path: 'src/lib/axios/axios-instance.ts',
-                    name: 'axiosInstanceFn',
+                    name: 'axiosInstanceFn'
                 },
                 operations: {
                     DiscoveryController_getDiscovery: {
                         query: {
                             useInfinite: true,
-                            useInfiniteQueryParam: 'cursor',
-                        },
+                            useInfiniteQueryParam: 'cursor'
+                        }
                     },
                     NotificationsController_getNotifications: {
                         query: {
                             useInfinite: true,
-                            useInfiniteQueryParam: 'cursor',
-                        },
+                            useInfiniteQueryParam: 'cursor'
+                        }
                     },
                     ChatController_getShoutouts: {
                         query: {
                             useInfinite: true,
-                            useInfiniteQueryParam: 'cursor',
-                        },
+                            useInfiniteQueryParam: 'cursor'
+                        }
                     },
                     ChatController_getConversations: {
                         query: {
                             useInfinite: true,
-                            useInfiniteQueryParam: 'cursor',
-                        },
+                            useInfiniteQueryParam: 'cursor'
+                        }
                     },
                     ChatController_getConversationMessages: {
                         query: {
                             useInfinite: true,
-                            useInfiniteQueryParam: 'cursor',
-                        },
+                            useInfiniteQueryParam: 'cursor'
+                        }
                     },
                     MatchesController_getMatches: {
                         query: {
                             useInfinite: true,
-                            useInfiniteQueryParam: 'cursor',
-                        },
-                    },
-                },
-            },
-        },
-    },
+                            useInfiniteQueryParam: 'cursor'
+                        }
+                    }
+                }
+            }
+        }
+    }
 });

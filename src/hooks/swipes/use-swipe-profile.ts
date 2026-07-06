@@ -10,11 +10,11 @@ export function useSwipeProfile() {
         ...swipe,
         like: (receiverId: string) =>
             swipe.mutate({
-                data: { receiverId, type: CreateSwipeDtoType.LIKE },
+                data: { receiverId, type: CreateSwipeDtoType.LIKE }
             }),
         dislike: (receiverId: string) =>
             swipe.mutate({
-                data: { receiverId, type: CreateSwipeDtoType.DISLIKE },
-            }),
+                data: { receiverId, type: CreateSwipeDtoType.DISLIKE }
+            })
     };
 }

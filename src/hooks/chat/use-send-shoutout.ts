@@ -1,9 +1,6 @@
 'use client';
 
-import {
-    getChatControllerGetShoutoutsInfiniteQueryKey,
-    useChatControllerSendShoutout,
-} from '@services/generated/chat/chat';
+import { getChatControllerGetShoutoutsInfiniteQueryKey, useChatControllerSendShoutout } from '@services/generated/chat/chat';
 import { useQueryClient } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { handleBackendError } from '@/lib/error/error-util';
@@ -17,12 +14,12 @@ export function useSendShoutout() {
             onSuccess: () => {
                 queryClient.invalidateQueries({
                     queryKey: getChatControllerGetShoutoutsInfiniteQueryKey({
-                        type: 'sent',
-                    }),
+                        type: 'sent'
+                    })
                 });
 
                 toast.success('Shoutout sent successfully!');
-            },
-        },
+            }
+        }
     });
 }
