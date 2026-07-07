@@ -1,15 +1,24 @@
 'use client';
 
 import type { MessageItemDto } from '@services/model/messageItemDto';
-import { ArrowLeft, Check, MoreVertical, Send, Trash, X } from 'lucide-react';
+import { ArrowLeft, Ban, Check, Flag, Loader2, MessageCircle, MoreVertical, Send, Trash, X } from 'lucide-react';
 import Link from 'next/link';
 import { useCallback, useEffect, useRef, useState } from 'react';
+import { toast } from 'sonner';
 import { useAuthContext } from '@/components/auth-provider';
 import { LoadMoreRow } from '@/components/load-more-row';
+import { ActionConfirmDialog } from '@/components/mobile/action-confirm-dialog';
 import { Avatar, EmptyState } from '@/components/mobile/app-chrome';
-import { DeleteConfirmSheet } from '@/components/mobile/delete-confirm-sheet';
 import { ProfileSheet } from '@/components/mobile/profile-sheet';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { ReportDialog } from '@/components/report-dialog';
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger
+} from '@/components/ui/dropdown-menu';
+import { useBlockUser } from '@/hooks/block/use-block-user';
 import { useConversation } from '@/hooks/chat/use-conversation';
 import { useConversationMessages } from '@/hooks/chat/use-conversation-messages';
 import { useDeleteConversation } from '@/hooks/chat/use-delete-conversation';
@@ -17,12 +26,17 @@ import { useDeleteMessage } from '@/hooks/chat/use-delete-message';
 import { useEditMessage } from '@/hooks/chat/use-edit-message';
 import { useMarkConversationSeen } from '@/hooks/chat/use-mark-conversation-seen';
 import { useSendMessage } from '@/hooks/chat/use-send-message';
+import { useReportUser } from '@/hooks/reports/use-report-user';
 import { formatDateToNow } from '@/lib/date/format-date';
 import { useChatState } from '../[chatId]/_hooks/use-chat-state';
 import Message from './message';
+import { useRouter } from 'next/navigation';
+import Skeleton from '@/components/skeleton';
 
 export function ChatClient({ chatId }: { chatId: string }) {
     const { user } = useAuthContext();
+
+    const router = useRouter();
 
     const {
         messages,
@@ -55,17 +69,18 @@ export function ChatClient({ chatId }: { chatId: string }) {
     } = useChatState();
 
     const [showDeleteMessageConfirm, setShowDeleteMessageConfirm] = useState(false);
+    const [showBlockConfirm, setShowBlockConfirm] = useState(false);
+    const [showReportConfirm, setShowReportConfirm] = useState(false);
 
     const myId = user?.user?.id;
 
-    const { mutateAsync: sendMessage, isPending: isSendingMessage } = useSendMessage(chatId, myId, () => setDraft(''));
+    const { mutateAsync: sendMessage, isPending: isSendingMessage } = useSendMessage(chatId, myId);
 
     const { mutate: deleteConversation, isPending: isDeleting } = useDeleteConversation();
     const { mutate: editMessage, isPending: isEditingMessage } = useEditMessage(chatId);
-    const { mutate: deleteMessage, isPending: isDeletingMessage } = useDeleteMessage(chatId, () => {
-        setShowDeleteMessageConfirm(false);
-        setDeleteMessageTargetId(null);
-    });
+    const { mutate: deleteMessage, isPending: isDeletingMessage } = useDeleteMessage(chatId);
+    const { mutateAsync: blockUser, isPending: isBlocking } = useBlockUser(chatId);
+    const { mutateAsync: reportUser, isPending: isReporting } = useReportUser();
 
     const scrollToBottom = useCallback((behavior: ScrollBehavior = 'auto') => {
         messagesEndRef.current?.scrollIntoView({ behavior });
@@ -118,8 +133,15 @@ export function ChatClient({ chatId }: { chatId: string }) {
         const content = draft.trim();
         if (!content || !myId) return;
 
-        await sendMessage({ data: { conversationId: chatId, content } });
-        scrollToBottom();
+        await sendMessage(
+            { data: { conversationId: chatId, content } },
+            {
+                onSuccess: () => {
+                    setDraft('');
+                    scrollToBottom();
+                }
+            }
+        );
     }
 
     function handleSubmitEdit() {
@@ -134,15 +156,17 @@ export function ChatClient({ chatId }: { chatId: string }) {
     }
 
     if (conversationLoading || (!conversation && hasNextPageMessages)) {
-        return <EmptyState title="Loading conversation" body="Opening your conversation." />;
+        return <Skeleton />;
     }
 
     if (!conversation) {
-        return <EmptyState title="Conversation unavailable" body="This chat may have been deleted or is no longer available." />;
+        return (
+            <EmptyState title="Conversation unavailable" body="This chat may have been deleted or is no longer available." icon="message" />
+        );
     }
 
     if (!myId) {
-        return <EmptyState title="Authentication required" body="Please sign in to view this conversation." />;
+        return <EmptyState title="Authentication required" body="Please sign in to view this conversation." icon="user" />;
     }
 
     const statusText = conversation.isOnline
@@ -173,6 +197,15 @@ export function ChatClient({ chatId }: { chatId: string }) {
                         <MoreVertical className="size-5" />
                     </DropdownMenuTrigger>
                     <DropdownMenuContent align="end">
+                        <DropdownMenuItem onClick={() => setShowReportConfirm(true)}>
+                            <Flag className="size-4" />
+                            Report user
+                        </DropdownMenuItem>
+                        <DropdownMenuItem className="text-red-500" onClick={() => setShowBlockConfirm(true)}>
+                            <Ban className="size-4" />
+                            Block user
+                        </DropdownMenuItem>
+                        <DropdownMenuSeparator />
                         <DropdownMenuItem className="text-red-500" onClick={() => setShowChatDeleteConfirm(true)}>
                             <Trash className="size-4" />
                             Delete chat
@@ -183,15 +216,9 @@ export function ChatClient({ chatId }: { chatId: string }) {
 
             <main className="min-h-0 flex-1 overflow-y-auto bg-white px-5 py-6">
                 {isLoadingMessages ? (
-                    <EmptyState title="Loading messages" body="Opening your messages." />
+                    <Skeleton />
                 ) : messages.length ? (
                     <div className="flex flex-col gap-3">
-                        <LoadMoreRow
-                            ref={loadMoreMessagesRef}
-                            hasNextPage={hasNextPageMessages}
-                            isFetchingNextPage={isFetchingNextPageMessages}
-                            endLabel=""
-                        />
                         {messages.map((message) => {
                             return (
                                 <Message
@@ -211,9 +238,16 @@ export function ChatClient({ chatId }: { chatId: string }) {
                         <div ref={messagesEndRef} />
                     </div>
                 ) : (
-                    <EmptyState title="No messages yet" body="Send the first message to start the conversation." />
+                    <EmptyState title="No messages yet" body="Send the first message to start the conversation." icon="message-circle" />
                 )}
             </main>
+
+            <LoadMoreRow
+                ref={loadMoreMessagesRef}
+                hasNextPage={hasNextPageMessages}
+                isFetchingNextPage={isFetchingNextPageMessages}
+                endLabel="No More Messages"
+            />
 
             <form
                 onSubmit={
@@ -269,7 +303,8 @@ export function ChatClient({ chatId }: { chatId: string }) {
             </form>
 
             {showChatDeleteConfirm && (
-                <DeleteConfirmSheet
+                <ActionConfirmDialog
+                    action="Delete"
                     title="Delete chat"
                     message="Are you sure you want to delete this chat? This action cannot be undone."
                     isPending={isDeleting}
@@ -279,7 +314,8 @@ export function ChatClient({ chatId }: { chatId: string }) {
             )}
             {selectedProfileId && <ProfileSheet userId={selectedProfileId} onClose={() => setSelectedProfileId(null)} from="visit" />}
             {showDeleteMessageConfirm && deleteMessageTargetId && (
-                <DeleteConfirmSheet
+                <ActionConfirmDialog
+                    action="Delete"
                     title="Delete message"
                     message="Are you sure you want to delete this message? This action cannot be undone."
                     isPending={isDeletingMessage}
@@ -287,9 +323,59 @@ export function ChatClient({ chatId }: { chatId: string }) {
                         setShowDeleteMessageConfirm(false);
                         setDeleteMessageTargetId(null);
                     }}
-                    onConfirm={() => deleteMessage({ messageId: deleteMessageTargetId })}
+                    onConfirm={() =>
+                        deleteMessage(
+                            { messageId: deleteMessageTargetId },
+                            {
+                                onSuccess: () => {
+                                    setShowDeleteMessageConfirm(false);
+                                    setDeleteMessageTargetId(null);
+                                    toast.success('Message deleted successfully');
+                                }
+                            }
+                        )
+                    }
                 />
             )}
+            {showBlockConfirm && (
+                <ActionConfirmDialog
+                    action="Block"
+                    title="Block user"
+                    message={`Are you sure you want to block ${conversation.participant.name}? They won't be able to message you or see your profile.`}
+                    isPending={isBlocking}
+                    onClose={() => setShowBlockConfirm(false)}
+                    onConfirm={() => {
+                        blockUser(
+                            { data: { blockedId: conversation.participant.id } },
+                            {
+                                onSuccess: () => {
+                                    setShowBlockConfirm(false);
+                                    toast.success('Block scuccessfully');
+                                    router.replace('/chats');
+                                }
+                            }
+                        );
+                    }}
+                />
+            )}
+            <ReportDialog
+                open={showReportConfirm}
+                onOpenChange={setShowReportConfirm}
+                userName={conversation.participant.name}
+                isPending={isReporting}
+                onSubmit={async (reason, description) => {
+                    await reportUser(
+                        {
+                            data: {
+                                reportedId: conversation.participant.id,
+                                reason,
+                                description
+                            }
+                        },
+                        { onSuccess: () => setShowReportConfirm(false) }
+                    );
+                }}
+            />
         </div>
     );
 }

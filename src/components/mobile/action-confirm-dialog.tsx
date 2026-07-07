@@ -1,6 +1,5 @@
 'use client';
 
-import { Trash } from 'lucide-react';
 import {
     AlertDialog,
     AlertDialogAction,
@@ -13,18 +12,20 @@ import {
 } from '@/components/ui/alert-dialog';
 import { cn } from '@/lib/utils';
 
-export function DeleteConfirmSheet({
+export function ActionConfirmDialog({
     title,
     message,
     onConfirm,
     onClose,
-    isPending
+    isPending,
+    action
 }: {
     title: string;
     message: string;
     onConfirm: () => void;
     onClose: () => void;
     isPending: boolean;
+    action: 'Delete' | 'Block' | 'Unblock' | 'Reset';
 }) {
     return (
         <AlertDialog open onOpenChange={(open) => !open && onClose()}>
@@ -42,8 +43,7 @@ export function DeleteConfirmSheet({
                         disabled={isPending}
                         onClick={onConfirm}
                     >
-                        <Trash className="size-4" />
-                        Delete
+                        {action}
                     </AlertDialogAction>
                 </AlertDialogFooter>
             </AlertDialogContent>

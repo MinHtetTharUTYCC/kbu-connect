@@ -1,6 +1,6 @@
 'use client';
 
-import { ArrowLeft, GraduationCap } from 'lucide-react';
+import { ArrowLeft, Ban, Bell, GraduationCap, Loader2, LucideIcon, Megaphone, MessageCircle, Search, User } from 'lucide-react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import type { ReactNode } from 'react';
@@ -40,7 +40,7 @@ export function TopBar({ title = 'UniMatch', action, canBack = true }: { title?:
                 ) : (
                     <GraduationCap className="size-6 text-primary" />
                 )}
-                <span className="truncate text-xl font-bold text-primary">{title}</span>
+                <span className="truncate text-lg font-bold text-primary">{title}</span>
             </div>
             {action && action}
         </header>
@@ -73,12 +73,27 @@ export function Chip({ children, active = false }: { children: ReactNode; active
     );
 }
 
-export function EmptyState({ title, body }: { title: string; body: string }) {
+const iconMap: Record<string, LucideIcon> = {
+    graduation: GraduationCap,
+    blocked: Ban,
+    message: MessageCircle,
+    search: Search,
+    user: User,
+    bell: Bell,
+    shoutout: Megaphone,
+    loader: Loader2
+};
+
+export function EmptyState({ title, body, icon }: { title: string; body: string; icon: string }) {
+    const Icon = iconMap[icon];
+
     return (
-        <div className="flex flex-1 flex-col items-center justify-center px-8 text-center">
-            <div className="mb-4 grid size-14 place-items-center rounded-2xl bg-primary/10 text-primary">
-                <GraduationCap className="size-7" />
-            </div>
+        <div className="mt-8 flex flex-1 flex-col items-center justify-center px-8 text-center">
+            {Icon && (
+                <div className="mb-4 grid size-14 place-items-center rounded-2xl bg-primary/10 text-primary">
+                    <Icon className={`size-6 ${icon === 'loader' ? 'animate-spin' : ''}`} />
+                </div>
+            )}
             <h2 className="text-lg font-semibold">{title}</h2>
             <p className="mt-2 text-sm leading-6 text-muted-foreground">{body}</p>
         </div>

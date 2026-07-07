@@ -50,16 +50,25 @@ export function NotificationClient() {
     return (
         <main className="flex-1 overflow-y-auto bg-background pb-8">
             {isLoading ? (
-                <EmptyState title="Loading notifications" body="Checking for new activity." />
+                <EmptyState title="Loading notifications" body="Checking for new activities." icon={'loader'} />
             ) : notifications.length ? (
                 <Section title="">
                     {notifications.map((item, index) => (
                         <NotificationRow key={`${item.id}-${index}`} notification={item} />
                     ))}
-                    <LoadMoreRow ref={loadMoreRef} hasNextPage={hasNextPage} isFetchingNextPage={isFetchingNextPage} />
+                    <LoadMoreRow
+                        ref={loadMoreRef}
+                        hasNextPage={hasNextPage}
+                        isFetchingNextPage={isFetchingNextPage}
+                        endLabel="No More Notifications"
+                    />
                 </Section>
             ) : (
-                <EmptyState title="No notifications" body="You are all caught up. New matches, messages, and updates will show here." />
+                <EmptyState
+                    title="No notifications"
+                    body="You are all caught up. New matches, messages, and updates will show here."
+                    icon={'bell'}
+                />
             )}
         </main>
     );

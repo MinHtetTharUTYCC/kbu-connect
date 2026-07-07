@@ -1,12 +1,15 @@
 'use client';
 
-import { Cake, Globe, GraduationCap, Heart, LoaderCircle, type LucideIcon, MessageCircle, Search, UserRound, X } from 'lucide-react';
+import { Cake, Flag, Globe, GraduationCap, Heart, LoaderCircle, type LucideIcon, MessageCircle, Search, UserRound, X } from 'lucide-react';
 import Image from 'next/image';
 import { useState } from 'react';
 import { createPortal } from 'react-dom';
+import { toast } from 'sonner';
 import { Chip } from '@/components/mobile/app-chrome';
 import { FullScreenImageViewer } from '@/components/mobile/full-screen-image-viewer';
+import { ReportDialog } from '@/components/report-dialog';
 import { Drawer, DrawerContent } from '@/components/ui/drawer';
+import { useReportUser } from '@/hooks/reports/use-report-user';
 import { useVisitProfile } from '@/hooks/users/use-visit-profile';
 import { ageFromBirthYear, formatEnum } from '@/lib/utils';
 
@@ -27,8 +30,11 @@ export function ProfileSheet({
     onMessage?: () => void;
     from: 'discovery' | 'visit';
 }) {
-    const { data: profile, isLoading } = useVisitProfile(userId);
     const [viewerIndex, setViewerIndex] = useState<number | null>(null);
+    const [showReportConfirm, setShowReportConfirm] = useState(false);
+
+    const { data: profile, isLoading } = useVisitProfile(userId);
+    const { mutateAsync: reportUser, isPending: isReporting } = useReportUser();
 
     const galleryImages = (profile?.gallery ?? []).toSorted((a, b) => a.order - b.order).map((item) => item.imageUrl);
 
@@ -98,6 +104,14 @@ export function ProfileSheet({
                                                     Matched
                                                 </span>
                                             )}
+                                            <button
+                                                type="button"
+                                                onClick={() => setShowReportConfirm(true)}
+                                                className="shrink-0 text-muted-foreground transition hover:text-destructive"
+                                                aria-label="Report user"
+                                            >
+                                                <Flag className="size-4" />
+                                            </button>
                                         </div>
                                         {metadataItems.length > 0 ? (
                                             <div className="mt-2 flex flex-wrap gap-1.5">
@@ -236,6 +250,32 @@ export function ProfileSheet({
                     <FullScreenImageViewer images={galleryImages} initialIndex={viewerIndex} onClose={() => setViewerIndex(null)} />,
                     document.body
                 )}
+
+            {profile && (
+                <ReportDialog
+                    open={showReportConfirm}
+                    onOpenChange={setShowReportConfirm}
+                    userName={profile.name}
+                    isPending={isReporting}
+                    onSubmit={async (reason, description) => {
+                        await reportUser(
+                            {
+                                data: {
+                                    reportedId: userId,
+                                    reason,
+                                    description
+                                }
+                            },
+                            {
+                                onSuccess: () => {
+                                    setShowReportConfirm(false);
+                                    toast.success('Report submitted');
+                                }
+                            }
+                        );
+                    }}
+                />
+            )}
         </Drawer>
     );
 }

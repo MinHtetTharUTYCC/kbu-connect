@@ -17,7 +17,7 @@ const iconMap = {
     home: Home
 };
 
-const HIDDEN_ON_PATHS = [...publicRoutes.slice(1), '/chats/', '/profile-setup'];
+const HIDDEN_ON_PATHS = [...publicRoutes.slice(1), '/chats/', '/profile-setup', '/profile/me/blocked'];
 
 export default function BottomNav() {
     const pathname = usePathname();

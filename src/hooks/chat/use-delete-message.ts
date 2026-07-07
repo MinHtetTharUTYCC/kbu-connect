@@ -1,10 +1,9 @@
 import { getChatControllerGetConversationMessagesInfiniteQueryKey, useChatControllerDeleteMessage } from '@services/generated/chat/chat';
 import type { MessagesListResponseDto } from '@services/model';
 import { type InfiniteData, useQueryClient } from '@tanstack/react-query';
-import { toast } from 'sonner';
 import { handleBackendError } from '@/lib/error/error-util';
 
-export function useDeleteMessage(conversationId: string, onSuccess: () => void) {
+export function useDeleteMessage(conversationId: string) {
     const queryClient = useQueryClient();
 
     const queryKey = getChatControllerGetConversationMessagesInfiniteQueryKey(conversationId);
@@ -24,9 +23,6 @@ export function useDeleteMessage(conversationId: string, onSuccess: () => void) 
                         }))
                     };
                 });
-
-                toast.success('Message deleted successfully');
-                onSuccess();
             }
         }
     });

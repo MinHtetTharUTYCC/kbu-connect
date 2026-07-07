@@ -4,10 +4,9 @@ import { getChatControllerGetShoutoutsInfiniteQueryKey, useChatControllerDeleteS
 import type { ShoutoutsListResponseDto } from '@services/model';
 import type { InfiniteData } from '@tanstack/react-query';
 import { useQueryClient } from '@tanstack/react-query';
-import { toast } from 'sonner';
 import { handleBackendError } from '@/lib/error/error-util';
 
-export function useDeleteShoutout(onSuccess: () => void) {
+export function useDeleteShoutout() {
     const queryClient = useQueryClient();
 
     return useChatControllerDeleteShoutout({
@@ -35,9 +34,6 @@ export function useDeleteShoutout(onSuccess: () => void) {
                 if (!wasFound) {
                     queryClient.invalidateQueries({ queryKey });
                 }
-
-                toast.success('Shoutout deleted');
-                onSuccess();
             }
         }
     });

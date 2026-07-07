@@ -54,6 +54,12 @@ export default defineConfig({
                             useInfinite: true,
                             useInfiniteQueryParam: 'cursor'
                         }
+                    },
+                    BlockController_getBlockedUsers: {
+                        query: {
+                            useInfinite: true,
+                            useInfiniteQueryParam: 'cursor'
+                        }
                     }
                 }
             }

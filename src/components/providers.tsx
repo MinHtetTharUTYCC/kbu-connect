@@ -1,8 +1,9 @@
 'use client';
 
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { MutationCache, QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { useState } from 'react';
+import { handleBackendError } from '@/lib/error/error-util';
 import { AuthProvider } from './auth-provider';
 
 export default function Providers({ children }: { children: React.ReactNode }) {
@@ -11,10 +12,21 @@ export default function Providers({ children }: { children: React.ReactNode }) {
             new QueryClient({
                 defaultOptions: {
                     queries: {
-                        staleTime: 30 * 1000,
+                        staleTime: 5 * 60 * 1000,
                         retry: 1
                     }
-                }
+                },
+                mutationCache: new MutationCache({
+                    onError: (error, _variables, _context, mutation) => {
+                        // Check if the specific hook wants to skip global handling
+                        if (mutation.meta?.skipGlobalToast) {
+                            return;
+                        }
+
+                        // Fall back to your standard error toast
+                        handleBackendError(error);
+                    }
+                })
             })
     );
 

@@ -3,9 +3,10 @@
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
+import { toast } from 'sonner';
 import { LoadMoreRow } from '@/components/load-more-row';
+import { ActionConfirmDialog } from '@/components/mobile/action-confirm-dialog';
 import { Avatar, EmptyState } from '@/components/mobile/app-chrome';
-import { DeleteConfirmSheet } from '@/components/mobile/delete-confirm-sheet';
 import { ProfileSheet } from '@/components/mobile/profile-sheet';
 import { ShoutoutDetailSheet } from '@/components/mobile/shoutout-detail-sheet';
 import { useDeleteShoutout } from '@/hooks/chat/use-delete-shoutout';
@@ -13,6 +14,8 @@ import { useReplyShoutout } from '@/hooks/chat/use-reply-shoutout';
 import { type ShoutoutItem, type ShoutoutType, useShoutoutsList } from '@/hooks/chat/use-shoutouts-list';
 import { getFormattedDate } from '@/lib/date/format-date';
 import { cn } from '@/lib/utils';
+import { Loader2, MessageCircle } from 'lucide-react';
+import Skeleton from '@/components/skeleton';
 
 export function ShoutoutsPanel() {
     const router = useRouter();
@@ -25,8 +28,8 @@ export function ShoutoutsPanel() {
     const [deleteTargetId, setDeleteTargetId] = useState<string | null>(null);
 
     const { shoutouts, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } = useShoutoutsList({ type: activeSubTab });
-    const { mutate: replyToShoutout, isPending: isReplying } = useReplyShoutout(() => setSelectedShoutoutId(null));
-    const { mutate: deleteShoutout, isPending: isDeleting } = useDeleteShoutout(() => setDeleteTargetId(null));
+    const { mutate: replyToShoutout, isPending: isReplying } = useReplyShoutout();
+    const { mutate: deleteShoutout, isPending: isDeleting } = useDeleteShoutout();
 
     useEffect(() => {
         const target = loadMoreRef.current;
@@ -70,13 +73,18 @@ export function ShoutoutsPanel() {
                 </div>
             </div>
             {isLoading ? (
-                <EmptyState title="Loading shoutouts" body="Checking your shoutouts." />
+                <Skeleton />
             ) : shoutouts.length ? (
                 <div>
                     {shoutouts.map((item, index) => (
                         <ShoutoutRow key={`${item.id}-${index}`} shoutout={item} onClick={() => setSelectedShoutoutId(item.id)} />
                     ))}
-                    <LoadMoreRow ref={loadMoreRef} hasNextPage={hasNextPage} isFetchingNextPage={isFetchingNextPage} />
+                    <LoadMoreRow
+                        ref={loadMoreRef}
+                        hasNextPage={hasNextPage}
+                        isFetchingNextPage={isFetchingNextPage}
+                        endLabel="No More Sent Shoutouts"
+                    />
                 </div>
             ) : (
                 <div>
@@ -85,10 +93,17 @@ export function ShoutoutsPanel() {
                         body={
                             activeSubTab === 'received' ? 'Shoutouts people send you will show here.' : 'Shoutouts you send will show here.'
                         }
+                        icon="shoutout"
                     />
-                    <LoadMoreRow ref={loadMoreRef} hasNextPage={hasNextPage} isFetchingNextPage={isFetchingNextPage} />
                 </div>
             )}
+
+            <LoadMoreRow
+                ref={loadMoreRef}
+                hasNextPage={hasNextPage}
+                isFetchingNextPage={isFetchingNextPage}
+                endLabel="No More Received Shoutouts"
+            />
             {selectedProfileId && (
                 <ProfileSheet
                     userId={selectedProfileId}
@@ -120,6 +135,7 @@ export function ShoutoutsPanel() {
                             {
                                 onSuccess: () => {
                                     setSelectedShoutoutId(null);
+                                    toast.success('Replied to shoutout.');
                                 }
                             }
                         )
@@ -129,12 +145,23 @@ export function ShoutoutsPanel() {
                 />
             )}
             {deleteTargetId && (
-                <DeleteConfirmSheet
+                <ActionConfirmDialog
+                    action="Delete"
                     title="Delete shoutout"
                     message="Are you sure you want to delete this shoutout? This action cannot be undone."
                     isPending={isDeleting}
                     onClose={() => setDeleteTargetId(null)}
-                    onConfirm={() => deleteShoutout({ shoutoutId: deleteTargetId })}
+                    onConfirm={() =>
+                        deleteShoutout(
+                            { shoutoutId: deleteTargetId },
+                            {
+                                onSuccess: () => {
+                                    setDeleteTargetId(null);
+                                    toast.success('Shoutout deleted');
+                                }
+                            }
+                        )
+                    }
                 />
             )}
         </section>

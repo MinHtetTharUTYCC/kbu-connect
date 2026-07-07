@@ -39,7 +39,7 @@ const steps: Array<{ id: SetupStep; eyebrow: string; title: string }> = [
         eyebrow: 'Step 3 of 6',
         title: 'Set your matching preferences'
     },
-    { id: 'avatar', eyebrow: 'Step 4 of 6', title: 'Add your avatar' },
+    { id: 'avatar', eyebrow: 'Step 4 of 6', title: 'Add your profile picture' },
     { id: 'gallery', eyebrow: 'Step 5 of 6', title: 'Add your gallery' },
     {
         id: 'review',
@@ -112,8 +112,11 @@ export function ProfileSetupClient() {
         return true;
     }, [activeStep.id, avatarUrl, birthYear, gallery.length, maxPreferredAge, minPreferredAge, name, selectedInterests.length]);
 
-    if (isLoading || !current) {
-        return <EmptyState title="Loading profile" body="Setting up your account." />;
+    if (isLoading) {
+        return <EmptyState title="Loading profile" body="Setting up your account." icon={'loader'} />;
+    }
+    if (!current) {
+        return <EmptyState title="Loading profile" body="Setting up your account." icon={'loader'} />;
     }
 
     function toggleInterest(value: UpdateProfileDtoInterestsItem) {
@@ -198,6 +201,9 @@ export function ProfileSetupClient() {
                                 placeholder="Coffee enthusiast, design lover, and always up for campus events."
                                 className="min-h-28 w-full resize-none rounded-xl border border-black/10 bg-muted px-4 py-3 text-sm outline-none focus:border-primary"
                             />
+                            <span className={`mt-1 block text-xs ${bio.length > 500 ? 'text-red-500' : 'text-muted-foreground'}`}>
+                                {bio.length} / 500
+                            </span>
                         </Field>
                     </section>
                 )}
@@ -311,7 +317,7 @@ export function ProfileSetupClient() {
                 )}
             </main>
 
-            <footer className="fixed bottom-0 left-1/2 flex w-full max-w-[430px] -translate-x-1/2 gap-3 bg-gradient-to-t from-white via-white to-white/0 px-5 py-6">
+            <footer className="fixed bottom-0 left-1/2 flex w-full max-w-[430px] -translate-x-1/2 gap-3 bg-linear-to-t from-white via-white to-white/0 px-5 py-6">
                 <Button
                     type="button"
                     variant="outline"
@@ -386,8 +392,8 @@ function Select({
 function ReviewRow({ label, value }: { label: string; value: string }) {
     return (
         <div className="flex items-center justify-between gap-4 rounded-xl border border-black/10 bg-muted p-4">
-            <span className="text-xs font-semibold uppercase tracking-wide text-muted-foreground">{label}</span>
-            <span className="truncate text-sm font-semibold">{formatEnum(value)}</span>
+            <span className="text-xs font-semibold tracking-wide text-muted-foreground">{label}</span>
+            <span className="truncate text-sm font-semibold">{label === 'Name' ? value : formatEnum(value)}</span>
         </div>
     );
 }

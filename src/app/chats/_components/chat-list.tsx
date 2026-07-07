@@ -10,6 +10,8 @@ import { useConversationsList } from '@/hooks/chat/use-conversations-list';
 import { getFormattedDate } from '@/lib/date/format-date';
 import { cn } from '@/lib/utils';
 import { ShoutoutsPanel } from './shoutouts-panel';
+import { MessageCircle } from 'lucide-react';
+import Skeleton from '@/components/skeleton';
 
 type ChatTab = 'chats' | 'shoutouts';
 
@@ -72,11 +74,11 @@ export function ChatListClient() {
     }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
 
     if (isLoading) {
-        return <EmptyState title="Loading chats" body="Checking your conversations." />;
+        return <Skeleton />;
     }
 
     if (!conversations.length) {
-        return <EmptyState title="No chats" body="After you match and start a conversation, it will show here." />;
+        return <EmptyState title="No chats" body="After you match and start a conversation, it will show here." icon="message" />;
     }
 
     return (

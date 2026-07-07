@@ -5,9 +5,8 @@ import {
 } from '@services/generated/chat/chat';
 import type { MessageItemDto, MessagesListResponseDto } from '@services/model';
 import { type InfiniteData, useQueryClient } from '@tanstack/react-query';
-import { toast } from 'sonner';
 
-export function useSendMessage(conversationId: string, userId: string | undefined, onSuccess: () => void) {
+export function useSendMessage(conversationId: string, userId: string | undefined) {
     const queryClient = useQueryClient();
 
     const queryKey = getChatControllerGetConversationMessagesInfiniteQueryKey(conversationId);
@@ -88,7 +87,6 @@ export function useSendMessage(conversationId: string, userId: string | undefine
                 if (context?.previous) {
                     queryClient.setQueryData(queryKey, context.previous);
                 }
-                toast.error('Failed to send message. Please try again.');
             },
 
             onSuccess: (data, _vars, context?: { tempId?: string }) => {
@@ -101,8 +99,6 @@ export function useSendMessage(conversationId: string, userId: string | undefine
                         queryKey: getChatControllerGetConversationsInfiniteQueryKey()
                     });
                 }
-
-                onSuccess();
             }
         }
     });

@@ -118,15 +118,17 @@ export function DiscoverClient() {
     }
 
     if (isLoading) {
-        return <EmptyState title="Loading profiles" body="Finding people you may want to meet." />;
+        return <EmptyState title="Loading profiles" body="Looking for people from the campus." icon={'search'} />;
+    }
+
+    if (isFetchingNextPage) {
+        return <EmptyState title="Loading more profiles" body="Looking for more people from the campus." icon={'search'} />;
     }
 
     if (!profile) {
-        if (isFetchingNextPage) {
-            return <EmptyState title="Loading more profiles" body="Looking for more people from the campus." />;
-        }
-
-        return <EmptyState title="No profiles nearby" body="Check back later as more KBU students complete their profiles." />;
+        return (
+            <EmptyState title="No profiles available" body="Check back later as more students complete their profiles." icon={'search'} />
+        );
     }
 
     const dragRotation = dragX * 0.06;

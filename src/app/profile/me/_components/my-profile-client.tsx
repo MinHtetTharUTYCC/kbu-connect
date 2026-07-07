@@ -1,12 +1,12 @@
 'use client';
 
-import { Cake, Globe, GraduationCap, LogOut, Pencil, Search, UserRound } from 'lucide-react';
+import { Cake, ChevronRight, GraduationCap, LogOut, Pencil, Search } from 'lucide-react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useState } from 'react';
 import { useAuthContext } from '@/components/auth-provider';
+import { ActionConfirmDialog } from '@/components/mobile/action-confirm-dialog';
 import { Avatar, EmptyState } from '@/components/mobile/app-chrome';
-import { DeleteConfirmSheet } from '@/components/mobile/delete-confirm-sheet';
 import { FullScreenImageViewer } from '@/components/mobile/full-screen-image-viewer';
 import { useTopBar } from '@/components/mobile/top-bar-provider';
 import { useLogout } from '@/hooks/auth/use-logout';
@@ -30,8 +30,12 @@ export function MyProfileClient() {
         title: profile?.name ?? 'My Profile'
     });
 
-    if (isLoading || !profile) {
-        return <EmptyState title="Loading profile" body="Setting up your account..." />;
+    if (isLoading) {
+        return <EmptyState title="Loading profile" body="Setting up your account..." icon={'loader'} />;
+    }
+    if (!profile) {
+        // i intentionally do not show an empty state with loader,
+        return <EmptyState title="Loading profile" body="Setting up your account..." icon={'loader'} />;
     }
 
     const { avatarUrl, name, bio, faculty, birthYear, gallery, isDiscoverable, lookingFor } = profile;
@@ -118,7 +122,7 @@ export function MyProfileClient() {
             )}
 
             <SettingsSection title="Privacy">
-                <div className="border-b border-black/10 px-5 py-4">
+                <div className="px-5 py-4 border-b border-black/10">
                     <div className="flex items-center justify-between">
                         <div className="min-w-0 flex-1">
                             <span className="text-sm font-medium">Discoverable</span>
@@ -152,10 +156,14 @@ export function MyProfileClient() {
                         </button>
                     </div>
                 </div>
+                <Link href="/profile/me/blocked" className="flex w-full items-center justify-between px-5 py-4 border-b border-black/10">
+                    <span className="text-sm">Blocked Users</span>
+                    <ChevronRight className="size-5 opacity-70" />
+                </Link>
             </SettingsSection>
 
             <SettingsSection title="Discovery">
-                <div className="px-5 py-4">
+                <div className="px-5 py-4 border-b border-black/10">
                     <div className="flex items-center justify-between">
                         <div className="min-w-0 flex-1">
                             <span className="text-sm font-medium">Reset Swipe History</span>
@@ -176,7 +184,8 @@ export function MyProfileClient() {
             </SettingsSection>
 
             {showResetHistoryConfirm && (
-                <DeleteConfirmSheet
+                <ActionConfirmDialog
+                    action="Reset"
                     title="Reset Swipe History?"
                     message="This will make all previously swiped profiles reappear in your feed. This action cannot be undone."
                     onConfirm={() => {
@@ -189,18 +198,29 @@ export function MyProfileClient() {
             )}
 
             <SettingsSection title="Account">
-                <div className="flex items-center justify-between border-b border-black/10 px-5 py-4">
+                <div className="flex items-center justify-between px-5 py-4 border-b border-black/10">
                     <span className="text-sm">Email address</span>
-                    <span className="max-w-[190px] truncate text-sm text-muted-foreground">{profile?.email ?? 'student@ms.kbu.ac.th'}</span>
+                    <span className="max-w-[190px] truncate text-sm text-muted-foreground">{profile.email}</span>
                 </div>
                 <button
                     type="button"
                     onClick={() => logout()}
-                    className="flex w-full items-center justify-between px-5 py-4 text-left text-primary active:bg-primary/10"
+                    className="flex w-full items-center justify-between px-5 py-4 text-left text-primary active:bg-primary/10 border-b border-black/10"
                 >
                     <span className="text-sm">Logout</span>
                     <LogOut className="size-5 opacity-70" />
                 </button>
+            </SettingsSection>
+
+            <SettingsSection title="Preferences">
+                <Link href="/privacy-policy" className="flex w-full items-center justify-between px-5 py-4 border-b border-black/10">
+                    <span className="text-sm">Privacy Policy</span>
+                    <ChevronRight className="size-5 opacity-70" />
+                </Link>
+                <Link href="/terms-and-conditions" className="flex w-full items-center justify-between px-5 py-4 border-b border-black/10">
+                    <span className="text-sm">Terms & Conditions</span>
+                    <ChevronRight className="size-5 opacity-70" />
+                </Link>
             </SettingsSection>
 
             <div className="flex flex-col items-center py-8 text-xs text-muted-foreground">
@@ -224,8 +244,8 @@ export function MyProfileClient() {
 function SettingsSection({ title, children }: { title: string; children: React.ReactNode }) {
     return (
         <section className="mb-6">
-            <h2 className="mb-2 px-5 text-xs font-semibold uppercase tracking-wide text-muted-foreground">{title}</h2>
-            <div className="border-y border-black/10 bg-white">{children}</div>
+            <h2 className="mb-1 px-5 text-sm font-semibold tracking-wide text-muted-foreground">{title}</h2>
+            <div className="bg-white">{children}</div>
         </section>
     );
 }

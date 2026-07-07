@@ -5,10 +5,12 @@ type LoadMoreRowProps = {
     endLabel?: string;
 };
 
-export function LoadMoreRow({ ref, hasNextPage, isFetchingNextPage, endLabel = 'No more shoutouts' }: LoadMoreRowProps) {
+export function LoadMoreRow({ ref, hasNextPage, isFetchingNextPage, endLabel }: LoadMoreRowProps) {
+    if (!hasNextPage) return null;
+
     return (
         <div ref={ref} className="px-5 py-4 text-center text-xs text-muted-foreground">
-            {isFetchingNextPage ? 'Loading more...' : hasNextPage ? '' : endLabel}
+            {isFetchingNextPage ? 'Loading more...' : endLabel}
         </div>
     );
 }

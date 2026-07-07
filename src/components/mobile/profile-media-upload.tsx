@@ -35,7 +35,7 @@ export function AvatarUploadStep({
 
     return (
         <section className="space-y-5">
-            <div className="flex items-center gap-4">
+            <div className="flex flex-col items-center justify-center gap-4">
                 <div className="relative">
                     <Avatar src={avatarUrl} name={name} className="size-24" />
                     {isUploadingAvatar && (
@@ -44,14 +44,14 @@ export function AvatarUploadStep({
                         </div>
                     )}
                 </div>
-                <div className="min-w-0 flex-1">
+                <div className="flexf flex-col items-center gap-2 mx-auto">
                     <button
                         type="button"
                         onClick={() => avatarInputRef.current?.click()}
                         disabled={isUploadingAvatar}
-                        className="inline-flex h-11 items-center gap-2 rounded-xl bg-primary px-4 text-sm font-semibold text-white disabled:opacity-60"
+                        className="w-full inline-flex h-11 items-center gap-2 rounded-xl bg-primary px-4 text-sm font-semibold text-white disabled:opacity-60"
                     >
-                        <Camera className="size-4" /> Upload avatar
+                        <Camera className="size-4" /> Upload profile photo
                     </button>
                     <p className="mt-2 text-xs leading-5 text-muted-foreground">Use a clear campus-friendly profile photo.</p>
                 </div>

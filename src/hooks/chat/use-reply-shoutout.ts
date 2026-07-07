@@ -8,10 +8,9 @@ import {
 import type { ConversationsListResponseDto, ShoutoutsListResponseDto } from '@services/model';
 import type { InfiniteData } from '@tanstack/react-query';
 import { useQueryClient } from '@tanstack/react-query';
-import { toast } from 'sonner';
 import { handleBackendError } from '@/lib/error/error-util';
 
-export function useReplyShoutout(onSuccess: () => void) {
+export function useReplyShoutout() {
     const queryClient = useQueryClient();
 
     return useChatControllerReplyToShoutout({
@@ -52,9 +51,6 @@ export function useReplyShoutout(onSuccess: () => void) {
                         pages
                     };
                 });
-
-                toast.success('Replied to shoutout.');
-                onSuccess();
             }
         }
     });
