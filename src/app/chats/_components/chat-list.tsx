@@ -6,12 +6,11 @@ import { useEffect, useRef } from 'react';
 import { LoadMoreRow } from '@/components/load-more-row';
 import { Avatar, EmptyState } from '@/components/mobile/app-chrome';
 import { useTopBar } from '@/components/mobile/top-bar-provider';
+import Skeleton from '@/components/skeleton';
 import { useConversationsList } from '@/hooks/chat/use-conversations-list';
 import { getFormattedDate } from '@/lib/date/format-date';
 import { cn } from '@/lib/utils';
 import { ShoutoutsPanel } from './shoutouts-panel';
-import { MessageCircle } from 'lucide-react';
-import Skeleton from '@/components/skeleton';
 
 type ChatTab = 'chats' | 'shoutouts';
 

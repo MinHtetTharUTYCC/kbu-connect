@@ -1,8 +1,9 @@
 'use client';
 
 import type { MessageItemDto } from '@services/model/messageItemDto';
-import { ArrowLeft, Ban, Check, Flag, Loader2, MessageCircle, MoreVertical, Send, Trash, X } from 'lucide-react';
+import { ArrowLeft, Ban, Check, Flag, MoreVertical, Send, Trash, X } from 'lucide-react';
 import Link from 'next/link';
+import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import { useAuthContext } from '@/components/auth-provider';
@@ -11,6 +12,7 @@ import { ActionConfirmDialog } from '@/components/mobile/action-confirm-dialog';
 import { Avatar, EmptyState } from '@/components/mobile/app-chrome';
 import { ProfileSheet } from '@/components/mobile/profile-sheet';
 import { ReportDialog } from '@/components/report-dialog';
+import Skeleton from '@/components/skeleton';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -30,8 +32,6 @@ import { useReportUser } from '@/hooks/reports/use-report-user';
 import { formatDateToNow } from '@/lib/date/format-date';
 import { useChatState } from '../[chatId]/_hooks/use-chat-state';
 import Message from './message';
-import { useRouter } from 'next/navigation';
-import Skeleton from '@/components/skeleton';
 
 export function ChatClient({ chatId }: { chatId: string }) {
     const { user } = useAuthContext();

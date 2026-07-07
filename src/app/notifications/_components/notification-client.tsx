@@ -1,31 +1,42 @@
 'use client';
 
 import { type NotificationItemDto, NotificationItemDtoType } from '@services/model';
-import { Bell, Heart, Megaphone, MessageCircle } from 'lucide-react';
+import { Bell, BellCheck, BellRing, Heart, Loader2, Megaphone, MessageCircle } from 'lucide-react';
 import { useEffect, useRef } from 'react';
 import { LoadMoreRow } from '@/components/load-more-row';
 import { EmptyState } from '@/components/mobile/app-chrome';
 import { useTopBar } from '@/components/mobile/top-bar-provider';
+import Skeleton from '@/components/skeleton';
 import { useMarkAllNotificationsRead } from '@/hooks/notifications/use-mark-all-notifications-read';
+import { useNotificationsUnreadCount } from '@/hooks/notifications/use-noti-unread-count';
 import { useNotificationsList } from '@/hooks/notifications/use-notifications-list';
 import { getFormattedDate } from '@/lib/date/format-date';
 import { cn } from '@/lib/utils';
 
 export function NotificationClient() {
-    const { notifications, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } = useNotificationsList({});
-    const markAllRead = useMarkAllNotificationsRead();
     const loadMoreRef = useRef<HTMLDivElement | null>(null);
-    const hasUnread = notifications.some((item) => !item.isRead);
+
+    const { notifications, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } = useNotificationsList({});
+    const { mutate: markAllRead, isPending: isMarkingAllRead } = useMarkAllNotificationsRead();
+
+    const { data: countData = { unreadCount: 0 } } = useNotificationsUnreadCount();
 
     useTopBar({
+        title: 'Notifications',
         action: (
             <button
                 type="button"
-                className="text-xs font-semibold text-primary disabled:text-muted-foreground"
-                disabled={!hasUnread || markAllRead.isPending}
-                onClick={() => markAllRead.mutate()}
+                className="p-2 bg-primary/10 rounded-md text-primary disabled:text-muted-foreground"
+                disabled={countData.unreadCount === 0 || isMarkingAllRead}
+                onClick={() => markAllRead()}
             >
-                {markAllRead.isPending ? 'Marking...' : hasUnread ? 'Mark all as read' : 'All read'}
+                {isMarkingAllRead ? (
+                    <Loader2 className="w-4 h-4 animate-spin" />
+                ) : countData.unreadCount === 0 ? (
+                    <BellCheck className="w-4 h-4" />
+                ) : (
+                    <BellRing className="w-4 h-4" />
+                )}
             </button>
         )
     });
@@ -50,12 +61,14 @@ export function NotificationClient() {
     return (
         <main className="flex-1 overflow-y-auto bg-background pb-8">
             {isLoading ? (
-                <EmptyState title="Loading notifications" body="Checking for new activities." icon={'loader'} />
+                <Skeleton />
             ) : notifications.length ? (
                 <Section title="">
-                    {notifications.map((item, index) => (
-                        <NotificationRow key={`${item.id}-${index}`} notification={item} />
-                    ))}
+                    <div className="space-y-1.5">
+                        {notifications.map((item) => (
+                            <NotificationRow key={item.id} notification={item} />
+                        ))}
+                    </div>
                     <LoadMoreRow
                         ref={loadMoreRef}
                         hasNextPage={hasNextPage}

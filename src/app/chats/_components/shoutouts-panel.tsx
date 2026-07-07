@@ -9,13 +9,12 @@ import { ActionConfirmDialog } from '@/components/mobile/action-confirm-dialog';
 import { Avatar, EmptyState } from '@/components/mobile/app-chrome';
 import { ProfileSheet } from '@/components/mobile/profile-sheet';
 import { ShoutoutDetailSheet } from '@/components/mobile/shoutout-detail-sheet';
+import Skeleton from '@/components/skeleton';
 import { useDeleteShoutout } from '@/hooks/chat/use-delete-shoutout';
 import { useReplyShoutout } from '@/hooks/chat/use-reply-shoutout';
 import { type ShoutoutItem, type ShoutoutType, useShoutoutsList } from '@/hooks/chat/use-shoutouts-list';
 import { getFormattedDate } from '@/lib/date/format-date';
 import { cn } from '@/lib/utils';
-import { Loader2, MessageCircle } from 'lucide-react';
-import Skeleton from '@/components/skeleton';
 
 export function ShoutoutsPanel() {
     const router = useRouter();

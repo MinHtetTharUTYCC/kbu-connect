@@ -8,7 +8,7 @@ export const userLinks: NavItem[] = [
     { href: '/discover', label: 'Discover', icon: 'search' },
     { href: '/matches', label: 'Matches', icon: 'heart' },
     { href: '/chats', label: 'Chats', icon: 'message' },
-    { href: '/notification', label: 'Notifications', icon: 'bell' },
+    { href: '/notifications', label: 'Notifications', icon: 'bell' },
     { href: '/profile/me', label: 'Profile', icon: 'user' }
 ];
 

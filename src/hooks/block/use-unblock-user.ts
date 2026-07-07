@@ -1,8 +1,8 @@
 'use client';
 
 import { getBlockControllerGetBlockedUsersInfiniteQueryKey, useBlockControllerUnblockUser } from '@services/generated/block/block';
-import { BlocksListResponseDto } from '@services/model';
-import { InfiniteData, useQueryClient } from '@tanstack/react-query';
+import type { BlocksListResponseDto } from '@services/model';
+import { type InfiniteData, useQueryClient } from '@tanstack/react-query';
 
 export function useUnblockUser() {
     const queryClient = useQueryClient();
