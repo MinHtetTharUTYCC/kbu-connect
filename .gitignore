@@ -15,6 +15,5 @@
 *.tsbuildinfo
 next-env.d.ts
 
-# orval generated files (TODO:: remove for prod)
 /services/model/
 /services/generated/
