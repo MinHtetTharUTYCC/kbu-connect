@@ -10,7 +10,7 @@ import { ProfileSheet } from '@/components/mobile/profile-sheet';
 import { useSendShoutout } from '@/hooks/chat/use-send-shoutout';
 import { useDiscoveryProfiles } from '@/hooks/discovery/use-discovery-profiles';
 import { useSwipeProfile } from '@/hooks/swipes/use-swipe-profile';
-import { cn, formatEnum } from '@/lib/utils';
+import { cn, formatEnum, formatFaculty } from '@/lib/utils';
 import { SendShoutoutSheet } from './send-shoutout-sheet';
 
 const SWIPE_THRESHOLD = 80;
@@ -232,7 +232,7 @@ export function DiscoverClient() {
                             </div>
                             <div className="flex items-center gap-2 text-primary font-medium">
                                 <GraduationCap className="size-4" />
-                                <p className="line-clamp-1 font-semibold">{formatEnum(profile.faculty)}</p>
+                                <p className="line-clamp-1 font-semibold text-xs">{formatFaculty(profile.faculty)}</p>
                             </div>
 
                             <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none [&::-webkit-scrollbar]:hidden">

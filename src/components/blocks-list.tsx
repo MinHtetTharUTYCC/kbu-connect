@@ -3,13 +3,13 @@
 import { UserX } from 'lucide-react';
 import { useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
+import ItemsLoading from '@/app/chats/_components/loading';
 import { Avatar } from '@/components/mobile/app-chrome';
 import { Button } from '@/components/ui/button';
 import { useBlockedUsers } from '@/hooks/block/use-blocked-users';
 import { useUnblockUser } from '@/hooks/block/use-unblock-user';
 import { LoadMoreRow } from './load-more-row';
 import { ActionConfirmDialog } from './mobile/action-confirm-dialog';
-import Skeleton from './skeleton';
 
 type UnblockTarget = {
     id: string;
@@ -42,7 +42,7 @@ export function BlocksList() {
     }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
 
     if (isLoading) {
-        return <Skeleton />;
+        return <ItemsLoading />;
     }
 
     if (blocks.length === 0) {

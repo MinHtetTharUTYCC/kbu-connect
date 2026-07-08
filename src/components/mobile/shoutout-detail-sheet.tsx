@@ -39,12 +39,6 @@ export function ShoutoutDetailSheet({
     return (
         <Drawer open={!!shoutout} onOpenChange={(open) => !open && onClose()}>
             <DrawerContent className="mx-auto max-w-[430px] px-4 pb-4 gap-4 rounded-t-2xl bg-white shadow-xl">
-                {/* <DrawerHeader className="flex items-center justify-between p-0">
-                    <DrawerTitle className="text-base font-semibold">
-                        {isReceived ? 'Received shoutout' : 'Sent shoutout'}
-                    </DrawerTitle>
-                </DrawerHeader> */}
-
                 <button
                     type="button"
                     onClick={() => onProfileClick(shoutout.otherUser.id)}
@@ -85,7 +79,7 @@ export function ShoutoutDetailSheet({
                         type="button"
                         onClick={onDelete}
                         disabled={isDeleting}
-                        className="flex items-center justify-center gap-2 rounded-lg border border-red-200 bg-red-50 py-2 px-4 text-sm font-semibold text-red-600 hover:bg-red-100 disabled:opacity-50"
+                        className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-primary py-2 px-4 text-sm font-semibold text-white disabled:opacity-50"
                     >
                         <Trash className="size-4" />
                         Delete

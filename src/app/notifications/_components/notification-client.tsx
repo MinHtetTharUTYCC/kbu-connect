@@ -1,20 +1,24 @@
 'use client';
 
 import { type NotificationItemDto, NotificationItemDtoType } from '@services/model';
-import { Bell, BellCheck, BellRing, Heart, Loader2, Megaphone, MessageCircle } from 'lucide-react';
-import { useEffect, useRef } from 'react';
+import { Bell, BellRing, Heart, Loader2, Megaphone, MessageCircle } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { useEffect, useRef, useState } from 'react';
+import ItemsLoading from '@/app/chats/_components/loading';
 import { LoadMoreRow } from '@/components/load-more-row';
 import { EmptyState } from '@/components/mobile/app-chrome';
 import { useTopBar } from '@/components/mobile/top-bar-provider';
-import Skeleton from '@/components/skeleton';
 import { useMarkAllNotificationsRead } from '@/hooks/notifications/use-mark-all-notifications-read';
 import { useNotificationsUnreadCount } from '@/hooks/notifications/use-noti-unread-count';
 import { useNotificationsList } from '@/hooks/notifications/use-notifications-list';
 import { getFormattedDate } from '@/lib/date/format-date';
 import { cn } from '@/lib/utils';
+import { NotificationDetailSheet } from './notification-detail-sheet';
 
 export function NotificationClient() {
+    const router = useRouter();
     const loadMoreRef = useRef<HTMLDivElement | null>(null);
+    const [selectedNotification, setSelectedNotification] = useState<NotificationItemDto | null>(null);
 
     const { notifications, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } = useNotificationsList({});
     const { mutate: markAllRead, isPending: isMarkingAllRead } = useMarkAllNotificationsRead();
@@ -23,22 +27,17 @@ export function NotificationClient() {
 
     useTopBar({
         title: 'Notifications',
-        action: (
-            <button
-                type="button"
-                className="p-2 bg-primary/10 rounded-md text-primary disabled:text-muted-foreground"
-                disabled={countData.unreadCount === 0 || isMarkingAllRead}
-                onClick={() => markAllRead()}
-            >
-                {isMarkingAllRead ? (
-                    <Loader2 className="w-4 h-4 animate-spin" />
-                ) : countData.unreadCount === 0 ? (
-                    <BellCheck className="w-4 h-4" />
-                ) : (
-                    <BellRing className="w-4 h-4" />
-                )}
-            </button>
-        )
+        action:
+            isMarkingAllRead || countData.unreadCount > 0 ? (
+                <button
+                    type="button"
+                    className="p-2 bg-primary/10 rounded-md text-primary disabled:text-muted-foreground"
+                    disabled={countData.unreadCount === 0 || isMarkingAllRead}
+                    onClick={() => markAllRead()}
+                >
+                    {isMarkingAllRead ? <Loader2 className="w-4 h-4 animate-spin" /> : <BellRing className="w-4 h-4" />}
+                </button>
+            ) : undefined
     });
 
     useEffect(() => {
@@ -58,15 +57,36 @@ export function NotificationClient() {
         return () => observer.disconnect();
     }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
 
+    function handleNavigate(notification: NotificationItemDto) {
+        switch (notification.type) {
+            case NotificationItemDtoType.NEW_MESSAGE:
+                router.push(`/chats/${(notification.data as Record<string, unknown>)?.conversationId}`);
+                break;
+            case NotificationItemDtoType.NEW_MATCH:
+                router.push('/matches');
+                break;
+            case NotificationItemDtoType.SHOUTOUT_RECEIVED:
+                router.push('/chats?tab=shoutouts');
+                break;
+            case NotificationItemDtoType.SHOUTOUT_REPLIED:
+                router.push(`/chats/${(notification.data as Record<string, unknown>)?.conversationId}`);
+                break;
+            case NotificationItemDtoType.SYSTEM:
+            case NotificationItemDtoType.ANNOUNCEMENT:
+                setSelectedNotification(notification);
+                break;
+        }
+    }
+
     return (
         <main className="flex-1 overflow-y-auto bg-background pb-8">
             {isLoading ? (
-                <Skeleton />
+                <ItemsLoading />
             ) : notifications.length ? (
                 <Section title="">
                     <div className="space-y-1.5">
                         {notifications.map((item) => (
-                            <NotificationRow key={item.id} notification={item} />
+                            <NotificationRow key={item.id} notification={item} onNavigate={handleNavigate} />
                         ))}
                     </div>
                     <LoadMoreRow
@@ -83,6 +103,7 @@ export function NotificationClient() {
                     icon={'bell'}
                 />
             )}
+            <NotificationDetailSheet notification={selectedNotification} onClose={() => setSelectedNotification(null)} />
         </main>
     );
 }
@@ -96,13 +117,21 @@ function Section({ title, children }: { title: string; children: React.ReactNode
     );
 }
 
-function NotificationRow({ notification }: { notification: NotificationItemDto }) {
+function NotificationRow({
+    notification,
+    onNavigate
+}: {
+    notification: NotificationItemDto;
+    onNavigate: (notification: NotificationItemDto) => void;
+}) {
     const Icon = getNotificationIcon(notification.type);
 
     return (
-        <div
+        <button
+            type="button"
+            onClick={() => onNavigate(notification)}
             className={cn(
-                'rounded-md',
+                'w-full rounded-md text-left active:bg-black/5',
                 notification.isRead ? 'border-b border-black/10 bg-white' : 'border-b border-black/10 bg-primary/10'
             )}
         >
@@ -112,13 +141,13 @@ function NotificationRow({ notification }: { notification: NotificationItemDto }
                 </div>
                 <div className="min-w-0 flex-1">
                     <div className="mb-0.5 flex items-start justify-between gap-3">
-                        <h3 className="font-semibold">{notification.title}</h3>
+                        <h3 className="font-semibold line-clamp-2">{notification.title}</h3>
                         <span className="shrink-0 text-xs text-muted-foreground">{getFormattedDate(notification.createdAt)}</span>
                     </div>
-                    {notification.body && <p className="text-sm leading-6 text-foreground">{notification.body}</p>}
+                    {notification.body && <p className="text-sm leading-6 text-foreground line-clamp-2">{notification.body}</p>}
                 </div>
             </div>
-        </div>
+        </button>
     );
 }
 

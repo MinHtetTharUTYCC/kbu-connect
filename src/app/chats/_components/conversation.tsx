@@ -12,7 +12,6 @@ import { ActionConfirmDialog } from '@/components/mobile/action-confirm-dialog';
 import { Avatar, EmptyState } from '@/components/mobile/app-chrome';
 import { ProfileSheet } from '@/components/mobile/profile-sheet';
 import { ReportDialog } from '@/components/report-dialog';
-import Skeleton from '@/components/skeleton';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -31,6 +30,7 @@ import { useSendMessage } from '@/hooks/chat/use-send-message';
 import { useReportUser } from '@/hooks/reports/use-report-user';
 import { formatDateToNow } from '@/lib/date/format-date';
 import { useChatState } from '../[chatId]/_hooks/use-chat-state';
+import ItemsLoading from './loading';
 import Message from './message';
 
 export function ChatClient({ chatId }: { chatId: string }) {
@@ -155,9 +155,7 @@ export function ChatClient({ chatId }: { chatId: string }) {
         );
     }
 
-    if (conversationLoading || (!conversation && hasNextPageMessages)) {
-        return <Skeleton />;
-    }
+    if (conversationLoading) return <ItemsLoading />;
 
     if (!conversation) {
         return (
@@ -216,7 +214,7 @@ export function ChatClient({ chatId }: { chatId: string }) {
 
             <main className="min-h-0 flex-1 overflow-y-auto bg-white px-5 py-6">
                 {isLoadingMessages ? (
-                    <Skeleton />
+                    <ItemsLoading />
                 ) : messages.length ? (
                     <div className="flex flex-col gap-3">
                         {messages.map((message) => {

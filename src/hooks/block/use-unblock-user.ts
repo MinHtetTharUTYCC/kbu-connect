@@ -1,6 +1,7 @@
 'use client';
 
 import { getBlockControllerGetBlockedUsersInfiniteQueryKey, useBlockControllerUnblockUser } from '@services/generated/block/block';
+import { getChatControllerGetConversationsInfiniteQueryKey } from '@services/generated/chat/chat';
 import type { BlocksListResponseDto } from '@services/model';
 import { type InfiniteData, useQueryClient } from '@tanstack/react-query';
 
@@ -10,9 +11,10 @@ export function useUnblockUser() {
     return useBlockControllerUnblockUser({
         mutation: {
             onSuccess: ({ unblockedUserId }) => {
-                const blockedUsersQueryKey = getBlockControllerGetBlockedUsersInfiniteQueryKey();
+                const blocksListQueryKey = getBlockControllerGetBlockedUsersInfiniteQueryKey();
+                const conversationsListQueryKey = getChatControllerGetConversationsInfiniteQueryKey();
 
-                queryClient.setQueryData<InfiniteData<BlocksListResponseDto>>(blockedUsersQueryKey, (oldData) => {
+                queryClient.setQueryData<InfiniteData<BlocksListResponseDto>>(blocksListQueryKey, (oldData) => {
                     if (!oldData || !oldData.pages) return oldData;
 
                     const newPages = oldData.pages.map((page) => {
@@ -26,6 +28,11 @@ export function useUnblockUser() {
                         ...oldData,
                         pages: newPages
                     };
+                });
+
+                queryClient.invalidateQueries({
+                    queryKey: conversationsListQueryKey,
+                    refetchType: 'all'
                 });
             }
         }

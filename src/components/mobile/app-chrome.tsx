@@ -60,12 +60,13 @@ export function Avatar({ src, name, className }: { src?: string | null; name?: s
     );
 }
 
-export function Chip({ children, active = false }: { children: ReactNode; active?: boolean }) {
+export function Chip({ children, active = false, wfull = false }: { children: ReactNode; active?: boolean; wfull?: boolean }) {
     return (
         <span
             className={cn(
-                'inline-flex h-7 shrink-0 items-center rounded-full border px-3 text-xs font-medium',
-                active ? 'border-primary bg-primary text-white' : 'border-black/10 bg-muted text-muted-foreground'
+                'inline-flex h-8 shrink-0 items-center rounded-full border px-3 text-sm font-medium',
+                active ? 'border-primary bg-primary text-white' : 'border-black/10 bg-muted text-muted-foreground',
+                wfull && 'w-full'
             )}
         >
             {children}

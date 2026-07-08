@@ -9,12 +9,12 @@ import { ActionConfirmDialog } from '@/components/mobile/action-confirm-dialog';
 import { Avatar, EmptyState } from '@/components/mobile/app-chrome';
 import { ProfileSheet } from '@/components/mobile/profile-sheet';
 import { ShoutoutDetailSheet } from '@/components/mobile/shoutout-detail-sheet';
-import Skeleton from '@/components/skeleton';
 import { useDeleteShoutout } from '@/hooks/chat/use-delete-shoutout';
 import { useReplyShoutout } from '@/hooks/chat/use-reply-shoutout';
 import { type ShoutoutItem, type ShoutoutType, useShoutoutsList } from '@/hooks/chat/use-shoutouts-list';
 import { getFormattedDate } from '@/lib/date/format-date';
 import { cn } from '@/lib/utils';
+import ItemsLoading from './loading';
 
 export function ShoutoutsPanel() {
     const router = useRouter();
@@ -72,7 +72,7 @@ export function ShoutoutsPanel() {
                 </div>
             </div>
             {isLoading ? (
-                <Skeleton />
+                <ItemsLoading />
             ) : shoutouts.length ? (
                 <div>
                     {shoutouts.map((item, index) => (
@@ -147,7 +147,7 @@ export function ShoutoutsPanel() {
                 <ActionConfirmDialog
                     action="Delete"
                     title="Delete shoutout"
-                    message="Are you sure you want to delete this shoutout? This action cannot be undone."
+                    message="Are you sure you want to delete this shoutout? Receiver will no longer be able to see it."
                     isPending={isDeleting}
                     onClose={() => setDeleteTargetId(null)}
                     onConfirm={() =>

@@ -12,11 +12,18 @@ export function ageFromBirthYear(birthYear?: number | null) {
 
 export function formatEnum(value?: string | null) {
     if (!value) return '';
+
     return value
         .toLowerCase()
         .split('_')
         .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
         .join(' ');
+}
+
+export function formatFaculty(value?: string | null) {
+    if (!value) return '';
+
+    return value.split('_').join(' ');
 }
 
 export function initials(name?: string | null) {

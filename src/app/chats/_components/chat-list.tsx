@@ -6,10 +6,10 @@ import { useEffect, useRef } from 'react';
 import { LoadMoreRow } from '@/components/load-more-row';
 import { Avatar, EmptyState } from '@/components/mobile/app-chrome';
 import { useTopBar } from '@/components/mobile/top-bar-provider';
-import Skeleton from '@/components/skeleton';
 import { useConversationsList } from '@/hooks/chat/use-conversations-list';
 import { getFormattedDate } from '@/lib/date/format-date';
 import { cn } from '@/lib/utils';
+import ItemsLoading from './loading';
 import { ShoutoutsPanel } from './shoutouts-panel';
 
 type ChatTab = 'chats' | 'shoutouts';
@@ -72,9 +72,7 @@ export function ChatListClient() {
         return () => observer.disconnect();
     }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
 
-    if (isLoading) {
-        return <Skeleton />;
-    }
+    if (isLoading) return <ItemsLoading />;
 
     if (!conversations.length) {
         return <EmptyState title="No chats" body="After you match and start a conversation, it will show here." icon="message" />;

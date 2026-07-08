@@ -18,7 +18,7 @@ import { AvatarUploadStep, GalleryUploadStep } from '@/components/mobile/profile
 import { useTopBar } from '@/components/mobile/top-bar-provider';
 import { Button } from '@/components/ui/button';
 import { useUpdateMyProfile } from '@/hooks/profile/use-update-my-profile';
-import { formatEnum } from '@/lib/utils';
+import { formatEnum, formatFaculty } from '@/lib/utils';
 
 const faculties = Object.values(UpdateProfileDtoFaculty);
 const interests = Object.values(UpdateProfileDtoInterestsItem);
@@ -201,7 +201,7 @@ export function ProfileSetupClient() {
                                 placeholder="Coffee enthusiast, design lover, and always up for campus events."
                                 className="min-h-28 w-full resize-none rounded-xl border border-black/10 bg-muted px-4 py-3 text-sm outline-none focus:border-primary"
                             />
-                            <span className={`mt-1 block text-xs ${bio.length > 500 ? 'text-red-500' : 'text-muted-foreground'}`}>
+                            <span className={`mt-1 block text-sm ${bio.length > 500 ? 'text-red-500' : 'text-muted-foreground'}`}>
                                 {bio.length} / 500
                             </span>
                         </Field>
@@ -211,26 +211,31 @@ export function ProfileSetupClient() {
                 {activeStep.id === 'academic' && (
                     <section className="grid gap-8">
                         <div>
-                            <div className="mb-4 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Select faculty</div>
+                            <div className="mb-4 text-sm font-semibold tracking-wide text-muted-foreground">Select faculty</div>
                             <div className="grid grid-cols-3 gap-2">
                                 {faculties.map((item) => (
-                                    <button
-                                        key={item}
-                                        type="button"
-                                        onClick={() => setFaculty(item)}
-                                        className={
-                                            faculty === item
-                                                ? 'h-8 rounded-full border border-primary bg-primary px-2 text-[10px] font-semibold text-white'
-                                                : 'h-8 rounded-full border border-black/10 bg-white px-2 text-[10px] font-semibold text-muted-foreground'
-                                        }
-                                    >
-                                        {formatEnum(item)}
+                                    // <button
+                                    //     key={item}
+                                    //     type="button"
+                                    //     onClick={() => setFaculty(item)}
+                                    //     className={
+                                    //         faculty === item
+                                    //             ? 'h-8 rounded-full border border-primary bg-primary px-2 text-sm font-semibold text-white'
+                                    //             : 'h-8 rounded-full border border-black/10 bg-white px-2 text-sm font-semibold text-muted-foreground'
+                                    //     }
+                                    // >
+                                    //     {formatEnum(item)}
+                                    // </button>
+                                    <button type="button" key={item} onClick={() => setFaculty(item)}>
+                                        <Chip active={faculty === item} wfull>
+                                            {formatFaculty(item)}
+                                        </Chip>
                                     </button>
                                 ))}
                             </div>
                         </div>
                         <div>
-                            <div className="mb-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Interests</div>
+                            <div className="mb-3 text-sm font-semibold tracking-wide text-muted-foreground">Interests</div>
                             <div className="flex flex-wrap gap-2">
                                 {interests.map((interest) => (
                                     <button type="button" key={interest} onClick={() => toggleInterest(interest)}>
@@ -245,19 +250,19 @@ export function ProfileSetupClient() {
                 {activeStep.id === 'preferences' && (
                     <section className="grid gap-5">
                         <Select
-                            label="Your identity"
+                            label="Your Identity"
                             value={gender}
                             onChange={(value) => setGender(value as UpdateProfileDtoGender)}
                             options={Object.values(UpdateProfileDtoGender)}
                         />
                         <Select
-                            label="Interested in"
+                            label="Interested In"
                             value={preferredGender}
                             onChange={(value) => setPreferredGender(value as UpdateProfileDtoPreferredGender)}
                             options={Object.values(UpdateProfileDtoPreferredGender)}
                         />
                         <Select
-                            label="Looking for"
+                            label="Looking For"
                             value={lookingFor}
                             onChange={(value) => setLookingFor(value as UpdateProfileDtoLookingFor)}
                             options={lookingForOptions}
@@ -270,13 +275,13 @@ export function ProfileSetupClient() {
                         />
                         <div className="grid grid-cols-2 gap-3">
                             <Select
-                                label="Min age"
+                                label="Minimum Age"
                                 value={String(minPreferredAge)}
                                 onChange={(value) => setMinPreferredAge(Number(value))}
                                 options={Array.from({ length: 23 }, (_, i) => String(18 + i))}
                             />
                             <Select
-                                label="Max age"
+                                label="Maximum Age"
                                 value={String(maxPreferredAge)}
                                 onChange={(value) => setMaxPreferredAge(Number(value))}
                                 options={Array.from({ length: 23 }, (_, i) => String(18 + i))}
@@ -304,7 +309,7 @@ export function ProfileSetupClient() {
                         <ReviewRow label="Avatar" value={avatarUrl ? 'Uploaded' : 'Missing'} />
                         <ReviewRow label="Gallery" value={`${gallery.length} photo${gallery.length === 1 ? '' : 's'}`} />
                         <div className="rounded-xl border border-black/10 bg-muted p-4">
-                            <div className="mb-3 text-xs font-semibold uppercase tracking-wide text-muted-foreground">Interests</div>
+                            <div className="mb-3 text-sm font-semibold tracking-wide text-muted-foreground">Interests</div>
                             <div className="flex flex-wrap gap-2">
                                 {selectedInterests.map((interest) => (
                                     <Chip key={interest} active>
@@ -352,7 +357,7 @@ export function ProfileSetupClient() {
 function Field({ label, htmlFor, children }: { label: string; htmlFor: string; children: React.ReactNode }) {
     return (
         <div>
-            <label htmlFor={htmlFor} className="mb-2 text-xs font-semibold uppercase tracking-wide text-muted-foreground">
+            <label htmlFor={htmlFor} className="mb-2 text-sm font-semibold tracking-wide text-muted-foreground">
                 {label}
             </label>
             {children}
@@ -373,7 +378,7 @@ function Select({
 }) {
     return (
         <label>
-            <span className="mb-2 block text-xs font-semibold uppercase tracking-wide text-muted-foreground">{label}</span>
+            <span className="mb-2 block text-sm font-semibold tracking-wide text-muted-foreground">{label}</span>
             <select
                 value={value}
                 onChange={(event) => onChange(event.target.value)}
@@ -392,7 +397,7 @@ function Select({
 function ReviewRow({ label, value }: { label: string; value: string }) {
     return (
         <div className="flex items-center justify-between gap-4 rounded-xl border border-black/10 bg-muted p-4">
-            <span className="text-xs font-semibold tracking-wide text-muted-foreground">{label}</span>
+            <span className="text-sm font-semibold tracking-wide text-muted-foreground">{label}</span>
             <span className="truncate text-sm font-semibold">{label === 'Name' ? value : formatEnum(value)}</span>
         </div>
     );
