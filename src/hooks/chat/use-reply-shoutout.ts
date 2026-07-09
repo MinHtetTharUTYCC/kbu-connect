@@ -8,14 +8,12 @@ import {
 import type { ConversationsListResponseDto, ShoutoutsListResponseDto } from '@services/model';
 import type { InfiniteData } from '@tanstack/react-query';
 import { useQueryClient } from '@tanstack/react-query';
-import { handleBackendError } from '@/lib/error/error-util';
 
 export function useReplyShoutout() {
     const queryClient = useQueryClient();
 
     return useChatControllerReplyToShoutout({
         mutation: {
-            onError: (error) => handleBackendError(error),
             onSuccess: (data, variables) => {
                 const { shoutoutId } = variables;
 

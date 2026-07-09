@@ -20,9 +20,8 @@ export function NotificationClient() {
     const loadMoreRef = useRef<HTMLDivElement | null>(null);
     const [selectedNotification, setSelectedNotification] = useState<NotificationItemDto | null>(null);
 
-    const { notifications, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } = useNotificationsList({});
+    const { notifications, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } = useNotificationsList();
     const { mutate: markAllRead, isPending: isMarkingAllRead } = useMarkAllNotificationsRead();
-
     const { data: countData = { unreadCount: 0 } } = useNotificationsUnreadCount();
 
     useTopBar({

@@ -1,9 +1,10 @@
 'use client';
 
 import { Send, Trash } from 'lucide-react';
+import { VisuallyHidden } from 'radix-ui';
 import { useState } from 'react';
 import { Avatar } from '@/components/mobile/app-chrome';
-import { Drawer, DrawerContent } from '@/components/ui/drawer';
+import { Drawer, DrawerContent, DrawerTitle } from '@/components/ui/drawer';
 import type { ShoutoutItem } from '@/hooks/chat/use-shoutouts-list';
 import { getFormattedDate } from '@/lib/date/format-date';
 
@@ -38,7 +39,14 @@ export function ShoutoutDetailSheet({
 
     return (
         <Drawer open={!!shoutout} onOpenChange={(open) => !open && onClose()}>
-            <DrawerContent className="mx-auto max-w-[430px] px-4 pb-4 gap-4 rounded-t-2xl bg-white shadow-xl">
+            <DrawerContent
+                aria-describedby={undefined}
+                aria-hidden="false"
+                className="mx-auto max-w-[430px] px-4 pb-4 gap-4 rounded-t-2xl bg-white shadow-xl"
+            >
+                <VisuallyHidden.Root>
+                    <DrawerTitle>Shoutout Details</DrawerTitle>
+                </VisuallyHidden.Root>
                 <button
                     type="button"
                     onClick={() => onProfileClick(shoutout.otherUser.id)}

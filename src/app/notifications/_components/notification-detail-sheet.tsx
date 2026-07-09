@@ -2,7 +2,8 @@
 
 import { type NotificationItemDto, NotificationItemDtoType } from '@services/model';
 import { Bell, Heart, Megaphone, MessageCircle, X } from 'lucide-react';
-import { Drawer, DrawerClose, DrawerContent } from '@/components/ui/drawer';
+import { VisuallyHidden } from 'radix-ui';
+import { Drawer, DrawerClose, DrawerContent, DrawerTitle } from '@/components/ui/drawer';
 import { getFormattedDate } from '@/lib/date/format-date';
 
 export function NotificationDetailSheet({ notification, onClose }: { notification: NotificationItemDto | null; onClose: () => void }) {
@@ -10,7 +11,14 @@ export function NotificationDetailSheet({ notification, onClose }: { notificatio
 
     return (
         <Drawer open={!!notification} onOpenChange={(open) => !open && onClose()}>
-            <DrawerContent className="mx-auto max-h-[85vh] w-full max-w-[430px] flex-col overflow-hidden rounded-t-2xl bg-white shadow-xl">
+            <DrawerContent
+                aria-describedby={undefined}
+                aria-hidden="false"
+                className="mx-auto max-h-[85vh] w-full max-w-[430px] flex-col overflow-hidden"
+            >
+                <VisuallyHidden.Root>
+                    <DrawerTitle>Notification Details</DrawerTitle>
+                </VisuallyHidden.Root>
                 <div className="flex items-center justify-between px-5 py-2">
                     <div className="flex items-center gap-3">
                         <div className="grid size-10 shrink-0 place-items-center rounded-full bg-primary/20 text-primary">

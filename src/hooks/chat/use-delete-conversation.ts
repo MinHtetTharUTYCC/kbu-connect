@@ -2,7 +2,6 @@ import { getChatControllerGetConversationsInfiniteQueryKey, useChatControllerDel
 import { useQueryClient } from '@tanstack/react-query';
 import { useRouter } from 'next/navigation';
 import { toast } from 'sonner';
-import { handleBackendError } from '@/lib/error/error-util';
 
 export function useDeleteConversation() {
     const router = useRouter();
@@ -10,7 +9,6 @@ export function useDeleteConversation() {
 
     return useChatControllerDeleteConversation({
         mutation: {
-            onError: (error) => handleBackendError(error),
             onSuccess: () => {
                 queryClient.invalidateQueries({
                     queryKey: getChatControllerGetConversationsInfiniteQueryKey()

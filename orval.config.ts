@@ -4,7 +4,7 @@ import { publicApiUrl } from './src/lib/constants/app.config'; // '@/' alias is 
 export default defineConfig({
     KBUConnectApi: {
         input: {
-            target: `${publicApiUrl}/api/json`
+            target: `${publicApiUrl}/api/docs/json`
         },
         output: {
             mode: 'tags-split', // one file per controller tag (auth, users, matches...)

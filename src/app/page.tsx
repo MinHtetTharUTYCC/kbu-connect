@@ -1,15 +1,15 @@
-import { GraduationCap, Heart, Mail, Megaphone, MessageCircle, School, ShieldCheck, Users } from 'lucide-react';
+import { Heart, Mail, Megaphone, MessageCircle, School, ShieldCheck, Users } from 'lucide-react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import TopBarClient from '@/components/mobile/top-bar-client';
 
 export const metadata: Metadata = {
-    title: 'KBU Connect - Your Exclusive Campus Network',
+    title: 'KBU Connect - Exclusive Campus Network',
     description:
-        'KBU Connect is a dating and social discovery platform exclusively for Kasem Bundit University students. Swipe, match, and connect with your campus community.',
+        'KBU Connect is a dating and social discovery platform exclusively for Kasem Bundit University students in Thailand. Swipe, match, and connect with your campus community.',
     openGraph: {
-        title: 'KBU Connect - Your Exclusive Campus Network',
-        description: 'KBU Connect is a dating and social discovery platform exclusively for Kasem Bundit University students.',
+        title: 'KBU Connect - Exclusive Campus Network',
+        description: 'KBU Connect is a dating and social discovery platform exclusively for Kasem Bundit University students in Thailand.',
         type: 'website'
     }
 };
@@ -78,7 +78,7 @@ export default function HomePage() {
                             <div
                                 className="h-[180px] bg-cover bg-center"
                                 style={{
-                                    backgroundImage: "url('https://images.unsplash.com/photo-1523580494863-6f3031224c94?w=800&q=80')"
+                                    backgroundImage: "url('/images/kbu.webp')"
                                 }}
                             />
                         </div>
@@ -86,12 +86,12 @@ export default function HomePage() {
                             <div
                                 className="h-[120px] bg-cover bg-center"
                                 style={{
-                                    backgroundImage: "url('https://images.unsplash.com/photo-1523580494863-6f3031224c94?w=800&q=80')"
+                                    backgroundImage: "url('/images/library.webp')"
                                 }}
                             />
                         </div>
                         <div className="flex flex-col items-center justify-center rounded-2xl border border-border bg-background p-4">
-                            <GraduationCap className="mb-1 size-8 text-primary" />
+                            <Users className="mb-1 size-8 text-primary" />
                             <span className="text-lg font-bold">5,000+</span>
                             <span className="text-[11px] text-muted-foreground">Active Students</span>
                         </div>

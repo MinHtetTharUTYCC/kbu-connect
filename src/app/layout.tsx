@@ -1,4 +1,4 @@
-import { Geist, Geist_Mono } from 'next/font/google';
+import { Inter, JetBrains_Mono } from 'next/font/google';
 
 import './globals.css';
 import { MobileScreen } from '@/components/mobile/app-chrome';
@@ -8,9 +8,9 @@ import { Toaster } from '@/components/ui/sonner';
 import BottomNav from '@/components/web/bottom-nav';
 import { cn } from '@/lib/utils';
 
-const geist = Geist({ subsets: ['latin'], variable: '--font-sans' });
+const inter = Inter({ subsets: ['latin'], variable: '--font-sans' });
 
-const fontMono = Geist_Mono({
+const jetbrainsMono = JetBrains_Mono({
     subsets: ['latin'],
     variable: '--font-mono'
 });
@@ -21,7 +21,7 @@ export default function RootLayout({
     children: React.ReactNode;
 }>) {
     return (
-        <html lang="en" suppressHydrationWarning className={cn('antialiased', fontMono.variable, 'font-sans', geist.variable)}>
+        <html lang="en" suppressHydrationWarning className={cn('antialiased', jetbrainsMono.variable, 'font-sans', inter.variable)}>
             <body className="flex flex-col h-dvh">
                 <Providers>
                     <MobileScreen>

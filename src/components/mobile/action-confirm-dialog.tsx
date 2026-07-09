@@ -10,7 +10,6 @@ import {
     AlertDialogHeader,
     AlertDialogTitle
 } from '@/components/ui/alert-dialog';
-import { cn } from '@/lib/utils';
 
 export function ActionConfirmDialog({
     title,
@@ -29,7 +28,7 @@ export function ActionConfirmDialog({
 }) {
     return (
         <AlertDialog open onOpenChange={(open) => !open && onClose()}>
-            <AlertDialogContent aria-describedby={undefined}>
+            <AlertDialogContent>
                 <AlertDialogHeader>
                     <AlertDialogTitle>{title}</AlertDialogTitle>
                     <AlertDialogDescription>{message}</AlertDialogDescription>
@@ -38,11 +37,11 @@ export function ActionConfirmDialog({
                     <div className="grid grid-cols-2 gap-2">
                         <AlertDialogCancel disabled={isPending}>Cancel</AlertDialogCancel>
                         <AlertDialogAction
-                            className={cn(
-                                'bg-destructive/10 text-destructive hover:bg-destructive/20 focus-visible:border-destructive/40 focus-visible:ring-destructive/20 dark:bg-destructive/20 dark:hover:bg-destructive/30 dark:focus-visible:ring-destructive/40'
-                            )}
                             disabled={isPending}
-                            onClick={onConfirm}
+                            onClick={(e) => {
+                                e.preventDefault();
+                                onConfirm();
+                            }}
                         >
                             {action}
                         </AlertDialogAction>

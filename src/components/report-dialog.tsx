@@ -14,7 +14,7 @@ import {
 } from '@/components/ui/alert-dialog';
 import { Label } from '@/components/ui/label';
 
-const reasonLabels: Record<string, string> = {
+const reasonLabels: Record<keyof typeof CreateReportDtoReason, string> = {
     INAPPROPRIATE_BEHAVIOR: 'Inappropriate Behavior',
     FAKE_PROFILE: 'Fake Profile',
     SCAM: 'Scam',
@@ -38,7 +38,8 @@ export function ReportDialog({
     const [reason, setReason] = useState<CreateReportDtoReason>(CreateReportDtoReason.INAPPROPRIATE_BEHAVIOR);
     const [description, setDescription] = useState('');
 
-    function handleSubmit() {
+    function handleSubmit(e: React.MouseEvent<HTMLButtonElement>) {
+        e.preventDefault(); //prevent default close
         onSubmit(reason, description.trim() || undefined);
     }
 
@@ -85,10 +86,14 @@ export function ReportDialog({
                     </div>
                 </div>
                 <AlertDialogFooter>
-                    <AlertDialogCancel disabled={isPending}>Cancel</AlertDialogCancel>
-                    <AlertDialogAction disabled={isPending} onClick={handleSubmit}>
-                        Submit Report
-                    </AlertDialogAction>
+                    <div className="grid grid-cols-2 gap-2">
+                        <AlertDialogCancel className="w-full" disabled={isPending}>
+                            Cancel
+                        </AlertDialogCancel>
+                        <AlertDialogAction className="w-full" disabled={isPending} onClick={handleSubmit}>
+                            {isPending ? 'Reporting...' : 'Report'}
+                        </AlertDialogAction>
+                    </div>
                 </AlertDialogFooter>
             </AlertDialogContent>
         </AlertDialog>

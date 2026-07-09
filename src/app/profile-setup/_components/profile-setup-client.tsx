@@ -183,15 +183,18 @@ export function ProfileSetupClient() {
                             />
                         </Field>
                         <Field label="Birth year" htmlFor="birthYear">
-                            <input
+                            <select
                                 id="birthYear"
                                 value={birthYear}
                                 onChange={(event) => setBirthYear(Number(event.target.value))}
-                                type="number"
-                                min={1900}
-                                max={new Date().getFullYear()}
                                 className="h-11 w-full rounded-xl border border-black/10 bg-muted px-4 outline-none focus:border-primary"
-                            />
+                            >
+                                {Array.from({ length: 23 }, (_, i) => 2008 - i).map((year) => (
+                                    <option key={year} value={year}>
+                                        {year}
+                                    </option>
+                                ))}
+                            </select>
                         </Field>
                         <Field label="Short bio" htmlFor="bio">
                             <textarea

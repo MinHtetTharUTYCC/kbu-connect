@@ -2,13 +2,14 @@
 
 import { Cake, Flag, Globe, GraduationCap, Heart, LoaderCircle, type LucideIcon, MessageCircle, Search, UserRound, X } from 'lucide-react';
 import Image from 'next/image';
+import { VisuallyHidden } from 'radix-ui';
 import { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { toast } from 'sonner';
 import { Chip } from '@/components/mobile/app-chrome';
 import { FullScreenImageViewer } from '@/components/mobile/full-screen-image-viewer';
 import { ReportDialog } from '@/components/report-dialog';
-import { Drawer, DrawerContent } from '@/components/ui/drawer';
+import { Drawer, DrawerContent, DrawerTitle } from '@/components/ui/drawer';
 import { useReportUser } from '@/hooks/reports/use-report-user';
 import { useVisitProfile } from '@/hooks/users/use-visit-profile';
 import { ageFromBirthYear, formatEnum } from '@/lib/utils';
@@ -64,10 +65,14 @@ export function ProfileSheet({
 
     return (
         <Drawer open={!!userId} onOpenChange={(open) => !open && viewerIndex === null && onClose()}>
-            <DrawerContent className="mx-auto max-h-[85vh] w-full max-w-[430px] flex-col overflow-hidden rounded-t-2xl bg-white shadow-xl">
-                {/* No Header Here*/}
+            <DrawerContent
+                aria-describedby={undefined}
+                className="mx-auto max-h-[85vh] w-full max-w-[430px] flex-col overflow-hidden rounded-t-2xl bg-white shadow-xl"
+            >
+                <VisuallyHidden.Root>
+                    <DrawerTitle>Profile</DrawerTitle>
+                </VisuallyHidden.Root>
 
-                {/* Main Content Area */}
                 <div className="flex-1 overflow-y-auto">
                     {isLoading ? (
                         <div className="flex items-center justify-center py-16">
