@@ -1,3 +1,4 @@
+'use client';
 import { useAuthControllerVerify } from '@services/generated/auth/auth';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/stores/auth-store';
@@ -17,6 +18,9 @@ export function useVerify() {
                 } else {
                     router.replace('/profile-setup');
                 }
+            },
+            meta: {
+                skipGlobalToast: true
             }
         }
     });

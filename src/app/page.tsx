@@ -1,4 +1,4 @@
-import { Heart, Mail, Megaphone, MessageCircle, School, ShieldCheck, Users } from 'lucide-react';
+import { GraduationCap, Heart, Mail, Megaphone, MessageCircle, ShieldCheck, Users } from 'lucide-react';
 import type { Metadata } from 'next';
 import Link from 'next/link';
 import TopBarClient from '@/components/mobile/top-bar-client';
@@ -41,13 +41,12 @@ export default function HomePage() {
     return (
         <>
             <TopBarClient title="KBU Connect" canBack={false} />
-            {/* <main className="mx-auto flex min-h-svh w-full max-w-[430px] flex-col overflow-y-auto bg-background px-5 pb-10 text-foreground"> */}
             <main className="bg-background px-5 pb-10 text-foreground">
                 <section className="flex flex-col items-center py-8 text-center">
                     <div className="mb-5 grid size-[72px] place-items-center rounded-[18px] bg-primary text-primary-foreground">
-                        <School className="size-8" />
+                        <GraduationCap className="size-8" />
                     </div>
-                    <h1 className="text-[22px] font-medium tracking-tight">KBU Connect</h1>
+                    <h1 className="text-[22px] text-primary font-bold tracking-wide">KBU Connect</h1>
                     <p className="mt-1.5 text-[13px] text-muted-foreground">Campus community · Kasem Bundit University</p>
                 </section>
 
@@ -65,7 +64,7 @@ export default function HomePage() {
                 </div>
 
                 <section className="mb-8">
-                    <p className="mb-3 text-[13px] font-medium uppercase tracking-[0.06em] text-muted-foreground">About</p>
+                    <p className="mb-3 text-[13px] font-medium tracking-widest text-muted-foreground">About</p>
                     <p className="text-sm leading-[1.75] text-muted-foreground">
                         KBU Connect is a dating and social discovery platform built exclusively for Kasem Bundit University students. Swipe
                         through profiles, match with people you are interested in, and start a conversation.
@@ -99,7 +98,7 @@ export default function HomePage() {
                 </section>
 
                 <section className="mb-8">
-                    <p className="mb-3 text-[13px] font-medium uppercase tracking-[0.06em] text-muted-foreground">How it works</p>
+                    <p className="mb-3 text-[13px] font-medium tracking-widest text-muted-foreground">How it works</p>
                     <div className="divide-y divide-border rounded-xl border border-border">
                         {HOW_IT_WORKS.map(({ icon: Icon, title, description }) => (
                             <div key={title} className="flex items-start gap-3.5 px-4 py-3.5">
@@ -116,7 +115,7 @@ export default function HomePage() {
                 </section>
 
                 <section className="mb-8">
-                    <p className="mb-3 text-[13px] font-medium uppercase tracking-[0.06em] text-muted-foreground">Who can join</p>
+                    <p className="mb-3 text-[13px] font-medium tracking-widest text-muted-foreground">Who can join</p>
                     <div className="flex items-center gap-2.5 rounded-xl border border-border px-4 py-3.5">
                         <Mail className="size-[18px] shrink-0 text-primary" />
                         <p className="text-[13px] leading-[1.6] text-muted-foreground">
@@ -127,19 +126,15 @@ export default function HomePage() {
                     </div>
                 </section>
 
-                <div className="mt-auto flex flex-col items-center gap-3 pt-8">
-                    <span className="text-xs text-muted-foreground">Version 1.0.0</span>
-                    <span className="text-xs text-muted-foreground">KBU Connect</span>
+                <div className="mt-auto flex flex-col items-center gap-3 pt-8 text-xs">
+                    <span className="text-muted-foreground">KBU Connect . Version 1.0.0</span>
                     <div className="flex items-center gap-4">
-                        <Link href="/privacy-policy" className="text-[12px] text-muted-foreground hover:text-primary transition-colors">
-                            Privacy Policy
+                        <Link href="/terms-and-conditions" className="text-primary hover:underline">
+                            Terms of Service
                         </Link>
                         <span className="text-muted-foreground">.</span>
-                        <Link
-                            href="/terms-and-conditions"
-                            className="text-[12px] text-muted-foreground hover:text-primary transition-colors"
-                        >
-                            Terms & Conditions
+                        <Link href="/privacy-policy" className="text-primary hover:underline">
+                            Privacy Policy
                         </Link>
                     </div>
                 </div>

@@ -5,331 +5,359 @@
  * Exclusive dating platform for KBU students
  * OpenAPI spec version: 1.0
  */
-import {
-  useInfiniteQuery,
-  useMutation,
-  useQuery
-} from '@tanstack/react-query';
+import { useInfiniteQuery, useMutation, useQuery } from '@tanstack/react-query';
 import type {
-  DataTag,
-  DefinedInitialDataOptions,
-  DefinedUseInfiniteQueryResult,
-  DefinedUseQueryResult,
-  InfiniteData,
-  MutationFunction,
-  QueryClient,
-  QueryFunction,
-  QueryKey,
-  UndefinedInitialDataOptions,
-  UseInfiniteQueryOptions,
-  UseInfiniteQueryResult,
-  UseMutationOptions,
-  UseMutationResult,
-  UseQueryOptions,
-  UseQueryResult
+    DataTag,
+    DefinedInitialDataOptions,
+    DefinedUseInfiniteQueryResult,
+    DefinedUseQueryResult,
+    InfiniteData,
+    MutationFunction,
+    QueryClient,
+    QueryFunction,
+    QueryKey,
+    UndefinedInitialDataOptions,
+    UseInfiniteQueryOptions,
+    UseInfiniteQueryResult,
+    UseMutationOptions,
+    UseMutationResult,
+    UseQueryOptions,
+    UseQueryResult
 } from '@tanstack/react-query';
 
-import type {
-  MatchListResponseDto,
-  MatchMarkAsSeenResponseDto,
-  MatchesControllerGetMatchesParams,
-  UnmatchDto,
-  UnmatchResponseDto
-} from '../../model';
+import type { MatchListResponseDto, MatchesControllerGetMatchesParams, UnmatchDto, UnmatchResponseDto } from '../../model';
 
 import { axiosInstanceFn } from '../../../src/lib/axios/axios-instance';
 
-
-
-
 /**
  * @summary Get a list of matches for the current user
  */
-export const matchesControllerGetMatches = (
+export const matchesControllerGetMatches = (params?: MatchesControllerGetMatchesParams, signal?: AbortSignal) => {
+    return axiosInstanceFn<MatchListResponseDto>({ url: `/matches`, method: 'GET', params, signal });
+};
+
+export const getMatchesControllerGetMatchesInfiniteQueryKey = (params?: MatchesControllerGetMatchesParams) => {
+    return ['infinite', `/matches`, ...(params ? [params] : [])] as const;
+};
+
+export const getMatchesControllerGetMatchesQueryKey = (params?: MatchesControllerGetMatchesParams) => {
+    return [`/matches`, ...(params ? [params] : [])] as const;
+};
+
+export const getMatchesControllerGetMatchesInfiniteQueryOptions = <
+    TData = InfiniteData<Awaited<ReturnType<typeof matchesControllerGetMatches>>, MatchesControllerGetMatchesParams['cursor']>,
+    TError = unknown
+>(
     params?: MatchesControllerGetMatchesParams,
- signal?: AbortSignal
-) => {
-
-
-      return axiosInstanceFn<MatchListResponseDto>(
-      {url: `/matches`, method: 'GET',
-        params, signal
-    },
-      );
+    options?: {
+        query?: Partial<
+            UseInfiniteQueryOptions<
+                Awaited<ReturnType<typeof matchesControllerGetMatches>>,
+                TError,
+                TData,
+                QueryKey,
+                MatchesControllerGetMatchesParams['cursor']
+            >
+        >;
     }
-
-
-
-
-export const getMatchesControllerGetMatchesInfiniteQueryKey = (params?: MatchesControllerGetMatchesParams,) => {
-    return [
-    'infinite', `/matches`, ...(params ? [params] : [])
-    ] as const;
-    }
-
-export const getMatchesControllerGetMatchesQueryKey = (params?: MatchesControllerGetMatchesParams,) => {
-    return [
-    `/matches`, ...(params ? [params] : [])
-    ] as const;
-    }
-
-
-export const getMatchesControllerGetMatchesInfiniteQueryOptions = <TData = InfiniteData<Awaited<ReturnType<typeof matchesControllerGetMatches>>, MatchesControllerGetMatchesParams['cursor']>, TError = unknown>(params?: MatchesControllerGetMatchesParams, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof matchesControllerGetMatches>>, TError, TData, QueryKey, MatchesControllerGetMatchesParams['cursor']>>, }
 ) => {
+    const { query: queryOptions } = options ?? {};
 
-const {query: queryOptions} = options ?? {};
+    const queryKey = queryOptions?.queryKey ?? getMatchesControllerGetMatchesInfiniteQueryKey(params);
 
-  const queryKey =  queryOptions?.queryKey ?? getMatchesControllerGetMatchesInfiniteQueryKey(params);
+    const queryFn: QueryFunction<
+        Awaited<ReturnType<typeof matchesControllerGetMatches>>,
+        QueryKey,
+        MatchesControllerGetMatchesParams['cursor']
+    > = ({ signal, pageParam }) => matchesControllerGetMatches({ ...params, cursor: pageParam ?? params?.['cursor'] }, signal);
 
-
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof matchesControllerGetMatches>>, QueryKey, MatchesControllerGetMatchesParams['cursor']> = ({ signal, pageParam }) => matchesControllerGetMatches({...params, 'cursor': pageParam ?? params?.['cursor']}, signal);
-
-
-
-
-
-   return  { queryKey, queryFn, ...queryOptions} as UseInfiniteQueryOptions<Awaited<ReturnType<typeof matchesControllerGetMatches>>, TError, TData, QueryKey, MatchesControllerGetMatchesParams['cursor']> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type MatchesControllerGetMatchesInfiniteQueryResult = NonNullable<Awaited<ReturnType<typeof matchesControllerGetMatches>>>
-export type MatchesControllerGetMatchesInfiniteQueryError = unknown
-
-
-export function useMatchesControllerGetMatchesInfinite<TData = InfiniteData<Awaited<ReturnType<typeof matchesControllerGetMatches>>, MatchesControllerGetMatchesParams['cursor']>, TError = unknown>(
- params: undefined |  MatchesControllerGetMatchesParams, options: { query:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof matchesControllerGetMatches>>, TError, TData, QueryKey, MatchesControllerGetMatchesParams['cursor']>> & Pick<
-        DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof matchesControllerGetMatches>>,
-          TError,
-          Awaited<ReturnType<typeof matchesControllerGetMatches>>, QueryKey
-        > , 'initialData'
-      >, }
- , queryClient?: QueryClient
-  ):  DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useMatchesControllerGetMatchesInfinite<TData = InfiniteData<Awaited<ReturnType<typeof matchesControllerGetMatches>>, MatchesControllerGetMatchesParams['cursor']>, TError = unknown>(
- params?: MatchesControllerGetMatchesParams, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof matchesControllerGetMatches>>, TError, TData, QueryKey, MatchesControllerGetMatchesParams['cursor']>> & Pick<
-        UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof matchesControllerGetMatches>>,
-          TError,
-          Awaited<ReturnType<typeof matchesControllerGetMatches>>, QueryKey
-        > , 'initialData'
-      >, }
- , queryClient?: QueryClient
-  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useMatchesControllerGetMatchesInfinite<TData = InfiniteData<Awaited<ReturnType<typeof matchesControllerGetMatches>>, MatchesControllerGetMatchesParams['cursor']>, TError = unknown>(
- params?: MatchesControllerGetMatchesParams, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof matchesControllerGetMatches>>, TError, TData, QueryKey, MatchesControllerGetMatchesParams['cursor']>>, }
- , queryClient?: QueryClient
-  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-/**
- * @summary Get a list of matches for the current user
- */
-
-export function useMatchesControllerGetMatchesInfinite<TData = InfiniteData<Awaited<ReturnType<typeof matchesControllerGetMatches>>, MatchesControllerGetMatchesParams['cursor']>, TError = unknown>(
- params?: MatchesControllerGetMatchesParams, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof matchesControllerGetMatches>>, TError, TData, QueryKey, MatchesControllerGetMatchesParams['cursor']>>, }
- , queryClient?: QueryClient
- ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-
-  const queryOptions = getMatchesControllerGetMatchesInfiniteQueryOptions(params,options)
-
-  const query = useInfiniteQuery(queryOptions, queryClient) as  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  return { ...query, queryKey: queryOptions.queryKey };
-}
-
-
-
-
-
-
-export const getMatchesControllerGetMatchesQueryOptions = <TData = Awaited<ReturnType<typeof matchesControllerGetMatches>>, TError = unknown>(params?: MatchesControllerGetMatchesParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof matchesControllerGetMatches>>, TError, TData>>, }
-) => {
-
-const {query: queryOptions} = options ?? {};
-
-  const queryKey =  queryOptions?.queryKey ?? getMatchesControllerGetMatchesQueryKey(params);
-
-
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof matchesControllerGetMatches>>> = ({ signal }) => matchesControllerGetMatches(params, signal);
-
-
-
-
-
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof matchesControllerGetMatches>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type MatchesControllerGetMatchesQueryResult = NonNullable<Awaited<ReturnType<typeof matchesControllerGetMatches>>>
-export type MatchesControllerGetMatchesQueryError = unknown
-
-
-export function useMatchesControllerGetMatches<TData = Awaited<ReturnType<typeof matchesControllerGetMatches>>, TError = unknown>(
- params: undefined |  MatchesControllerGetMatchesParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof matchesControllerGetMatches>>, TError, TData>> & Pick<
-        DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof matchesControllerGetMatches>>,
-          TError,
-          Awaited<ReturnType<typeof matchesControllerGetMatches>>
-        > , 'initialData'
-      >, }
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useMatchesControllerGetMatches<TData = Awaited<ReturnType<typeof matchesControllerGetMatches>>, TError = unknown>(
- params?: MatchesControllerGetMatchesParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof matchesControllerGetMatches>>, TError, TData>> & Pick<
-        UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof matchesControllerGetMatches>>,
-          TError,
-          Awaited<ReturnType<typeof matchesControllerGetMatches>>
-        > , 'initialData'
-      >, }
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useMatchesControllerGetMatches<TData = Awaited<ReturnType<typeof matchesControllerGetMatches>>, TError = unknown>(
- params?: MatchesControllerGetMatchesParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof matchesControllerGetMatches>>, TError, TData>>, }
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-/**
- * @summary Get a list of matches for the current user
- */
-
-export function useMatchesControllerGetMatches<TData = Awaited<ReturnType<typeof matchesControllerGetMatches>>, TError = unknown>(
- params?: MatchesControllerGetMatchesParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof matchesControllerGetMatches>>, TError, TData>>, }
- , queryClient?: QueryClient
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
-
-  const queryOptions = getMatchesControllerGetMatchesQueryOptions(params,options)
-
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  return { ...query, queryKey: queryOptions.queryKey };
-}
-
-
-
-
-
-
-/**
- * @summary Mark a match as seen
- */
-export const matchesControllerMarkMatchAsSeen = (
-    matchId: string,
- signal?: AbortSignal
-) => {
-
-
-      return axiosInstanceFn<MatchMarkAsSeenResponseDto>(
-      {url: `/matches/${matchId}/seen`, method: 'PATCH', signal
-    },
-      );
-    }
-
-
-
-export const getMatchesControllerMarkMatchAsSeenMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof matchesControllerMarkMatchAsSeen>>, TError,{matchId: string}, TContext>, }
-): UseMutationOptions<Awaited<ReturnType<typeof matchesControllerMarkMatchAsSeen>>, TError,{matchId: string}, TContext> => {
-
-const mutationKey = ['matchesControllerMarkMatchAsSeen'];
-const {mutation: mutationOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }};
-
-
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof matchesControllerMarkMatchAsSeen>>, {matchId: string}> = (props) => {
-          const {matchId} = props ?? {};
-
-          return  matchesControllerMarkMatchAsSeen(matchId,)
-        }
-
-
-
-
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type MatchesControllerMarkMatchAsSeenMutationResult = NonNullable<Awaited<ReturnType<typeof matchesControllerMarkMatchAsSeen>>>
-
-    export type MatchesControllerMarkMatchAsSeenMutationError = unknown
-
-    /**
- * @summary Mark a match as seen
- */
-export const useMatchesControllerMarkMatchAsSeen = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof matchesControllerMarkMatchAsSeen>>, TError,{matchId: string}, TContext>, }
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof matchesControllerMarkMatchAsSeen>>,
+    return { queryKey, queryFn, ...queryOptions } as UseInfiniteQueryOptions<
+        Awaited<ReturnType<typeof matchesControllerGetMatches>>,
         TError,
-        {matchId: string},
-        TContext
-      > => {
-      return useMutation(getMatchesControllerMarkMatchAsSeenMutationOptions(options), queryClient);
-    }
-    /**
- * @summary Unmatch with a user
- */
-export const matchesControllerUnmatch = (
-    matchId: string,
-    unmatchDto: UnmatchDto,
- signal?: AbortSignal
-) => {
+        TData,
+        QueryKey,
+        MatchesControllerGetMatchesParams['cursor']
+    > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
 
+export type MatchesControllerGetMatchesInfiniteQueryResult = NonNullable<Awaited<ReturnType<typeof matchesControllerGetMatches>>>;
+export type MatchesControllerGetMatchesInfiniteQueryError = unknown;
 
-      return axiosInstanceFn<UnmatchResponseDto>(
-      {url: `/matches/${matchId}`, method: 'DELETE',
-      headers: {'Content-Type': 'application/json', },
-      data: unmatchDto, signal
+export function useMatchesControllerGetMatchesInfinite<
+    TData = InfiniteData<Awaited<ReturnType<typeof matchesControllerGetMatches>>, MatchesControllerGetMatchesParams['cursor']>,
+    TError = unknown
+>(
+    params: undefined | MatchesControllerGetMatchesParams,
+    options: {
+        query: Partial<
+            UseInfiniteQueryOptions<
+                Awaited<ReturnType<typeof matchesControllerGetMatches>>,
+                TError,
+                TData,
+                QueryKey,
+                MatchesControllerGetMatchesParams['cursor']
+            >
+        > &
+            Pick<
+                DefinedInitialDataOptions<
+                    Awaited<ReturnType<typeof matchesControllerGetMatches>>,
+                    TError,
+                    Awaited<ReturnType<typeof matchesControllerGetMatches>>,
+                    QueryKey
+                >,
+                'initialData'
+            >;
     },
-      );
-    }
+    queryClient?: QueryClient
+): DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useMatchesControllerGetMatchesInfinite<
+    TData = InfiniteData<Awaited<ReturnType<typeof matchesControllerGetMatches>>, MatchesControllerGetMatchesParams['cursor']>,
+    TError = unknown
+>(
+    params?: MatchesControllerGetMatchesParams,
+    options?: {
+        query?: Partial<
+            UseInfiniteQueryOptions<
+                Awaited<ReturnType<typeof matchesControllerGetMatches>>,
+                TError,
+                TData,
+                QueryKey,
+                MatchesControllerGetMatchesParams['cursor']
+            >
+        > &
+            Pick<
+                UndefinedInitialDataOptions<
+                    Awaited<ReturnType<typeof matchesControllerGetMatches>>,
+                    TError,
+                    Awaited<ReturnType<typeof matchesControllerGetMatches>>,
+                    QueryKey
+                >,
+                'initialData'
+            >;
+    },
+    queryClient?: QueryClient
+): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useMatchesControllerGetMatchesInfinite<
+    TData = InfiniteData<Awaited<ReturnType<typeof matchesControllerGetMatches>>, MatchesControllerGetMatchesParams['cursor']>,
+    TError = unknown
+>(
+    params?: MatchesControllerGetMatchesParams,
+    options?: {
+        query?: Partial<
+            UseInfiniteQueryOptions<
+                Awaited<ReturnType<typeof matchesControllerGetMatches>>,
+                TError,
+                TData,
+                QueryKey,
+                MatchesControllerGetMatchesParams['cursor']
+            >
+        >;
+    },
+    queryClient?: QueryClient
+): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+/**
+ * @summary Get a list of matches for the current user
+ */
 
+export function useMatchesControllerGetMatchesInfinite<
+    TData = InfiniteData<Awaited<ReturnType<typeof matchesControllerGetMatches>>, MatchesControllerGetMatchesParams['cursor']>,
+    TError = unknown
+>(
+    params?: MatchesControllerGetMatchesParams,
+    options?: {
+        query?: Partial<
+            UseInfiniteQueryOptions<
+                Awaited<ReturnType<typeof matchesControllerGetMatches>>,
+                TError,
+                TData,
+                QueryKey,
+                MatchesControllerGetMatchesParams['cursor']
+            >
+        >;
+    },
+    queryClient?: QueryClient
+): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+    const queryOptions = getMatchesControllerGetMatchesInfiniteQueryOptions(params, options);
 
+    const query = useInfiniteQuery(queryOptions, queryClient) as UseInfiniteQueryResult<TData, TError> & {
+        queryKey: DataTag<QueryKey, TData, TError>;
+    };
 
-export const getMatchesControllerUnmatchMutationOptions = <TError = void,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof matchesControllerUnmatch>>, TError,{matchId: string;data: UnmatchDto}, TContext>, }
-): UseMutationOptions<Awaited<ReturnType<typeof matchesControllerUnmatch>>, TError,{matchId: string;data: UnmatchDto}, TContext> => {
+    return { ...query, queryKey: queryOptions.queryKey };
+}
 
-const mutationKey = ['matchesControllerUnmatch'];
-const {mutation: mutationOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }};
+export const getMatchesControllerGetMatchesQueryOptions = <
+    TData = Awaited<ReturnType<typeof matchesControllerGetMatches>>,
+    TError = unknown
+>(
+    params?: MatchesControllerGetMatchesParams,
+    options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof matchesControllerGetMatches>>, TError, TData>> }
+) => {
+    const { query: queryOptions } = options ?? {};
 
+    const queryKey = queryOptions?.queryKey ?? getMatchesControllerGetMatchesQueryKey(params);
 
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof matchesControllerGetMatches>>> = ({ signal }) =>
+        matchesControllerGetMatches(params, signal);
 
+    return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+        Awaited<ReturnType<typeof matchesControllerGetMatches>>,
+        TError,
+        TData
+    > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
 
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof matchesControllerUnmatch>>, {matchId: string;data: UnmatchDto}> = (props) => {
-          const {matchId,data} = props ?? {};
+export type MatchesControllerGetMatchesQueryResult = NonNullable<Awaited<ReturnType<typeof matchesControllerGetMatches>>>;
+export type MatchesControllerGetMatchesQueryError = unknown;
 
-          return  matchesControllerUnmatch(matchId,data,)
-        }
+export function useMatchesControllerGetMatches<TData = Awaited<ReturnType<typeof matchesControllerGetMatches>>, TError = unknown>(
+    params: undefined | MatchesControllerGetMatchesParams,
+    options: {
+        query: Partial<UseQueryOptions<Awaited<ReturnType<typeof matchesControllerGetMatches>>, TError, TData>> &
+            Pick<
+                DefinedInitialDataOptions<
+                    Awaited<ReturnType<typeof matchesControllerGetMatches>>,
+                    TError,
+                    Awaited<ReturnType<typeof matchesControllerGetMatches>>
+                >,
+                'initialData'
+            >;
+    },
+    queryClient?: QueryClient
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useMatchesControllerGetMatches<TData = Awaited<ReturnType<typeof matchesControllerGetMatches>>, TError = unknown>(
+    params?: MatchesControllerGetMatchesParams,
+    options?: {
+        query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof matchesControllerGetMatches>>, TError, TData>> &
+            Pick<
+                UndefinedInitialDataOptions<
+                    Awaited<ReturnType<typeof matchesControllerGetMatches>>,
+                    TError,
+                    Awaited<ReturnType<typeof matchesControllerGetMatches>>
+                >,
+                'initialData'
+            >;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useMatchesControllerGetMatches<TData = Awaited<ReturnType<typeof matchesControllerGetMatches>>, TError = unknown>(
+    params?: MatchesControllerGetMatchesParams,
+    options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof matchesControllerGetMatches>>, TError, TData>> },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+/**
+ * @summary Get a list of matches for the current user
+ */
 
+export function useMatchesControllerGetMatches<TData = Awaited<ReturnType<typeof matchesControllerGetMatches>>, TError = unknown>(
+    params?: MatchesControllerGetMatchesParams,
+    options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof matchesControllerGetMatches>>, TError, TData>> },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+    const queryOptions = getMatchesControllerGetMatchesQueryOptions(params, options);
 
+    const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
+    return { ...query, queryKey: queryOptions.queryKey };
+}
 
+/**
+ * @summary Mark a match as seen
+ */
+export const matchesControllerMarkMatchAsSeen = (matchId: string, signal?: AbortSignal) => {
+    return axiosInstanceFn<void>({ url: `/matches/${matchId}/seen`, method: 'PATCH', signal });
+};
 
+export const getMatchesControllerMarkMatchAsSeenMutationOptions = <TError = unknown, TContext = unknown>(options?: {
+    mutation?: UseMutationOptions<Awaited<ReturnType<typeof matchesControllerMarkMatchAsSeen>>, TError, { matchId: string }, TContext>;
+}): UseMutationOptions<Awaited<ReturnType<typeof matchesControllerMarkMatchAsSeen>>, TError, { matchId: string }, TContext> => {
+    const mutationKey = ['matchesControllerMarkMatchAsSeen'];
+    const { mutation: mutationOptions } = options
+        ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+            ? options
+            : { ...options, mutation: { ...options.mutation, mutationKey } }
+        : { mutation: { mutationKey } };
 
-  return  { mutationFn, ...mutationOptions }}
+    const mutationFn: MutationFunction<Awaited<ReturnType<typeof matchesControllerMarkMatchAsSeen>>, { matchId: string }> = (props) => {
+        const { matchId } = props ?? {};
 
-    export type MatchesControllerUnmatchMutationResult = NonNullable<Awaited<ReturnType<typeof matchesControllerUnmatch>>>
-    export type MatchesControllerUnmatchMutationBody = UnmatchDto
-    export type MatchesControllerUnmatchMutationError = void
+        return matchesControllerMarkMatchAsSeen(matchId);
+    };
 
-    /**
+    return { mutationFn, ...mutationOptions };
+};
+
+export type MatchesControllerMarkMatchAsSeenMutationResult = NonNullable<Awaited<ReturnType<typeof matchesControllerMarkMatchAsSeen>>>;
+
+export type MatchesControllerMarkMatchAsSeenMutationError = unknown;
+
+/**
+ * @summary Mark a match as seen
+ */
+export const useMatchesControllerMarkMatchAsSeen = <TError = unknown, TContext = unknown>(
+    options?: {
+        mutation?: UseMutationOptions<Awaited<ReturnType<typeof matchesControllerMarkMatchAsSeen>>, TError, { matchId: string }, TContext>;
+    },
+    queryClient?: QueryClient
+): UseMutationResult<Awaited<ReturnType<typeof matchesControllerMarkMatchAsSeen>>, TError, { matchId: string }, TContext> => {
+    return useMutation(getMatchesControllerMarkMatchAsSeenMutationOptions(options), queryClient);
+};
+/**
  * @summary Unmatch with a user
  */
-export const useMatchesControllerUnmatch = <TError = void,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof matchesControllerUnmatch>>, TError,{matchId: string;data: UnmatchDto}, TContext>, }
- , queryClient?: QueryClient): UseMutationResult<
+export const matchesControllerUnmatch = (matchId: string, unmatchDto: UnmatchDto, signal?: AbortSignal) => {
+    return axiosInstanceFn<UnmatchResponseDto>({
+        url: `/matches/${matchId}`,
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        data: unmatchDto,
+        signal
+    });
+};
+
+export const getMatchesControllerUnmatchMutationOptions = <TError = void, TContext = unknown>(options?: {
+    mutation?: UseMutationOptions<
         Awaited<ReturnType<typeof matchesControllerUnmatch>>,
         TError,
-        {matchId: string;data: UnmatchDto},
+        { matchId: string; data: UnmatchDto },
         TContext
-      > => {
-      return useMutation(getMatchesControllerUnmatchMutationOptions(options), queryClient);
-    }
+    >;
+}): UseMutationOptions<Awaited<ReturnType<typeof matchesControllerUnmatch>>, TError, { matchId: string; data: UnmatchDto }, TContext> => {
+    const mutationKey = ['matchesControllerUnmatch'];
+    const { mutation: mutationOptions } = options
+        ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+            ? options
+            : { ...options, mutation: { ...options.mutation, mutationKey } }
+        : { mutation: { mutationKey } };
+
+    const mutationFn: MutationFunction<Awaited<ReturnType<typeof matchesControllerUnmatch>>, { matchId: string; data: UnmatchDto }> = (
+        props
+    ) => {
+        const { matchId, data } = props ?? {};
+
+        return matchesControllerUnmatch(matchId, data);
+    };
+
+    return { mutationFn, ...mutationOptions };
+};
+
+export type MatchesControllerUnmatchMutationResult = NonNullable<Awaited<ReturnType<typeof matchesControllerUnmatch>>>;
+export type MatchesControllerUnmatchMutationBody = UnmatchDto;
+export type MatchesControllerUnmatchMutationError = void;
+
+/**
+ * @summary Unmatch with a user
+ */
+export const useMatchesControllerUnmatch = <TError = void, TContext = unknown>(
+    options?: {
+        mutation?: UseMutationOptions<
+            Awaited<ReturnType<typeof matchesControllerUnmatch>>,
+            TError,
+            { matchId: string; data: UnmatchDto },
+            TContext
+        >;
+    },
+    queryClient?: QueryClient
+): UseMutationResult<Awaited<ReturnType<typeof matchesControllerUnmatch>>, TError, { matchId: string; data: UnmatchDto }, TContext> => {
+    return useMutation(getMatchesControllerUnmatchMutationOptions(options), queryClient);
+};

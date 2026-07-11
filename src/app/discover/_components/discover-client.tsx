@@ -118,16 +118,21 @@ export function DiscoverClient() {
     }
 
     if (isLoading) {
-        return <EmptyState title="Loading profiles" body="Looking for people from the campus." icon={'search'} />;
+        return <EmptyState title="" body="Looking for people from the campus..." icon={'search'} bounce />;
     }
 
     if (isFetchingNextPage) {
-        return <EmptyState title="Loading more profiles" body="Looking for more people from the campus." icon={'search'} />;
+        return <EmptyState title="" body="Looking for more people from the campus..." icon={'search'} bounce />;
     }
 
     if (!profile) {
         return (
-            <EmptyState title="No profiles available" body="Check back later as more students complete their profiles." icon={'search'} />
+            <EmptyState
+                title="No profiles available"
+                body="Check back later as more students complete their profiles."
+                icon={'search'}
+                bounce
+            />
         );
     }
 
@@ -208,7 +213,11 @@ export function DiscoverClient() {
                                 <SwipeStamp label="PASS" className="left-8 -rotate-12 border-muted-foreground text-muted-foreground" />
                             )}
                         </div>
-                        <div className="space-y-2 px-4 py-2">
+                        <button
+                            type="button"
+                            className="w-full space-y-2 px-4 py-2 text-left cursor-pointer active:opacity-70"
+                            onClick={() => setSelectedProfileId(profile.id)}
+                        >
                             {/* TOOD:: remove '!' */}
                             {!profile.lastSeen && (
                                 <div className="w-fit flex items-center gap-1 px-2 py-1 rounded-full bg-green-100 text-green-500 text-sm font-medium">
@@ -218,13 +227,7 @@ export function DiscoverClient() {
                             )}
 
                             <div className="flex items-end gap-2">
-                                <button
-                                    type="button"
-                                    onClick={() => setSelectedProfileId(profile.id)}
-                                    className="text-left text-xl line-clamp-2 font-semibold active:opacity-70 cursor-pointer"
-                                >
-                                    {profile.name}
-                                </button>
+                                <span className="text-xl line-clamp-2 font-semibold">{profile.name}</span>
                                 <p className="text-sm text-muted-foreground">
                                     {' | '}
                                     {formatEnum(profile.nationality)}
@@ -235,12 +238,12 @@ export function DiscoverClient() {
                                 <p className="line-clamp-1 font-semibold text-xs">{formatFaculty(profile.faculty)}</p>
                             </div>
 
-                            <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none [&::-webkit-scrollbar]:hidden">
+                            <div className="flex gap-2 overflow-x-hidden pb-1 scrollbar-none [&::-webkit-scrollbar]:hidden">
                                 {(profile.interests ?? []).map((interest) => (
                                     <Chip key={interest}>{formatEnum(interest)}</Chip>
                                 ))}
                             </div>
-                        </div>
+                        </button>
                     </div>
                 </section>
                 <section className="mt-4 flex shrink-0 items-center justify-center gap-8 pb-2">
@@ -271,6 +274,7 @@ export function DiscoverClient() {
             {selectedProfileId && (
                 <ProfileSheet
                     userId={selectedProfileId}
+                    initialProfile={profile}
                     onClose={() => setSelectedProfileId(null)}
                     onLike={() => handleSwipe('LIKE')}
                     onDislike={() => handleSwipe('DISLIKE')}

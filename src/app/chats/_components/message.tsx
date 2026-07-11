@@ -28,26 +28,28 @@ export default function Message({ message, myId, onEdit, onDeleteTrigger, showTi
     return (
         <div className={cn('flex max-w-[85%] flex-col', mine ? 'self-end items-end' : 'items-start')}>
             <div className="flex items-end gap-1">
-                <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
-                    <DropdownMenuTrigger
-                        disabled={isEditing}
-                        className="grid size-6 shrink-0 place-items-center rounded-full bg-white shadow-md hover:bg-black/5 mb-1"
-                    >
-                        <MoreVertical className="size-3" />
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="start">
-                        {mine && (
-                            <DropdownMenuItem onClick={() => onEdit(message.id, message.content)} disabled={isEditing}>
-                                <Pencil className="size-4" />
-                                Edit
+                {mine && (
+                    <DropdownMenu open={menuOpen} onOpenChange={setMenuOpen}>
+                        <DropdownMenuTrigger
+                            disabled={isEditing || message.id.startsWith('temp-')}
+                            className="grid size-6 shrink-0 place-items-center rounded-full bg-white shadow-md hover:bg-black/5 mb-1"
+                        >
+                            <MoreVertical className="size-3" />
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="start">
+                            {mine && (
+                                <DropdownMenuItem onClick={() => onEdit(message.id, message.content)} disabled={isEditing}>
+                                    <Pencil className="size-4" />
+                                    Edit
+                                </DropdownMenuItem>
+                            )}
+                            <DropdownMenuItem className="text-red-500" onClick={handleDelete}>
+                                <Trash className="size-4" />
+                                Delete
                             </DropdownMenuItem>
-                        )}
-                        <DropdownMenuItem className="text-red-500" onClick={handleDelete}>
-                            <Trash className="size-4" />
-                            Delete
-                        </DropdownMenuItem>
-                    </DropdownMenuContent>
-                </DropdownMenu>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                )}
                 <div
                     className={cn(
                         'rounded-xl p-3 text-sm leading-6 whitespace-pre-wrap',

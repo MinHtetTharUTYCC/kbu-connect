@@ -74,10 +74,15 @@ export function ChatClient({ chatId }: { chatId: string }) {
 
     const myId = user?.user?.id;
 
-    const { mutateAsync: sendMessage, isPending: isSendingMessage } = useSendMessage(chatId, myId);
+    const { mutateAsync: sendMessage, isPending: isSendingMessage } = useSendMessage(chatId, myId, () => {
+        setDraft('');
+        scrollToBottom();
+    });
 
     const { mutate: deleteConversation, isPending: isDeleting } = useDeleteConversation();
-    const { mutate: editMessage, isPending: isEditingMessage } = useEditMessage(chatId);
+    const { mutate: editMessage, isPending: isEditingMessage } = useEditMessage(chatId, () => {
+        handleCancelEdit();
+    });
     const { mutate: deleteMessage, isPending: isDeletingMessage } = useDeleteMessage(chatId);
     const { mutateAsync: blockUser, isPending: isBlocking } = useBlockUser(chatId);
     const { mutateAsync: reportUser, isPending: isReporting } = useReportUser();
@@ -133,15 +138,7 @@ export function ChatClient({ chatId }: { chatId: string }) {
         const content = draft.trim();
         if (!content || !myId) return;
 
-        await sendMessage(
-            { data: { conversationId: chatId, content } },
-            {
-                onSuccess: () => {
-                    setDraft('');
-                    scrollToBottom();
-                }
-            }
-        );
+        await sendMessage({ data: { conversationId: chatId, content } });
     }
 
     function handleSubmitEdit() {

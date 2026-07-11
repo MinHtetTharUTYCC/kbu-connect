@@ -1,6 +1,19 @@
 'use client';
 
-import { ArrowLeft, Ban, Bell, GraduationCap, Loader2, type LucideIcon, Megaphone, MessageCircle, Search, User, Users } from 'lucide-react';
+import {
+    ArrowLeft,
+    Ban,
+    Bell,
+    GraduationCap,
+    Loader2,
+    type LucideIcon,
+    Megaphone,
+    MessageCircle,
+    Search,
+    User,
+    UserRoundSearch,
+    Users
+} from 'lucide-react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import type { ReactNode } from 'react';
@@ -83,16 +96,19 @@ const iconMap: Record<string, LucideIcon> = {
     bell: Bell,
     shoutout: Megaphone,
     users: Users,
-    loader: Loader2
+    loader: Loader2,
+    searchUser: UserRoundSearch
 };
 
-export function EmptyState({ title, body, icon }: { title: string; body: string; icon: string }) {
+export function EmptyState({ title, body, icon, bounce = false }: { title: string; body: string; icon: string; bounce?: boolean }) {
     const Icon = iconMap[icon];
 
     return (
         <div className="mt-8 flex flex-1 flex-col items-center justify-center px-8 text-center">
             {Icon && (
-                <div className="mb-4 grid size-14 place-items-center rounded-2xl bg-primary/10 text-primary">
+                <div
+                    className={`mb-4 grid size-14 place-items-center rounded-2xl bg-primary/10 text-primary ${bounce ? 'animate-bounce' : ''}`}
+                >
                     <Icon className={`size-6 ${icon === 'loader' ? 'animate-spin' : ''}`} />
                 </div>
             )}

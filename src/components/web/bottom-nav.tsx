@@ -3,6 +3,9 @@
 import { Bell, Heart, Home, MessageCircle, Search, User } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { Badge } from '@/components/ui/badge';
+import { useConversationsUnreadCount } from '@/hooks/chat/use-conversations-unread-count';
+import { useNotificationsUnreadCount } from '@/hooks/notifications/use-noti-unread-count';
 import { userLinks } from '@/lib/constants/links';
 import { publicRoutes } from '@/lib/constants/routes';
 import { cn } from '@/lib/utils';
@@ -23,7 +26,10 @@ export default function BottomNav() {
     const pathname = usePathname();
 
     const { user, isLoading } = useAuthContext();
-    // const { unreadCount } = useChatUnreadCount(!!user && !isLoading);
+
+    const skip = !!user || !isLoading;
+    const { unreadCount: chatUnreadCount } = useConversationsUnreadCount(skip);
+    const { unreadCount: notiUnreadCount } = useNotificationsUnreadCount(skip);
 
     const navItems = !isLoading && user ? userLinks : [];
 
@@ -49,6 +55,16 @@ export default function BottomNav() {
                             >
                                 <div className="relative">
                                     <IconComponent size={22} strokeWidth={pathname === href ? 2.5 : 2} />
+                                    {icon === 'message' && chatUnreadCount > 0 && (
+                                        <Badge className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full px-1 text-[9px]">
+                                            {chatUnreadCount > 99 ? '99+' : chatUnreadCount}
+                                        </Badge>
+                                    )}
+                                    {icon === 'bell' && notiUnreadCount > 0 && (
+                                        <Badge className="absolute -right-1 -top-1 flex h-4 min-w-4 items-center justify-center rounded-full px-1 text-[9px]">
+                                            {notiUnreadCount > 99 ? '99+' : notiUnreadCount}
+                                        </Badge>
+                                    )}
                                 </div>
                                 <span>{label}</span>
                             </Link>

@@ -18,6 +18,8 @@ export default function Providers({ children }: { children: React.ReactNode }) {
                 },
                 mutationCache: new MutationCache({
                     onError: (error, _variables, _context, mutation) => {
+                        console.error(error);
+
                         // Check if the specific hook wants to skip global handling
                         if (mutation.meta?.skipGlobalToast) {
                             return;

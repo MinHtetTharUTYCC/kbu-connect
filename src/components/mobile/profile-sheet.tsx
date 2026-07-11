@@ -1,6 +1,20 @@
 'use client';
 
-import { Cake, Flag, Globe, GraduationCap, Heart, LoaderCircle, type LucideIcon, MessageCircle, Search, UserRound, X } from 'lucide-react';
+import type { DiscoveryUserItemDto } from '@services/model';
+import {
+    Cake,
+    Flag,
+    Globe,
+    GraduationCap,
+    Heart,
+    LoaderCircle,
+    type LucideIcon,
+    Megaphone,
+    MessageCircle,
+    Search,
+    UserRound,
+    X
+} from 'lucide-react';
 import Image from 'next/image';
 import { VisuallyHidden } from 'radix-ui';
 import { useState } from 'react';
@@ -13,29 +27,34 @@ import { Drawer, DrawerContent, DrawerTitle } from '@/components/ui/drawer';
 import { useReportUser } from '@/hooks/reports/use-report-user';
 import { useVisitProfile } from '@/hooks/users/use-visit-profile';
 import { ageFromBirthYear, formatEnum } from '@/lib/utils';
+import { useRouter } from 'next/navigation';
 
 export function ProfileSheet({
     userId,
+    initialProfile,
     onClose,
     onLike,
     onDislike,
     onShoutout,
-    onMessage,
     from
 }: {
     userId: string;
+    initialProfile?: DiscoveryUserItemDto;
     onClose: () => void;
     onLike?: () => void;
     onDislike?: () => void;
     onShoutout?: () => void;
-    onMessage?: () => void;
     from: 'discovery' | 'visit';
 }) {
+    const router = useRouter();
+
     const [viewerIndex, setViewerIndex] = useState<number | null>(null);
     const [showReportConfirm, setShowReportConfirm] = useState(false);
 
-    const { data: profile, isLoading } = useVisitProfile(userId);
+    const { data: fetchedProfile, isLoading } = useVisitProfile(userId);
     const { mutateAsync: reportUser, isPending: isReporting } = useReportUser();
+
+    const profile = fetchedProfile ?? (initialProfile as unknown as typeof fetchedProfile);
 
     const galleryImages = (profile?.gallery ?? []).toSorted((a, b) => a.order - b.order).map((item) => item.imageUrl);
 
@@ -74,7 +93,7 @@ export function ProfileSheet({
                 </VisuallyHidden.Root>
 
                 <div className="flex-1 overflow-y-auto">
-                    {isLoading ? (
+                    {isLoading && !profile ? (
                         <div className="flex items-center justify-center py-16">
                             <LoaderCircle className="size-6 animate-spin text-primary" />
                         </div>
@@ -178,7 +197,7 @@ export function ProfileSheet({
                 </div>
 
                 {/* Footer Interaction Controls */}
-                {!isLoading && profile && (
+                {profile && (
                     <div className="flex shrink-0 items-center justify-center gap-6 border-t border-black/10 px-5 py-4">
                         {from === 'discovery' && (
                             <>
@@ -193,19 +212,7 @@ export function ProfileSheet({
                                 >
                                     <X className="size-6" />
                                 </button>
-                                {profile.isMatched && onMessage ? (
-                                    <button
-                                        type="button"
-                                        onClick={() => {
-                                            onMessage();
-                                            onClose();
-                                        }}
-                                        className="grid size-12 place-items-center rounded-full border border-black/10 bg-primary text-white shadow-sm transition active:scale-90"
-                                        aria-label="Message"
-                                    >
-                                        <MessageCircle className="size-5" />
-                                    </button>
-                                ) : (
+                                {!profile.isMatched && onShoutout && (
                                     <button
                                         type="button"
                                         onClick={() => {
@@ -215,7 +222,7 @@ export function ProfileSheet({
                                         className="grid size-12 place-items-center rounded-full border border-black/10 bg-white text-primary shadow-sm transition active:scale-90"
                                         aria-label="Send shoutout"
                                     >
-                                        <MessageCircle className="size-5" />
+                                        <Megaphone className="size-5" />
                                     </button>
                                 )}
                                 <button
@@ -231,11 +238,11 @@ export function ProfileSheet({
                                 </button>
                             </>
                         )}
-                        {from === 'visit' && profile.isMatched && onMessage && (
+                        {from === 'visit' && (profile.isMatched || !!profile.conversationId) && (
                             <button
                                 type="button"
                                 onClick={() => {
-                                    onMessage();
+                                    router.push(`/chats/${profile.conversationId}`);
                                     onClose();
                                 }}
                                 className="grid size-12 place-items-center rounded-full border border-black/10 bg-primary text-white shadow-sm transition active:scale-90"

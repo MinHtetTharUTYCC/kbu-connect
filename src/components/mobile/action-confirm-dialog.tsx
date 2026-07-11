@@ -24,7 +24,7 @@ export function ActionConfirmDialog({
     onConfirm: () => void;
     onClose: () => void;
     isPending: boolean;
-    action: 'Delete' | 'Block' | 'Unblock' | 'Reset';
+    action: 'Delete' | 'Block' | 'Unblock' | 'Reset' | 'Logout';
 }) {
     return (
         <AlertDialog open onOpenChange={(open) => !open && onClose()}>
@@ -43,7 +43,7 @@ export function ActionConfirmDialog({
                                 onConfirm();
                             }}
                         >
-                            {action}
+                            {isPending ? '...' : action}
                         </AlertDialogAction>
                     </div>
                 </AlertDialogFooter>

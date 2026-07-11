@@ -9,6 +9,7 @@ import { LoadMoreRow } from '@/components/load-more-row';
 import { EmptyState } from '@/components/mobile/app-chrome';
 import { useTopBar } from '@/components/mobile/top-bar-provider';
 import { useMarkAllNotificationsRead } from '@/hooks/notifications/use-mark-all-notifications-read';
+import { useMarkNotificationRead } from '@/hooks/notifications/use-mark-notification-read';
 import { useNotificationsUnreadCount } from '@/hooks/notifications/use-noti-unread-count';
 import { useNotificationsList } from '@/hooks/notifications/use-notifications-list';
 import { getFormattedDate } from '@/lib/date/format-date';
@@ -22,6 +23,7 @@ export function NotificationClient() {
 
     const { notifications, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } = useNotificationsList();
     const { mutate: markAllRead, isPending: isMarkingAllRead } = useMarkAllNotificationsRead();
+    const { mutate: markNotificationRead, isPending: isMarkingNotificationRead } = useMarkNotificationRead();
     const { data: countData = { unreadCount: 0 } } = useNotificationsUnreadCount();
 
     useTopBar({
@@ -57,6 +59,10 @@ export function NotificationClient() {
     }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
 
     function handleNavigate(notification: NotificationItemDto) {
+        if (!notification.isRead || isMarkingNotificationRead) {
+            markNotificationRead({ id: notification.id });
+        }
+
         switch (notification.type) {
             case NotificationItemDtoType.NEW_MESSAGE:
                 router.push(`/chats/${(notification.data as Record<string, unknown>)?.conversationId}`);

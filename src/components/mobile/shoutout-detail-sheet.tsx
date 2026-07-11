@@ -90,7 +90,7 @@ export function ShoutoutDetailSheet({
                         className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-primary py-2 px-4 text-sm font-semibold text-white disabled:opacity-50"
                     >
                         <Trash className="size-4" />
-                        Delete
+                        {isDeleting ? '...' : 'Delete'}
                     </button>
                     {isReceived && (
                         <button
@@ -100,7 +100,7 @@ export function ShoutoutDetailSheet({
                             className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-primary py-2 text-sm font-semibold text-white disabled:opacity-50"
                         >
                             <Send className="size-4" />
-                            Reply
+                            {isReplying ? '...' : 'Reply'}
                         </button>
                     )}
                 </div>

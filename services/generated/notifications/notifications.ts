@@ -5,358 +5,469 @@
  * Exclusive dating platform for KBU students
  * OpenAPI spec version: 1.0
  */
-import {
-  useInfiniteQuery,
-  useMutation,
-  useQuery
-} from '@tanstack/react-query';
+import { useInfiniteQuery, useMutation, useQuery } from '@tanstack/react-query';
 import type {
-  DataTag,
-  DefinedInitialDataOptions,
-  DefinedUseInfiniteQueryResult,
-  DefinedUseQueryResult,
-  InfiniteData,
-  MutationFunction,
-  QueryClient,
-  QueryFunction,
-  QueryKey,
-  UndefinedInitialDataOptions,
-  UseInfiniteQueryOptions,
-  UseInfiniteQueryResult,
-  UseMutationOptions,
-  UseMutationResult,
-  UseQueryOptions,
-  UseQueryResult
+    DataTag,
+    DefinedInitialDataOptions,
+    DefinedUseInfiniteQueryResult,
+    DefinedUseQueryResult,
+    InfiniteData,
+    MutationFunction,
+    QueryClient,
+    QueryFunction,
+    QueryKey,
+    UndefinedInitialDataOptions,
+    UseInfiniteQueryOptions,
+    UseInfiniteQueryResult,
+    UseMutationOptions,
+    UseMutationResult,
+    UseQueryOptions,
+    UseQueryResult
 } from '@tanstack/react-query';
 
 import type {
-  NotificationsControllerGetNotificationsParams,
-  NotificationsListResponseDto,
-  NotificationsUnreadCountResponseDto,
-  SuccessMessageResponseDto
+    NotificationsControllerGetNotificationsParams,
+    NotificationsListResponseDto,
+    NotificationsUnreadCountResponseDto
 } from '../../model';
 
 import { axiosInstanceFn } from '../../../src/lib/axios/axios-instance';
 
-
-
-
 /**
  * @summary Get user notifications
  */
-export const notificationsControllerGetNotifications = (
+export const notificationsControllerGetNotifications = (params?: NotificationsControllerGetNotificationsParams, signal?: AbortSignal) => {
+    return axiosInstanceFn<NotificationsListResponseDto>({ url: `/notifications`, method: 'GET', params, signal });
+};
+
+export const getNotificationsControllerGetNotificationsInfiniteQueryKey = (params?: NotificationsControllerGetNotificationsParams) => {
+    return ['infinite', `/notifications`, ...(params ? [params] : [])] as const;
+};
+
+export const getNotificationsControllerGetNotificationsQueryKey = (params?: NotificationsControllerGetNotificationsParams) => {
+    return [`/notifications`, ...(params ? [params] : [])] as const;
+};
+
+export const getNotificationsControllerGetNotificationsInfiniteQueryOptions = <
+    TData = InfiniteData<
+        Awaited<ReturnType<typeof notificationsControllerGetNotifications>>,
+        NotificationsControllerGetNotificationsParams['cursor']
+    >,
+    TError = unknown
+>(
     params?: NotificationsControllerGetNotificationsParams,
- signal?: AbortSignal
+    options?: {
+        query?: Partial<
+            UseInfiniteQueryOptions<
+                Awaited<ReturnType<typeof notificationsControllerGetNotifications>>,
+                TError,
+                TData,
+                QueryKey,
+                NotificationsControllerGetNotificationsParams['cursor']
+            >
+        >;
+    }
 ) => {
+    const { query: queryOptions } = options ?? {};
 
+    const queryKey = queryOptions?.queryKey ?? getNotificationsControllerGetNotificationsInfiniteQueryKey(params);
 
-      return axiosInstanceFn<NotificationsListResponseDto>(
-      {url: `/notifications`, method: 'GET',
-        params, signal
+    const queryFn: QueryFunction<
+        Awaited<ReturnType<typeof notificationsControllerGetNotifications>>,
+        QueryKey,
+        NotificationsControllerGetNotificationsParams['cursor']
+    > = ({ signal, pageParam }) => notificationsControllerGetNotifications({ ...params, cursor: pageParam ?? params?.['cursor'] }, signal);
+
+    return { queryKey, queryFn, ...queryOptions } as UseInfiniteQueryOptions<
+        Awaited<ReturnType<typeof notificationsControllerGetNotifications>>,
+        TError,
+        TData,
+        QueryKey,
+        NotificationsControllerGetNotificationsParams['cursor']
+    > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
+
+export type NotificationsControllerGetNotificationsInfiniteQueryResult = NonNullable<
+    Awaited<ReturnType<typeof notificationsControllerGetNotifications>>
+>;
+export type NotificationsControllerGetNotificationsInfiniteQueryError = unknown;
+
+export function useNotificationsControllerGetNotificationsInfinite<
+    TData = InfiniteData<
+        Awaited<ReturnType<typeof notificationsControllerGetNotifications>>,
+        NotificationsControllerGetNotificationsParams['cursor']
+    >,
+    TError = unknown
+>(
+    params: undefined | NotificationsControllerGetNotificationsParams,
+    options: {
+        query: Partial<
+            UseInfiniteQueryOptions<
+                Awaited<ReturnType<typeof notificationsControllerGetNotifications>>,
+                TError,
+                TData,
+                QueryKey,
+                NotificationsControllerGetNotificationsParams['cursor']
+            >
+        > &
+            Pick<
+                DefinedInitialDataOptions<
+                    Awaited<ReturnType<typeof notificationsControllerGetNotifications>>,
+                    TError,
+                    Awaited<ReturnType<typeof notificationsControllerGetNotifications>>,
+                    QueryKey
+                >,
+                'initialData'
+            >;
     },
-      );
-    }
-
-
-
-
-export const getNotificationsControllerGetNotificationsInfiniteQueryKey = (params?: NotificationsControllerGetNotificationsParams,) => {
-    return [
-    'infinite', `/notifications`, ...(params ? [params] : [])
-    ] as const;
-    }
-
-export const getNotificationsControllerGetNotificationsQueryKey = (params?: NotificationsControllerGetNotificationsParams,) => {
-    return [
-    `/notifications`, ...(params ? [params] : [])
-    ] as const;
-    }
-
-
-export const getNotificationsControllerGetNotificationsInfiniteQueryOptions = <TData = InfiniteData<Awaited<ReturnType<typeof notificationsControllerGetNotifications>>, NotificationsControllerGetNotificationsParams['cursor']>, TError = unknown>(params?: NotificationsControllerGetNotificationsParams, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof notificationsControllerGetNotifications>>, TError, TData, QueryKey, NotificationsControllerGetNotificationsParams['cursor']>>, }
-) => {
-
-const {query: queryOptions} = options ?? {};
-
-  const queryKey =  queryOptions?.queryKey ?? getNotificationsControllerGetNotificationsInfiniteQueryKey(params);
-
-
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof notificationsControllerGetNotifications>>, QueryKey, NotificationsControllerGetNotificationsParams['cursor']> = ({ signal, pageParam }) => notificationsControllerGetNotifications({...params, 'cursor': pageParam ?? params?.['cursor']}, signal);
-
-
-
-
-
-   return  { queryKey, queryFn, ...queryOptions} as UseInfiniteQueryOptions<Awaited<ReturnType<typeof notificationsControllerGetNotifications>>, TError, TData, QueryKey, NotificationsControllerGetNotificationsParams['cursor']> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type NotificationsControllerGetNotificationsInfiniteQueryResult = NonNullable<Awaited<ReturnType<typeof notificationsControllerGetNotifications>>>
-export type NotificationsControllerGetNotificationsInfiniteQueryError = unknown
-
-
-export function useNotificationsControllerGetNotificationsInfinite<TData = InfiniteData<Awaited<ReturnType<typeof notificationsControllerGetNotifications>>, NotificationsControllerGetNotificationsParams['cursor']>, TError = unknown>(
- params: undefined |  NotificationsControllerGetNotificationsParams, options: { query:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof notificationsControllerGetNotifications>>, TError, TData, QueryKey, NotificationsControllerGetNotificationsParams['cursor']>> & Pick<
-        DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof notificationsControllerGetNotifications>>,
-          TError,
-          Awaited<ReturnType<typeof notificationsControllerGetNotifications>>, QueryKey
-        > , 'initialData'
-      >, }
- , queryClient?: QueryClient
-  ):  DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useNotificationsControllerGetNotificationsInfinite<TData = InfiniteData<Awaited<ReturnType<typeof notificationsControllerGetNotifications>>, NotificationsControllerGetNotificationsParams['cursor']>, TError = unknown>(
- params?: NotificationsControllerGetNotificationsParams, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof notificationsControllerGetNotifications>>, TError, TData, QueryKey, NotificationsControllerGetNotificationsParams['cursor']>> & Pick<
-        UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof notificationsControllerGetNotifications>>,
-          TError,
-          Awaited<ReturnType<typeof notificationsControllerGetNotifications>>, QueryKey
-        > , 'initialData'
-      >, }
- , queryClient?: QueryClient
-  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useNotificationsControllerGetNotificationsInfinite<TData = InfiniteData<Awaited<ReturnType<typeof notificationsControllerGetNotifications>>, NotificationsControllerGetNotificationsParams['cursor']>, TError = unknown>(
- params?: NotificationsControllerGetNotificationsParams, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof notificationsControllerGetNotifications>>, TError, TData, QueryKey, NotificationsControllerGetNotificationsParams['cursor']>>, }
- , queryClient?: QueryClient
-  ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+    queryClient?: QueryClient
+): DefinedUseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useNotificationsControllerGetNotificationsInfinite<
+    TData = InfiniteData<
+        Awaited<ReturnType<typeof notificationsControllerGetNotifications>>,
+        NotificationsControllerGetNotificationsParams['cursor']
+    >,
+    TError = unknown
+>(
+    params?: NotificationsControllerGetNotificationsParams,
+    options?: {
+        query?: Partial<
+            UseInfiniteQueryOptions<
+                Awaited<ReturnType<typeof notificationsControllerGetNotifications>>,
+                TError,
+                TData,
+                QueryKey,
+                NotificationsControllerGetNotificationsParams['cursor']
+            >
+        > &
+            Pick<
+                UndefinedInitialDataOptions<
+                    Awaited<ReturnType<typeof notificationsControllerGetNotifications>>,
+                    TError,
+                    Awaited<ReturnType<typeof notificationsControllerGetNotifications>>,
+                    QueryKey
+                >,
+                'initialData'
+            >;
+    },
+    queryClient?: QueryClient
+): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useNotificationsControllerGetNotificationsInfinite<
+    TData = InfiniteData<
+        Awaited<ReturnType<typeof notificationsControllerGetNotifications>>,
+        NotificationsControllerGetNotificationsParams['cursor']
+    >,
+    TError = unknown
+>(
+    params?: NotificationsControllerGetNotificationsParams,
+    options?: {
+        query?: Partial<
+            UseInfiniteQueryOptions<
+                Awaited<ReturnType<typeof notificationsControllerGetNotifications>>,
+                TError,
+                TData,
+                QueryKey,
+                NotificationsControllerGetNotificationsParams['cursor']
+            >
+        >;
+    },
+    queryClient?: QueryClient
+): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 /**
  * @summary Get user notifications
  */
 
-export function useNotificationsControllerGetNotificationsInfinite<TData = InfiniteData<Awaited<ReturnType<typeof notificationsControllerGetNotifications>>, NotificationsControllerGetNotificationsParams['cursor']>, TError = unknown>(
- params?: NotificationsControllerGetNotificationsParams, options?: { query?:Partial<UseInfiniteQueryOptions<Awaited<ReturnType<typeof notificationsControllerGetNotifications>>, TError, TData, QueryKey, NotificationsControllerGetNotificationsParams['cursor']>>, }
- , queryClient?: QueryClient
- ):  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useNotificationsControllerGetNotificationsInfinite<
+    TData = InfiniteData<
+        Awaited<ReturnType<typeof notificationsControllerGetNotifications>>,
+        NotificationsControllerGetNotificationsParams['cursor']
+    >,
+    TError = unknown
+>(
+    params?: NotificationsControllerGetNotificationsParams,
+    options?: {
+        query?: Partial<
+            UseInfiniteQueryOptions<
+                Awaited<ReturnType<typeof notificationsControllerGetNotifications>>,
+                TError,
+                TData,
+                QueryKey,
+                NotificationsControllerGetNotificationsParams['cursor']
+            >
+        >;
+    },
+    queryClient?: QueryClient
+): UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+    const queryOptions = getNotificationsControllerGetNotificationsInfiniteQueryOptions(params, options);
 
-  const queryOptions = getNotificationsControllerGetNotificationsInfiniteQueryOptions(params,options)
+    const query = useInfiniteQuery(queryOptions, queryClient) as UseInfiniteQueryResult<TData, TError> & {
+        queryKey: DataTag<QueryKey, TData, TError>;
+    };
 
-  const query = useInfiniteQuery(queryOptions, queryClient) as  UseInfiniteQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  return { ...query, queryKey: queryOptions.queryKey };
+    return { ...query, queryKey: queryOptions.queryKey };
 }
 
-
-
-
-
-
-export const getNotificationsControllerGetNotificationsQueryOptions = <TData = Awaited<ReturnType<typeof notificationsControllerGetNotifications>>, TError = unknown>(params?: NotificationsControllerGetNotificationsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof notificationsControllerGetNotifications>>, TError, TData>>, }
+export const getNotificationsControllerGetNotificationsQueryOptions = <
+    TData = Awaited<ReturnType<typeof notificationsControllerGetNotifications>>,
+    TError = unknown
+>(
+    params?: NotificationsControllerGetNotificationsParams,
+    options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof notificationsControllerGetNotifications>>, TError, TData>> }
 ) => {
+    const { query: queryOptions } = options ?? {};
 
-const {query: queryOptions} = options ?? {};
+    const queryKey = queryOptions?.queryKey ?? getNotificationsControllerGetNotificationsQueryKey(params);
 
-  const queryKey =  queryOptions?.queryKey ?? getNotificationsControllerGetNotificationsQueryKey(params);
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof notificationsControllerGetNotifications>>> = ({ signal }) =>
+        notificationsControllerGetNotifications(params, signal);
 
+    return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+        Awaited<ReturnType<typeof notificationsControllerGetNotifications>>,
+        TError,
+        TData
+    > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
 
+export type NotificationsControllerGetNotificationsQueryResult = NonNullable<
+    Awaited<ReturnType<typeof notificationsControllerGetNotifications>>
+>;
+export type NotificationsControllerGetNotificationsQueryError = unknown;
 
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof notificationsControllerGetNotifications>>> = ({ signal }) => notificationsControllerGetNotifications(params, signal);
-
-
-
-
-
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof notificationsControllerGetNotifications>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type NotificationsControllerGetNotificationsQueryResult = NonNullable<Awaited<ReturnType<typeof notificationsControllerGetNotifications>>>
-export type NotificationsControllerGetNotificationsQueryError = unknown
-
-
-export function useNotificationsControllerGetNotifications<TData = Awaited<ReturnType<typeof notificationsControllerGetNotifications>>, TError = unknown>(
- params: undefined |  NotificationsControllerGetNotificationsParams, options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof notificationsControllerGetNotifications>>, TError, TData>> & Pick<
-        DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof notificationsControllerGetNotifications>>,
-          TError,
-          Awaited<ReturnType<typeof notificationsControllerGetNotifications>>
-        > , 'initialData'
-      >, }
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useNotificationsControllerGetNotifications<TData = Awaited<ReturnType<typeof notificationsControllerGetNotifications>>, TError = unknown>(
- params?: NotificationsControllerGetNotificationsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof notificationsControllerGetNotifications>>, TError, TData>> & Pick<
-        UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof notificationsControllerGetNotifications>>,
-          TError,
-          Awaited<ReturnType<typeof notificationsControllerGetNotifications>>
-        > , 'initialData'
-      >, }
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useNotificationsControllerGetNotifications<TData = Awaited<ReturnType<typeof notificationsControllerGetNotifications>>, TError = unknown>(
- params?: NotificationsControllerGetNotificationsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof notificationsControllerGetNotifications>>, TError, TData>>, }
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useNotificationsControllerGetNotifications<
+    TData = Awaited<ReturnType<typeof notificationsControllerGetNotifications>>,
+    TError = unknown
+>(
+    params: undefined | NotificationsControllerGetNotificationsParams,
+    options: {
+        query: Partial<UseQueryOptions<Awaited<ReturnType<typeof notificationsControllerGetNotifications>>, TError, TData>> &
+            Pick<
+                DefinedInitialDataOptions<
+                    Awaited<ReturnType<typeof notificationsControllerGetNotifications>>,
+                    TError,
+                    Awaited<ReturnType<typeof notificationsControllerGetNotifications>>
+                >,
+                'initialData'
+            >;
+    },
+    queryClient?: QueryClient
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useNotificationsControllerGetNotifications<
+    TData = Awaited<ReturnType<typeof notificationsControllerGetNotifications>>,
+    TError = unknown
+>(
+    params?: NotificationsControllerGetNotificationsParams,
+    options?: {
+        query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof notificationsControllerGetNotifications>>, TError, TData>> &
+            Pick<
+                UndefinedInitialDataOptions<
+                    Awaited<ReturnType<typeof notificationsControllerGetNotifications>>,
+                    TError,
+                    Awaited<ReturnType<typeof notificationsControllerGetNotifications>>
+                >,
+                'initialData'
+            >;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useNotificationsControllerGetNotifications<
+    TData = Awaited<ReturnType<typeof notificationsControllerGetNotifications>>,
+    TError = unknown
+>(
+    params?: NotificationsControllerGetNotificationsParams,
+    options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof notificationsControllerGetNotifications>>, TError, TData>> },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 /**
  * @summary Get user notifications
  */
 
-export function useNotificationsControllerGetNotifications<TData = Awaited<ReturnType<typeof notificationsControllerGetNotifications>>, TError = unknown>(
- params?: NotificationsControllerGetNotificationsParams, options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof notificationsControllerGetNotifications>>, TError, TData>>, }
- , queryClient?: QueryClient
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useNotificationsControllerGetNotifications<
+    TData = Awaited<ReturnType<typeof notificationsControllerGetNotifications>>,
+    TError = unknown
+>(
+    params?: NotificationsControllerGetNotificationsParams,
+    options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof notificationsControllerGetNotifications>>, TError, TData>> },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+    const queryOptions = getNotificationsControllerGetNotificationsQueryOptions(params, options);
 
-  const queryOptions = getNotificationsControllerGetNotificationsQueryOptions(params,options)
+    const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  return { ...query, queryKey: queryOptions.queryKey };
+    return { ...query, queryKey: queryOptions.queryKey };
 }
-
-
-
-
-
 
 /**
  * @summary Get unread notifications count
  */
-export const notificationsControllerGetUnreadCount = (
-
- signal?: AbortSignal
-) => {
-
-
-      return axiosInstanceFn<NotificationsUnreadCountResponseDto>(
-      {url: `/notifications/unread-count`, method: 'GET', signal
-    },
-      );
-    }
-
-
-
+export const notificationsControllerGetUnreadCount = (signal?: AbortSignal) => {
+    return axiosInstanceFn<NotificationsUnreadCountResponseDto>({ url: `/notifications/unread-count`, method: 'GET', signal });
+};
 
 export const getNotificationsControllerGetUnreadCountQueryKey = () => {
-    return [
-    `/notifications/unread-count`
-    ] as const;
-    }
+    return [`/notifications/unread-count`] as const;
+};
 
+export const getNotificationsControllerGetUnreadCountQueryOptions = <
+    TData = Awaited<ReturnType<typeof notificationsControllerGetUnreadCount>>,
+    TError = unknown
+>(options?: {
+    query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof notificationsControllerGetUnreadCount>>, TError, TData>>;
+}) => {
+    const { query: queryOptions } = options ?? {};
 
-export const getNotificationsControllerGetUnreadCountQueryOptions = <TData = Awaited<ReturnType<typeof notificationsControllerGetUnreadCount>>, TError = unknown>( options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof notificationsControllerGetUnreadCount>>, TError, TData>>, }
-) => {
+    const queryKey = queryOptions?.queryKey ?? getNotificationsControllerGetUnreadCountQueryKey();
 
-const {query: queryOptions} = options ?? {};
+    const queryFn: QueryFunction<Awaited<ReturnType<typeof notificationsControllerGetUnreadCount>>> = ({ signal }) =>
+        notificationsControllerGetUnreadCount(signal);
 
-  const queryKey =  queryOptions?.queryKey ?? getNotificationsControllerGetUnreadCountQueryKey();
+    return { queryKey, queryFn, ...queryOptions } as UseQueryOptions<
+        Awaited<ReturnType<typeof notificationsControllerGetUnreadCount>>,
+        TError,
+        TData
+    > & { queryKey: DataTag<QueryKey, TData, TError> };
+};
 
+export type NotificationsControllerGetUnreadCountQueryResult = NonNullable<
+    Awaited<ReturnType<typeof notificationsControllerGetUnreadCount>>
+>;
+export type NotificationsControllerGetUnreadCountQueryError = unknown;
 
-
-    const queryFn: QueryFunction<Awaited<ReturnType<typeof notificationsControllerGetUnreadCount>>> = ({ signal }) => notificationsControllerGetUnreadCount(signal);
-
-
-
-
-
-   return  { queryKey, queryFn, ...queryOptions} as UseQueryOptions<Awaited<ReturnType<typeof notificationsControllerGetUnreadCount>>, TError, TData> & { queryKey: DataTag<QueryKey, TData, TError> }
-}
-
-export type NotificationsControllerGetUnreadCountQueryResult = NonNullable<Awaited<ReturnType<typeof notificationsControllerGetUnreadCount>>>
-export type NotificationsControllerGetUnreadCountQueryError = unknown
-
-
-export function useNotificationsControllerGetUnreadCount<TData = Awaited<ReturnType<typeof notificationsControllerGetUnreadCount>>, TError = unknown>(
-  options: { query:Partial<UseQueryOptions<Awaited<ReturnType<typeof notificationsControllerGetUnreadCount>>, TError, TData>> & Pick<
-        DefinedInitialDataOptions<
-          Awaited<ReturnType<typeof notificationsControllerGetUnreadCount>>,
-          TError,
-          Awaited<ReturnType<typeof notificationsControllerGetUnreadCount>>
-        > , 'initialData'
-      >, }
- , queryClient?: QueryClient
-  ):  DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useNotificationsControllerGetUnreadCount<TData = Awaited<ReturnType<typeof notificationsControllerGetUnreadCount>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof notificationsControllerGetUnreadCount>>, TError, TData>> & Pick<
-        UndefinedInitialDataOptions<
-          Awaited<ReturnType<typeof notificationsControllerGetUnreadCount>>,
-          TError,
-          Awaited<ReturnType<typeof notificationsControllerGetUnreadCount>>
-        > , 'initialData'
-      >, }
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
-export function useNotificationsControllerGetUnreadCount<TData = Awaited<ReturnType<typeof notificationsControllerGetUnreadCount>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof notificationsControllerGetUnreadCount>>, TError, TData>>, }
- , queryClient?: QueryClient
-  ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> }
+export function useNotificationsControllerGetUnreadCount<
+    TData = Awaited<ReturnType<typeof notificationsControllerGetUnreadCount>>,
+    TError = unknown
+>(
+    options: {
+        query: Partial<UseQueryOptions<Awaited<ReturnType<typeof notificationsControllerGetUnreadCount>>, TError, TData>> &
+            Pick<
+                DefinedInitialDataOptions<
+                    Awaited<ReturnType<typeof notificationsControllerGetUnreadCount>>,
+                    TError,
+                    Awaited<ReturnType<typeof notificationsControllerGetUnreadCount>>
+                >,
+                'initialData'
+            >;
+    },
+    queryClient?: QueryClient
+): DefinedUseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useNotificationsControllerGetUnreadCount<
+    TData = Awaited<ReturnType<typeof notificationsControllerGetUnreadCount>>,
+    TError = unknown
+>(
+    options?: {
+        query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof notificationsControllerGetUnreadCount>>, TError, TData>> &
+            Pick<
+                UndefinedInitialDataOptions<
+                    Awaited<ReturnType<typeof notificationsControllerGetUnreadCount>>,
+                    TError,
+                    Awaited<ReturnType<typeof notificationsControllerGetUnreadCount>>
+                >,
+                'initialData'
+            >;
+    },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
+export function useNotificationsControllerGetUnreadCount<
+    TData = Awaited<ReturnType<typeof notificationsControllerGetUnreadCount>>,
+    TError = unknown
+>(
+    options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof notificationsControllerGetUnreadCount>>, TError, TData>> },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 /**
  * @summary Get unread notifications count
  */
 
-export function useNotificationsControllerGetUnreadCount<TData = Awaited<ReturnType<typeof notificationsControllerGetUnreadCount>>, TError = unknown>(
-  options?: { query?:Partial<UseQueryOptions<Awaited<ReturnType<typeof notificationsControllerGetUnreadCount>>, TError, TData>>, }
- , queryClient?: QueryClient
- ):  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+export function useNotificationsControllerGetUnreadCount<
+    TData = Awaited<ReturnType<typeof notificationsControllerGetUnreadCount>>,
+    TError = unknown
+>(
+    options?: { query?: Partial<UseQueryOptions<Awaited<ReturnType<typeof notificationsControllerGetUnreadCount>>, TError, TData>> },
+    queryClient?: QueryClient
+): UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> } {
+    const queryOptions = getNotificationsControllerGetUnreadCountQueryOptions(options);
 
-  const queryOptions = getNotificationsControllerGetUnreadCountQueryOptions(options)
+    const query = useQuery(queryOptions, queryClient) as UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
 
-  const query = useQuery(queryOptions, queryClient) as  UseQueryResult<TData, TError> & { queryKey: DataTag<QueryKey, TData, TError> };
-
-  return { ...query, queryKey: queryOptions.queryKey };
+    return { ...query, queryKey: queryOptions.queryKey };
 }
-
-
-
-
-
 
 /**
  * @summary Mark all notifications as read
  */
-export const notificationsControllerMarkAllAsRead = (
+export const notificationsControllerMarkAllAsRead = (signal?: AbortSignal) => {
+    return axiosInstanceFn<void>({ url: `/notifications/mark-all-as-read`, method: 'PATCH', signal });
+};
 
- signal?: AbortSignal
-) => {
+export const getNotificationsControllerMarkAllAsReadMutationOptions = <TError = unknown, TContext = unknown>(options?: {
+    mutation?: UseMutationOptions<Awaited<ReturnType<typeof notificationsControllerMarkAllAsRead>>, TError, void, TContext>;
+}): UseMutationOptions<Awaited<ReturnType<typeof notificationsControllerMarkAllAsRead>>, TError, void, TContext> => {
+    const mutationKey = ['notificationsControllerMarkAllAsRead'];
+    const { mutation: mutationOptions } = options
+        ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+            ? options
+            : { ...options, mutation: { ...options.mutation, mutationKey } }
+        : { mutation: { mutationKey } };
 
+    const mutationFn: MutationFunction<Awaited<ReturnType<typeof notificationsControllerMarkAllAsRead>>, void> = () => {
+        return notificationsControllerMarkAllAsRead();
+    };
 
-      return axiosInstanceFn<SuccessMessageResponseDto>(
-      {url: `/notifications/mark-all-as-read`, method: 'PATCH', signal
-    },
-      );
-    }
+    return { mutationFn, ...mutationOptions };
+};
 
+export type NotificationsControllerMarkAllAsReadMutationResult = NonNullable<
+    Awaited<ReturnType<typeof notificationsControllerMarkAllAsRead>>
+>;
 
+export type NotificationsControllerMarkAllAsReadMutationError = unknown;
 
-export const getNotificationsControllerMarkAllAsReadMutationOptions = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof notificationsControllerMarkAllAsRead>>, TError,void, TContext>, }
-): UseMutationOptions<Awaited<ReturnType<typeof notificationsControllerMarkAllAsRead>>, TError,void, TContext> => {
-
-const mutationKey = ['notificationsControllerMarkAllAsRead'];
-const {mutation: mutationOptions} = options ?
-      options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey ?
-      options
-      : {...options, mutation: {...options.mutation, mutationKey}}
-      : {mutation: { mutationKey, }};
-
-
-
-
-      const mutationFn: MutationFunction<Awaited<ReturnType<typeof notificationsControllerMarkAllAsRead>>, void> = () => {
-
-
-          return  notificationsControllerMarkAllAsRead()
-        }
-
-
-
-
-
-
-  return  { mutationFn, ...mutationOptions }}
-
-    export type NotificationsControllerMarkAllAsReadMutationResult = NonNullable<Awaited<ReturnType<typeof notificationsControllerMarkAllAsRead>>>
-
-    export type NotificationsControllerMarkAllAsReadMutationError = unknown
-
-    /**
+/**
  * @summary Mark all notifications as read
  */
-export const useNotificationsControllerMarkAllAsRead = <TError = unknown,
-    TContext = unknown>(options?: { mutation?:UseMutationOptions<Awaited<ReturnType<typeof notificationsControllerMarkAllAsRead>>, TError,void, TContext>, }
- , queryClient?: QueryClient): UseMutationResult<
-        Awaited<ReturnType<typeof notificationsControllerMarkAllAsRead>>,
-        TError,
-        void,
-        TContext
-      > => {
-      return useMutation(getNotificationsControllerMarkAllAsReadMutationOptions(options), queryClient);
-    }
+export const useNotificationsControllerMarkAllAsRead = <TError = unknown, TContext = unknown>(
+    options?: { mutation?: UseMutationOptions<Awaited<ReturnType<typeof notificationsControllerMarkAllAsRead>>, TError, void, TContext> },
+    queryClient?: QueryClient
+): UseMutationResult<Awaited<ReturnType<typeof notificationsControllerMarkAllAsRead>>, TError, void, TContext> => {
+    return useMutation(getNotificationsControllerMarkAllAsReadMutationOptions(options), queryClient);
+};
+/**
+ * @summary Mark a specific notification as read
+ */
+export const notificationsControllerMarkAsRead = (id: string, signal?: AbortSignal) => {
+    return axiosInstanceFn<void>({ url: `/notifications/${id}/mark-as-read`, method: 'PATCH', signal });
+};
+
+export const getNotificationsControllerMarkAsReadMutationOptions = <TError = unknown, TContext = unknown>(options?: {
+    mutation?: UseMutationOptions<Awaited<ReturnType<typeof notificationsControllerMarkAsRead>>, TError, { id: string }, TContext>;
+}): UseMutationOptions<Awaited<ReturnType<typeof notificationsControllerMarkAsRead>>, TError, { id: string }, TContext> => {
+    const mutationKey = ['notificationsControllerMarkAsRead'];
+    const { mutation: mutationOptions } = options
+        ? options.mutation && 'mutationKey' in options.mutation && options.mutation.mutationKey
+            ? options
+            : { ...options, mutation: { ...options.mutation, mutationKey } }
+        : { mutation: { mutationKey } };
+
+    const mutationFn: MutationFunction<Awaited<ReturnType<typeof notificationsControllerMarkAsRead>>, { id: string }> = (props) => {
+        const { id } = props ?? {};
+
+        return notificationsControllerMarkAsRead(id);
+    };
+
+    return { mutationFn, ...mutationOptions };
+};
+
+export type NotificationsControllerMarkAsReadMutationResult = NonNullable<Awaited<ReturnType<typeof notificationsControllerMarkAsRead>>>;
+
+export type NotificationsControllerMarkAsReadMutationError = unknown;
+
+/**
+ * @summary Mark a specific notification as read
+ */
+export const useNotificationsControllerMarkAsRead = <TError = unknown, TContext = unknown>(
+    options?: {
+        mutation?: UseMutationOptions<Awaited<ReturnType<typeof notificationsControllerMarkAsRead>>, TError, { id: string }, TContext>;
+    },
+    queryClient?: QueryClient
+): UseMutationResult<Awaited<ReturnType<typeof notificationsControllerMarkAsRead>>, TError, { id: string }, TContext> => {
+    return useMutation(getNotificationsControllerMarkAsReadMutationOptions(options), queryClient);
+};

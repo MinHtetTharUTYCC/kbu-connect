@@ -18,13 +18,13 @@ export function MyProfileClient() {
     const { user, isLoading } = useAuthContext();
     const profile = user?.user;
 
-    const { mutate: logout } = useLogout();
-
     const { mutate: toggleDiscoverable, isPending: isToggleDiscoverablePending } = useToggleDiscoverable();
     const { mutate: resetSwipeHistory, isPending: isResetSwipeHistoryPending } = useResetSwipeHistory();
+    const { mutate: logout, isPending: isLoggingOut } = useLogout();
 
     const [viewerIndex, setViewerIndex] = useState<number | null>(null);
     const [showResetHistoryConfirm, setShowResetHistoryConfirm] = useState(false);
+    const [showLogoutConfirm, setShowLogoutConfirm] = useState(false);
 
     useTopBar({
         title: profile?.name ?? 'My Profile'
@@ -197,6 +197,17 @@ export function MyProfileClient() {
                 />
             )}
 
+            {showLogoutConfirm && (
+                <ActionConfirmDialog
+                    action="Logout"
+                    title="Are you sure to logout?"
+                    message="You will need to login again to access your account."
+                    onConfirm={() => logout()}
+                    onClose={() => setShowLogoutConfirm(false)}
+                    isPending={isLoggingOut}
+                />
+            )}
+
             <SettingsSection title="Account">
                 <div className="flex items-center justify-between px-5 py-4 border-b border-black/10">
                     <span className="text-sm">Email address</span>
@@ -204,7 +215,7 @@ export function MyProfileClient() {
                 </div>
                 <button
                     type="button"
-                    onClick={() => logout()}
+                    onClick={() => setShowLogoutConfirm(true)}
                     className="flex w-full items-center justify-between px-5 py-4 text-left text-primary active:bg-primary/10 border-b border-black/10"
                 >
                     <span className="text-sm">Logout</span>
@@ -225,9 +236,6 @@ export function MyProfileClient() {
 
             <div className="flex flex-col items-center py-8 text-xs text-muted-foreground">
                 <span className="mt-1">KBU Connect | Version 1.0.0</span>
-                <Link href="/about" className="mt-2 font-medium text-primary">
-                    About KBU Connect
-                </Link>
                 <div className="mt-2 flex gap-3">
                     <Link href="/privacy-policy" className="font-medium text-primary">
                         Privacy Policy

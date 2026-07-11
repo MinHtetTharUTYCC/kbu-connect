@@ -12,10 +12,12 @@ import MatchesLoading from './loading';
 import { MatchRow } from './match-row';
 
 export function MatchesClient() {
-    const { matches, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } = useMatchesList({});
+    const router = useRouter();
+
     const [selectedProfileId, setSelectedProfileId] = useState<string | null>(null);
     const loadMoreRef = useRef<HTMLDivElement | null>(null);
-    const router = useRouter();
+
+    const { matches, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } = useMatchesList({});
     const { mutate: markAsSeen } = useMarkMatchSeen();
 
     useTopBar({ title: 'Matches' });
