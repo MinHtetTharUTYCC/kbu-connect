@@ -16,6 +16,7 @@ import {
     X
 } from 'lucide-react';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import { VisuallyHidden } from 'radix-ui';
 import { useState } from 'react';
 import { createPortal } from 'react-dom';
@@ -25,9 +26,10 @@ import { FullScreenImageViewer } from '@/components/mobile/full-screen-image-vie
 import { ReportDialog } from '@/components/report-dialog';
 import { Drawer, DrawerContent, DrawerTitle } from '@/components/ui/drawer';
 import { useReportUser } from '@/hooks/reports/use-report-user';
+import { useUserStatus } from '@/hooks/use-user-status';
 import { useVisitProfile } from '@/hooks/users/use-visit-profile';
 import { ageFromBirthYear, formatEnum } from '@/lib/utils';
-import { useRouter } from 'next/navigation';
+import { useSocketContext } from '@/components/socket-provider';
 
 export function ProfileSheet({
     userId,
@@ -53,6 +55,8 @@ export function ProfileSheet({
 
     const { data: fetchedProfile, isLoading } = useVisitProfile(userId);
     const { mutateAsync: reportUser, isPending: isReporting } = useReportUser();
+    const { socket } = useSocketContext();
+    const { getOnlineStatus } = useUserStatus(socket);
 
     const profile = fetchedProfile ?? (initialProfile as unknown as typeof fetchedProfile);
 
@@ -126,6 +130,12 @@ export function ProfileSheet({
                                                 <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-xs font-semibold text-primary">
                                                     <Heart className="size-3 fill-primary" />
                                                     Matched
+                                                </span>
+                                            )}
+                                            {getOnlineStatus(userId) && (
+                                                <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-green-100 px-2 py-0.5 text-xs font-semibold text-green-700">
+                                                    <span className="size-1.5 rounded-full bg-green-500" />
+                                                    Online
                                                 </span>
                                             )}
                                             <button

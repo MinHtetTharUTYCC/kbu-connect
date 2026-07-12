@@ -5,6 +5,9 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { useState } from 'react';
 import { handleBackendError } from '@/lib/error/error-util';
 import { AuthProvider } from './auth-provider';
+import { MatchCelebration } from './match-celebration';
+import { SocketEvents } from './socket-events';
+import { SocketProvider } from './socket-provider';
 
 export default function Providers({ children }: { children: React.ReactNode }) {
     const [queryClient] = useState(
@@ -34,7 +37,13 @@ export default function Providers({ children }: { children: React.ReactNode }) {
 
     return (
         <QueryClientProvider client={queryClient}>
-            <AuthProvider>{children}</AuthProvider>
+            <AuthProvider>
+                <SocketProvider>
+                    <SocketEvents />
+                    <MatchCelebration />
+                    {children}
+                </SocketProvider>
+            </AuthProvider>
             <ReactQueryDevtools initialIsOpen={false} />
         </QueryClientProvider>
     );

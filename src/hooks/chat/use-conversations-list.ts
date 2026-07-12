@@ -4,11 +4,7 @@ import { useChatControllerGetConversationsInfinite } from '@services/generated/c
 import type { ChatControllerGetConversationsParams, ConversationsListResponseDto } from '@services/model';
 import type { InfiniteData } from '@tanstack/react-query';
 
-export function useConversationsList(
-    params: ChatControllerGetConversationsParams = {
-        cursor: null
-    }
-) {
+export function useConversationsList(params?: ChatControllerGetConversationsParams) {
     const query = useChatControllerGetConversationsInfinite<InfiniteData<ConversationsListResponseDto, string | null>>(params, {
         query: {
             initialPageParam: null,

@@ -2,15 +2,17 @@ type LoadMoreRowProps = {
     ref: React.Ref<HTMLDivElement>;
     hasNextPage: boolean;
     isFetchingNextPage: boolean;
-    endLabel?: string;
+    endLabel: string;
 };
 
 export function LoadMoreRow({ ref, hasNextPage, isFetchingNextPage, endLabel }: LoadMoreRowProps) {
-    if (!hasNextPage) return null;
+    if (!hasNextPage) {
+        return <div className="px-5 py-4 text-center text-xs text-muted-foreground">{endLabel}</div>;
+    }
 
     return (
         <div ref={ref} className="px-5 py-4 text-center text-xs text-muted-foreground">
-            {isFetchingNextPage ? 'Loading more...' : endLabel}
+            {isFetchingNextPage ? 'Loading more...' : ''}
         </div>
     );
 }

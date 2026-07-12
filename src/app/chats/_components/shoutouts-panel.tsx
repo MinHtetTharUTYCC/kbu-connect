@@ -81,7 +81,7 @@ export function ShoutoutsPanel() {
                         ref={loadMoreRef}
                         hasNextPage={hasNextPage}
                         isFetchingNextPage={isFetchingNextPage}
-                        endLabel="No More Sent Shoutouts"
+                        endLabel={`No More ${activeSubTab === 'received' ? 'Received' : 'Sent'} Shoutouts`}
                     />
                 </div>
             ) : (
@@ -95,13 +95,6 @@ export function ShoutoutsPanel() {
                     />
                 </div>
             )}
-
-            <LoadMoreRow
-                ref={loadMoreRef}
-                hasNextPage={hasNextPage}
-                isFetchingNextPage={isFetchingNextPage}
-                endLabel="No More Received Shoutouts"
-            />
             {selectedProfileId && <ProfileSheet userId={selectedProfileId} onClose={() => setSelectedProfileId(null)} from="visit" />}
             {selectedShoutoutId && (
                 <ShoutoutDetailSheet

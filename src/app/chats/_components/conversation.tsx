@@ -28,13 +28,17 @@ import { useEditMessage } from '@/hooks/chat/use-edit-message';
 import { useMarkConversationSeen } from '@/hooks/chat/use-mark-conversation-seen';
 import { useSendMessage } from '@/hooks/chat/use-send-message';
 import { useReportUser } from '@/hooks/reports/use-report-user';
+import { useUserStatus } from '@/hooks/use-user-status';
 import { formatDateToNow } from '@/lib/date/format-date';
+import { useSocketContext } from '@/components/socket-provider';
 import { useChatState } from '../[chatId]/_hooks/use-chat-state';
 import ItemsLoading from './loading';
 import Message from './message';
 
 export function ChatClient({ chatId }: { chatId: string }) {
     const { user } = useAuthContext();
+    const { socket } = useSocketContext();
+    const { getOnlineStatus } = useUserStatus(socket);
 
     const router = useRouter();
 
@@ -164,11 +168,9 @@ export function ChatClient({ chatId }: { chatId: string }) {
         return <EmptyState title="Authentication required" body="Please sign in to view this conversation." icon="user" />;
     }
 
-    const statusText = conversation.isOnline
-        ? 'Active now'
-        : conversation.lastOnline
-          ? `Active ${formatDateToNow(conversation.lastOnline)}`
-          : '';
+    const isOnline = getOnlineStatus(conversation.participant.id) || conversation.isOnline;
+
+    const statusText = isOnline ? 'Active now' : conversation.lastOnline ? `Active ${formatDateToNow(conversation.lastOnline)}` : '';
 
     return (
         <div className="flex h-full flex-col overflow-hidden">
@@ -184,7 +186,7 @@ export function ChatClient({ chatId }: { chatId: string }) {
                     <Avatar src={conversation.participant.avatarUrl} name={conversation.participant.name} className="size-10" />
                     <div className="min-w-0 flex-1">
                         <p className="truncate text-sm font-semibold">{conversation.participant.name}</p>
-                        {statusText && <p className="text-xs text-muted-foreground">{statusText}</p>}
+                        {statusText && <p className={`text-xs ${isOnline ? 'text-green-500' : 'text-muted-foreground'}`}>{statusText}</p>}
                     </div>
                 </button>
                 <DropdownMenu>
@@ -214,6 +216,12 @@ export function ChatClient({ chatId }: { chatId: string }) {
                     <ItemsLoading />
                 ) : messages.length ? (
                     <div className="flex flex-col gap-3">
+                        <LoadMoreRow
+                            ref={loadMoreMessagesRef}
+                            hasNextPage={hasNextPageMessages}
+                            isFetchingNextPage={isFetchingNextPageMessages}
+                            endLabel="No More Messages"
+                        />
                         {messages.map((message) => {
                             return (
                                 <Message
@@ -236,13 +244,6 @@ export function ChatClient({ chatId }: { chatId: string }) {
                     <EmptyState title="No messages yet" body="Send the first message to start the conversation." icon="message-circle" />
                 )}
             </main>
-
-            <LoadMoreRow
-                ref={loadMoreMessagesRef}
-                hasNextPage={hasNextPageMessages}
-                isFetchingNextPage={isFetchingNextPageMessages}
-                endLabel="No More Messages"
-            />
 
             <form
                 onSubmit={
