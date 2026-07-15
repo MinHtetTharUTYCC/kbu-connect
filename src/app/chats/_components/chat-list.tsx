@@ -6,12 +6,12 @@ import { useEffect, useRef } from 'react';
 import { LoadMoreRow } from '@/components/load-more-row';
 import { Avatar, EmptyState } from '@/components/mobile/app-chrome';
 import { useTopBar } from '@/components/mobile/top-bar-provider';
+import { Badge } from '@/components/ui/badge';
 import { useConversationsList } from '@/hooks/chat/use-conversations-list';
 import { getFormattedDate, getLastSeenToday } from '@/lib/date/format-date';
 import { cn } from '@/lib/utils';
 import ItemsLoading from './loading';
 import { ShoutoutsPanel } from './shoutouts-panel';
-import { Badge } from '@/components/ui/badge';
 
 type ChatTab = 'chats' | 'shoutouts';
 
@@ -91,13 +91,11 @@ export function ChatListClient() {
                             <Avatar src={conversation.otherUser.avatarUrl} name={conversation.otherUser.name} className="size-12" />
                             {conversation.isOnline ? (
                                 <Badge className="absolute bottom-0 right-0 flex h-3 w-3 items-center justify-center rounded-full px-1 text-[9px] bg-green-500" />
-                            ) : (
-                                conversation.lastOnline && (
-                                    <Badge className="absolute bottom-0 right-0 flex h-4 min-w-4 items-center justify-center rounded-full text-[9px]  bg-green-500">
-                                        {lastSeenToday}
-                                    </Badge>
-                                )
-                            )}
+                            ) : conversation.lastOnline ? (
+                                <Badge className="absolute bottom-0 right-0 flex h-4 min-w-4 items-center justify-center rounded-full text-[9px]  bg-green-500">
+                                    {lastSeenToday}
+                                </Badge>
+                            ) : null}
                         </div>
                         <div className="ml-3 min-w-0 flex-1">
                             <div className="flex items-baseline justify-between gap-3">

@@ -6,13 +6,16 @@ type LoadMoreRowProps = {
 };
 
 export function LoadMoreRow({ ref, hasNextPage, isFetchingNextPage, endLabel }: LoadMoreRowProps) {
-    if (!hasNextPage) {
-        return <div className="px-5 py-4 text-center text-xs text-muted-foreground">{endLabel}</div>;
-    }
-
     return (
         <div ref={ref} className="px-5 py-4 text-center text-xs text-muted-foreground">
-            {isFetchingNextPage ? 'Loading more...' : ''}
+            {!hasNextPage ? (
+                endLabel
+            ) : isFetchingNextPage ? (
+                'Loading more...'
+            ) : (
+                // Keep an empty space or a microscopic height so the observer can still target it
+                <span className="inline-block h-1" />
+            )}
         </div>
     );
 }

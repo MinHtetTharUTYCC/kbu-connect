@@ -7,11 +7,11 @@ import { useRouter } from 'next/navigation';
 import { useCallback, useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import { useAuthContext } from '@/components/auth-provider';
-import { LoadMoreRow } from '@/components/load-more-row';
 import { ActionConfirmDialog } from '@/components/mobile/action-confirm-dialog';
 import { Avatar, EmptyState } from '@/components/mobile/app-chrome';
 import { ProfileSheet } from '@/components/mobile/profile-sheet';
 import { ReportDialog } from '@/components/report-dialog';
+import { useSocketContext } from '@/components/socket-provider';
 import {
     DropdownMenu,
     DropdownMenuContent,
@@ -30,7 +30,6 @@ import { useSendMessage } from '@/hooks/chat/use-send-message';
 import { useReportUser } from '@/hooks/reports/use-report-user';
 import { useUserStatus } from '@/hooks/use-user-status';
 import { formatDateToNow } from '@/lib/date/format-date';
-import { useSocketContext } from '@/components/socket-provider';
 import { useChatState } from '../[chatId]/_hooks/use-chat-state';
 import ItemsLoading from './loading';
 import Message from './message';
@@ -52,8 +51,6 @@ export function ChatClient({ chatId }: { chatId: string }) {
     const { data: conversation, isLoading: conversationLoading } = useConversation(chatId);
     const { mutate: markSeen } = useMarkConversationSeen();
 
-    const loadMoreMessagesRef = useRef<HTMLDivElement | null>(null);
-    const messagesEndRef = useRef<HTMLDivElement | null>(null);
     const inputRef = useRef<HTMLTextAreaElement | null>(null);
 
     const [draft, setDraft] = useState('');
@@ -91,8 +88,34 @@ export function ChatClient({ chatId }: { chatId: string }) {
     const { mutateAsync: blockUser, isPending: isBlocking } = useBlockUser(chatId);
     const { mutateAsync: reportUser, isPending: isReporting } = useReportUser();
 
-    const scrollToBottom = useCallback((behavior: ScrollBehavior = 'auto') => {
-        messagesEndRef.current?.scrollIntoView({ behavior });
+    const mainRef = useRef<HTMLDivElement | null>(null);
+    const messagesEndRef = useRef<HTMLDivElement | null>(null);
+
+    const prevScrollHeight = useRef(0);
+    const hasScrolledInitially = useRef(false);
+
+    const scrollToBottom = useCallback(() => {
+        const el = mainRef.current;
+        if (!el) return;
+
+        console.log('Before', {
+            scrollTop: el.scrollTop,
+            scrollHeight: el.scrollHeight,
+            clientHeight: el.clientHeight
+        });
+
+        el.scrollTop = el.scrollHeight;
+
+        console.log('After', {
+            scrollTop: el.scrollTop,
+            scrollHeight: el.scrollHeight,
+            clientHeight: el.clientHeight
+        });
+    }, []);
+
+    // biome-ignore lint/correctness/useExhaustiveDependencies: <>
+    useEffect(() => {
+        console.log('ChatClient mounted', { chatId });
     }, []);
 
     useEffect(() => {
@@ -102,40 +125,39 @@ export function ChatClient({ chatId }: { chatId: string }) {
     }, [chatId, conversation, markSeen]);
 
     useEffect(() => {
-        if (messages.length > 0) {
-            scrollToBottom();
+        if (messages.length > 0 && !hasScrolledInitially.current) {
+            requestAnimationFrame(() => {
+                scrollToBottom();
+                hasScrolledInitially.current = true;
+            });
         }
     }, [messages.length, scrollToBottom]);
 
     useEffect(() => {
-        const target = loadMoreMessagesRef.current;
-        if (!target || !hasNextPageMessages) return;
+        if (!isFetchingNextPageMessages && mainRef.current && prevScrollHeight.current) {
+            const newScrollHeight = mainRef.current.scrollHeight;
 
-        const observer = new IntersectionObserver(
-            ([entry]) => {
-                if (entry.isIntersecting && !isFetchingNextPageMessages) {
-                    fetchNextPageMessages();
-                }
-            },
-            { rootMargin: '180px 0px' }
-        );
+            mainRef.current.scrollTop = newScrollHeight - prevScrollHeight.current;
 
-        observer.observe(target);
-        return () => observer.disconnect();
-    }, [fetchNextPageMessages, hasNextPageMessages, isFetchingNextPageMessages]);
+            prevScrollHeight.current = 0;
+        }
+    }, [isFetchingNextPageMessages]);
 
+    const handleLoadOlder = () => {
+        if (mainRef.current) {
+            prevScrollHeight.current = mainRef.current.scrollHeight;
+        }
+
+        fetchNextPageMessages();
+    };
+
+    // biome-ignore lint/correctness/useExhaustiveDependencies: <>
     useEffect(() => {
         const el = inputRef.current;
         if (!el) return;
         el.style.height = 'auto';
         el.style.height = `${Math.min(el.scrollHeight, 120)}px`;
-    }, []);
-
-    useEffect(() => {
-        const el = inputRef.current;
-        if (!el) return;
-        el.style.height = 'auto';
-    }, []);
+    }, [draft, editingContent]);
 
     async function handleSubmit(e: React.SubmitEvent<HTMLFormElement>) {
         e.preventDefault();
@@ -211,18 +233,23 @@ export function ChatClient({ chatId }: { chatId: string }) {
                 </DropdownMenu>
             </header>
 
-            <main className="min-h-0 flex-1 overflow-y-auto bg-white px-5 py-6">
+            <main ref={mainRef} className="min-h-0 flex-1 overflow-y-auto bg-white px-5 py-6">
                 {isLoadingMessages ? (
                     <ItemsLoading />
                 ) : messages.length ? (
                     <div className="flex flex-col gap-3">
-                        <LoadMoreRow
-                            ref={loadMoreMessagesRef}
-                            hasNextPage={hasNextPageMessages}
-                            isFetchingNextPage={isFetchingNextPageMessages}
-                            endLabel="No More Messages"
-                        />
-                        {messages.map((message) => {
+                        {hasNextPageMessages && (
+                            <button
+                                type="button"
+                                onClick={handleLoadOlder}
+                                disabled={isFetchingNextPageMessages}
+                                className="w-full py-2 text-sm text-muted-foreground hover:text-primary transition-colors"
+                            >
+                                {isFetchingNextPageMessages ? 'Loading...' : 'View older messages'}
+                            </button>
+                        )}
+
+                        {messages.map((message, index) => {
                             return (
                                 <Message
                                     key={message.id}
@@ -233,7 +260,7 @@ export function ChatClient({ chatId }: { chatId: string }) {
                                         setDeleteMessageTargetId(id);
                                         setShowDeleteMessageConfirm(true);
                                     }}
-                                    showTimestamp={shouldShowTimestamp(messages, messages.indexOf(message))}
+                                    showTimestamp={shouldShowTimestamp(messages, index)}
                                     isEditing={editingMessageId === message.id}
                                 />
                             );
@@ -377,10 +404,10 @@ export function ChatClient({ chatId }: { chatId: string }) {
 }
 
 function shouldShowTimestamp(messages: MessageItemDto[], index: number): boolean {
-    if (index === messages.length - 1) return true; // always show on last
-    if (index % 5 === 0) return true; // every 5 messages
+    if (index === messages.length - 1) return true;
+    if (index % 5 === 0) return true;
 
     const current = new Date(messages[index].timestamp).getTime();
     const next = new Date(messages[index + 1].timestamp).getTime();
-    return next - current > 5 * 60 * 1000; // 5 min gap
+    return next - current > 5 * 60 * 1000;
 }

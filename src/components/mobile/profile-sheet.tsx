@@ -24,12 +24,12 @@ import { toast } from 'sonner';
 import { Chip } from '@/components/mobile/app-chrome';
 import { FullScreenImageViewer } from '@/components/mobile/full-screen-image-viewer';
 import { ReportDialog } from '@/components/report-dialog';
+import { useSocketContext } from '@/components/socket-provider';
 import { Drawer, DrawerContent, DrawerTitle } from '@/components/ui/drawer';
 import { useReportUser } from '@/hooks/reports/use-report-user';
 import { useUserStatus } from '@/hooks/use-user-status';
 import { useVisitProfile } from '@/hooks/users/use-visit-profile';
 import { ageFromBirthYear, formatEnum } from '@/lib/utils';
-import { useSocketContext } from '@/components/socket-provider';
 
 export function ProfileSheet({
     userId,

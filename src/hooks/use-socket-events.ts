@@ -9,18 +9,20 @@ import {
 import { getMatchesControllerGetMatchesInfiniteQueryKey } from '@services/generated/matches/matches';
 import { getNotificationsControllerGetUnreadCountQueryKey } from '@services/generated/notifications/notifications';
 import type {
+    ChatUnreadCountResponseDto,
     ConversationItemDto,
     ConversationsListResponseDto,
     MatchItemDto,
     MatchListResponseDto,
     MessageItemDto,
     MessagesListResponseDto,
+    NotificationsUnreadCountResponseDto,
     ShoutoutItemDto,
     ShoutoutsListResponseDto
 } from '@services/model';
-import type { InfiniteData } from '@tanstack/react-query';
+import type { InfiniteData, QueryKey } from '@tanstack/react-query';
 import { useQueryClient } from '@tanstack/react-query';
-import { usePathname } from 'next/navigation';
+import { usePathname, useSearchParams } from 'next/navigation';
 import { useEffect, useRef } from 'react';
 import { toast } from 'sonner';
 import { useAuthContext } from '@/components/auth-provider';
@@ -57,13 +59,23 @@ interface MatchNewEvent {
 interface ShoutoutReceivedEvent {
     type: 'SHOUTOUT_RECEIVED';
     senderId: string;
-    shoutout: string;
+    shoutout: {
+        id: string;
+        content: string;
+        createdAt: string;
+        sender: { id: string; name: string; avatarUrl: string | null };
+    };
 }
 
 interface ShoutoutRepliedEvent {
     type: 'SHOUTOUT_REPLIED';
     conversationId: string;
-    shoutout: string;
+    shoutout: {
+        id: string;
+        content: string;
+        createdAt: string;
+        replier: { id: string; name: string; avatarUrl: string | null };
+    };
 }
 
 type SocketEvent =
@@ -79,93 +91,98 @@ export function useSocketEvents() {
     const { socket } = useSocketContext();
     const { user } = useAuthContext();
     const pathname = usePathname();
+    const searchParams = useSearchParams();
 
     const myId = user?.user?.id;
     const myIdRef = useRef(myId);
     myIdRef.current = myId;
 
     const activeConversationIdRef = useRef<string | null>(null);
+    const isOnShoutoutsTabRef = useRef(false);
     useEffect(() => {
         const match = pathname.match(/^\/chats\/([^/]+)$/);
         activeConversationIdRef.current = match?.[1] ?? null;
-    }, [pathname]);
+        isOnShoutoutsTabRef.current = pathname === '/chats' && searchParams.get('tab') === 'shoutouts';
+    }, [pathname, searchParams]);
 
     useEffect(() => {
         if (!socket || !myId) return;
 
         function handleMessageNew(data: MessageNewEvent) {
             console.log('Received new message event:', data);
-
             const { conversationId, message } = data;
+
             const isActive = activeConversationIdRef.current === conversationId;
             const currentMyId = myIdRef.current;
 
-            if (isActive) {
-                const messagesKey = getChatControllerGetConversationMessagesInfiniteQueryKey(conversationId);
+            const messagesKey = getChatControllerGetConversationMessagesInfiniteQueryKey(conversationId);
 
-                queryClient.setQueryData<InfiniteData<MessagesListResponseDto>>(messagesKey, (old) => {
-                    if (!old?.pages) return old;
+            queryClient.setQueryData<InfiniteData<MessagesListResponseDto>>(messagesKey, (old) => {
+                if (!old?.pages) return old;
 
-                    const existingIds = new Set(old.pages.flatMap((p) => p.messages.map((m) => m.id)));
-                    if (existingIds.has(message.id)) return old;
+                const existingIds = new Set(old.pages.flatMap((p) => p.messages.map((m) => m.id)));
+                if (existingIds.has(message.id)) return old;
 
-                    const tempIndex = old.pages[0].messages.findIndex(
-                        (m) => m.id.startsWith('temp-') && m.senderId === message.senderId && m.content === message.content
-                    );
+                const tempIndex = old.pages[0].messages.findIndex(
+                    (m) => m.id.startsWith('temp-') && m.senderId === message.senderId && m.content === message.content
+                );
 
-                    if (tempIndex !== -1) {
-                        const messages = [...old.pages[0].messages];
-                        messages[tempIndex] = message;
-                        return {
-                            ...old,
-                            pages: old.pages.map((page, idx) => (idx === 0 ? { ...page, messages } : page))
-                        };
-                    }
-
+                if (tempIndex !== -1) {
+                    const messages = [...old.pages[0].messages];
+                    messages[tempIndex] = message;
                     return {
                         ...old,
-                        pages: old.pages.map((page, idx) => (idx === 0 ? { ...page, messages: [message, ...page.messages] } : page))
+                        pages: old.pages.map((page, idx) => (idx === 0 ? { ...page, messages } : page))
                     };
-                });
-            } else {
-                const conversationsKey = getChatControllerGetConversationsInfiniteQueryKey();
-
-                queryClient.setQueryData<InfiniteData<ConversationsListResponseDto>>(conversationsKey, (old) => {
-                    if (!old?.pages) return old;
-
-                    let found = false;
-                    const pages = old.pages.map((page) => {
-                        const idx = page.conversations.findIndex((c) => c.id === conversationId);
-                        if (idx === -1) return page;
-
-                        found = true;
-                        const convo = page.conversations[idx];
-                        const updated: ConversationItemDto = {
-                            ...convo,
-                            lastMessage: message,
-                            updatedAt: message.timestamp,
-                            isRead: false
-                        };
-                        const filtered = page.conversations.filter((c) => c.id !== conversationId);
-                        return { ...page, conversations: [updated, ...filtered] };
-                    });
-
-                    if (!found) return old;
-                    return { ...old, pages };
-                });
-
-                const unreadKey = getChatControllerGetUnreadCountQueryKey();
-                queryClient.setQueryData(unreadKey, (old: { unreadCount: number } | undefined) => ({
-                    unreadCount: (old?.unreadCount ?? 0) + 1
-                }));
-
-                if (message.senderId !== currentMyId) {
-                    toast('New message');
                 }
+
+                return {
+                    ...old,
+                    pages: old.pages.map((page, idx) => (idx === 0 ? { ...page, messages: [message, ...page.messages] } : page))
+                };
+            });
+            const conversationsKey = getChatControllerGetConversationsInfiniteQueryKey();
+
+            queryClient.setQueryData<InfiniteData<ConversationsListResponseDto>>(conversationsKey, (old) => {
+                if (!old?.pages) return old;
+
+                let found = false;
+                const pages = old.pages.map((page) => {
+                    const idx = page.conversations.findIndex((c) => c.id === conversationId);
+                    if (idx === -1) return page;
+
+                    found = true;
+                    const convo = page.conversations[idx];
+                    const updated: ConversationItemDto = {
+                        ...convo,
+                        lastMessage: message,
+                        updatedAt: message.timestamp,
+                        isRead: false
+                    };
+                    const filtered = page.conversations.filter((c) => c.id !== conversationId);
+                    return { ...page, conversations: [updated, ...filtered] };
+                });
+
+                if (!found) return old;
+                return { ...old, pages };
+            });
+
+            if (!isActive && message.senderId !== currentMyId) {
+                increaseUnreadCount(queryClient, getChatControllerGetUnreadCountQueryKey());
+                toast(message.content, {
+                    action: {
+                        label: 'View Conversation',
+                        onClick: () => {
+                            window.location.href = `/chats/${conversationId}`;
+                        }
+                    }
+                });
             }
         }
 
         function handleMessageEdited(data: MessageEditedEvent) {
+            console.log('Received message edited event:', data);
+
             const conversationsKey = getChatControllerGetConversationsInfiniteQueryKey();
 
             queryClient.setQueryData<InfiniteData<ConversationsListResponseDto>>(conversationsKey, (old) => {
@@ -205,9 +222,27 @@ export function useSocketEvents() {
         }
 
         function handleMessageDeleted(data: MessageDeletedEvent) {
-            if (activeConversationIdRef.current !== data.conversationId) return;
-
+            const conversationsKey = getChatControllerGetConversationsInfiniteQueryKey();
             const messagesKey = getChatControllerGetConversationMessagesInfiniteQueryKey(data.conversationId);
+
+            queryClient.setQueryData<InfiniteData<ConversationsListResponseDto>>(conversationsKey, (old) => {
+                if (!old?.pages) return old;
+
+                let found = false;
+                const pages = old.pages.map((page) => {
+                    const idx = page.conversations.findIndex((c) => c.id === data.conversationId && c.lastMessage?.id === data.messageId);
+                    if (idx === -1) return page;
+
+                    found = true;
+                    return {
+                        ...page,
+                        conversations: page.conversations.map((c) => (c.id === data.conversationId ? { ...c, lastMessage: null } : c))
+                    };
+                });
+
+                if (!found) return old;
+                return { ...old, pages };
+            });
 
             queryClient.setQueryData<InfiniteData<MessagesListResponseDto>>(messagesKey, (old) => {
                 if (!old?.pages) return old;
@@ -223,6 +258,7 @@ export function useSocketEvents() {
         }
 
         function handleMatchNew(data: MatchNewEvent) {
+            console.log('Received new match event:', data);
             const match: MatchItemDto = {
                 id: data.match.id,
                 matchedAt: data.match.createdAt,
@@ -249,12 +285,8 @@ export function useSocketEvents() {
         }
 
         function handleShoutoutReceived(data: ShoutoutReceivedEvent) {
-            const parsed = JSON.parse(data.shoutout) as {
-                id: string;
-                content: string;
-                createdAt: string;
-                sender: { id: string; name: string; avatarUrl: string | null };
-            };
+            console.log('Received shoutout received event:', data);
+            const { shoutout: parsed } = data;
 
             const shoutout: ShoutoutItemDto = {
                 id: parsed.id,
@@ -268,7 +300,7 @@ export function useSocketEvents() {
                 }
             };
 
-            const shoutoutsKey = getChatControllerGetShoutoutsInfiniteQueryKey();
+            const shoutoutsKey = getChatControllerGetShoutoutsInfiniteQueryKey({ type: 'received' });
 
             queryClient.setQueryData<InfiniteData<ShoutoutsListResponseDto>>(shoutoutsKey, (old) => {
                 if (!old?.pages) return old;
@@ -282,23 +314,25 @@ export function useSocketEvents() {
                 };
             });
 
-            const notiCountKey = getNotificationsControllerGetUnreadCountQueryKey();
-            queryClient.setQueryData(notiCountKey, (old: { unreadCount: number } | undefined) => ({
-                unreadCount: (old?.unreadCount ?? 0) + 1
-            }));
+            increaseUnreadCount(queryClient, getNotificationsControllerGetUnreadCountQueryKey());
 
-            toast(`New shoutout from ${parsed.sender.name}`);
+            if (!isOnShoutoutsTabRef.current) {
+                toast(`Shoutout received from ${parsed.sender.name}`, {
+                    action: {
+                        label: 'View',
+                        onClick: () => {
+                            window.location.href = '/chats?tab=shoutouts';
+                        }
+                    }
+                });
+            }
         }
 
         function handleShoutoutReplied(data: ShoutoutRepliedEvent) {
-            const parsed = JSON.parse(data.shoutout) as {
-                id: string;
-                content: string;
-                createdAt: string;
-                replier: { id: string; name: string; avatarUrl: string | null };
-            };
+            console.log('Received shoutout replied event:', data);
+            const { shoutout: parsed } = data;
 
-            const shoutoutsKey = getChatControllerGetShoutoutsInfiniteQueryKey();
+            const shoutoutsKey = getChatControllerGetShoutoutsInfiniteQueryKey({ type: 'received' });
 
             queryClient.setQueryData<InfiniteData<ShoutoutsListResponseDto>>(shoutoutsKey, (old) => {
                 if (!old) return old;
@@ -348,7 +382,19 @@ export function useSocketEvents() {
                 return { ...old, pages };
             });
 
-            toast(`${parsed.replier.name} replied to your shoutout`);
+            increaseUnreadCount(queryClient, getChatControllerGetUnreadCountQueryKey());
+            increaseUnreadCount(queryClient, getNotificationsControllerGetUnreadCountQueryKey());
+
+            if (!isOnShoutoutsTabRef.current) {
+                toast(`${parsed.replier.name} replied your shoutout`, {
+                    action: {
+                        label: 'View',
+                        onClick: () => {
+                            window.location.href = `/chats/${data.conversationId}`;
+                        }
+                    }
+                });
+            }
         }
 
         function handleEvent(data: SocketEvent) {
@@ -390,4 +436,10 @@ export function useSocketEvents() {
             socket.off('shoutout:replied', handleEvent);
         };
     }, [socket, myId, queryClient]);
+}
+
+function increaseUnreadCount(queryClient: ReturnType<typeof useQueryClient>, queryKey: QueryKey) {
+    queryClient.setQueryData<NotificationsUnreadCountResponseDto | ChatUnreadCountResponseDto>(queryKey, (old) => ({
+        unreadCount: (old?.unreadCount ?? 0) + 1
+    }));
 }
