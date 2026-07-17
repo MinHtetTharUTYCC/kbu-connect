@@ -35,11 +35,11 @@ import ItemsLoading from './loading';
 import Message from './message';
 
 export function ChatClient({ chatId }: { chatId: string }) {
+    const router = useRouter();
+
     const { user } = useAuthContext();
     const { socket } = useSocketContext();
     const { getOnlineStatus } = useUserStatus(socket);
-
-    const router = useRouter();
 
     const {
         messages,

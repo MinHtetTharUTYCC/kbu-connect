@@ -22,7 +22,7 @@ import type {
 } from '@services/model';
 import type { InfiniteData, QueryKey } from '@tanstack/react-query';
 import { useQueryClient } from '@tanstack/react-query';
-import { usePathname, useSearchParams } from 'next/navigation';
+import { usePathname } from 'next/navigation';
 import { useEffect, useRef } from 'react';
 import { toast } from 'sonner';
 import { useAuthContext } from '@/components/auth-provider';
@@ -91,7 +91,6 @@ export function useSocketEvents() {
     const { socket } = useSocketContext();
     const { user } = useAuthContext();
     const pathname = usePathname();
-    const searchParams = useSearchParams();
 
     const myId = user?.user?.id;
     const myIdRef = useRef(myId);
@@ -99,17 +98,20 @@ export function useSocketEvents() {
 
     const activeConversationIdRef = useRef<string | null>(null);
     const isOnShoutoutsTabRef = useRef(false);
+
     useEffect(() => {
         const match = pathname.match(/^\/chats\/([^/]+)$/);
         activeConversationIdRef.current = match?.[1] ?? null;
-        isOnShoutoutsTabRef.current = pathname === '/chats' && searchParams.get('tab') === 'shoutouts';
-    }, [pathname, searchParams]);
+
+        const tab = typeof window !== 'undefined' ? new URLSearchParams(window.location.search).get('tab') : null;
+
+        isOnShoutoutsTabRef.current = pathname === '/chats' && tab === 'shoutouts';
+    }, [pathname]);
 
     useEffect(() => {
         if (!socket || !myId) return;
 
         function handleMessageNew(data: MessageNewEvent) {
-            console.log('Received new message event:', data);
             const { conversationId, message } = data;
 
             const isActive = activeConversationIdRef.current === conversationId;
@@ -181,8 +183,6 @@ export function useSocketEvents() {
         }
 
         function handleMessageEdited(data: MessageEditedEvent) {
-            console.log('Received message edited event:', data);
-
             const conversationsKey = getChatControllerGetConversationsInfiniteQueryKey();
 
             queryClient.setQueryData<InfiniteData<ConversationsListResponseDto>>(conversationsKey, (old) => {
@@ -285,18 +285,17 @@ export function useSocketEvents() {
         }
 
         function handleShoutoutReceived(data: ShoutoutReceivedEvent) {
-            console.log('Received shoutout received event:', data);
-            const { shoutout: parsed } = data;
+            const { shoutout } = data;
 
-            const shoutout: ShoutoutItemDto = {
-                id: parsed.id,
-                content: parsed.content,
+            const shoutoutReceived: ShoutoutItemDto = {
+                id: shoutout.id,
+                content: shoutout.content,
                 type: 'received',
-                createdAt: parsed.createdAt,
+                createdAt: shoutout.createdAt,
                 otherUser: {
-                    id: parsed.sender.id,
-                    name: parsed.sender.name,
-                    avatarUrl: parsed.sender.avatarUrl
+                    id: shoutout.sender.id,
+                    name: shoutout.sender.name,
+                    avatarUrl: shoutout.sender.avatarUrl
                 }
             };
 
@@ -306,18 +305,18 @@ export function useSocketEvents() {
                 if (!old?.pages) return old;
 
                 const existingIds = new Set(old.pages.flatMap((p) => p.shoutouts.map((s) => s.id)));
-                if (existingIds.has(shoutout.id)) return old;
+                if (existingIds.has(shoutoutReceived.id)) return old;
 
                 return {
                     ...old,
-                    pages: old.pages.map((page, idx) => (idx === 0 ? { ...page, shoutouts: [shoutout, ...page.shoutouts] } : page))
+                    pages: old.pages.map((page, idx) => (idx === 0 ? { ...page, shoutouts: [shoutoutReceived, ...page.shoutouts] } : page))
                 };
             });
 
             increaseUnreadCount(queryClient, getNotificationsControllerGetUnreadCountQueryKey());
 
             if (!isOnShoutoutsTabRef.current) {
-                toast(`Shoutout received from ${parsed.sender.name}`, {
+                toast(`New shoutout from ${shoutoutReceived.otherUser.name}`, {
                     action: {
                         label: 'View',
                         onClick: () => {
@@ -329,8 +328,7 @@ export function useSocketEvents() {
         }
 
         function handleShoutoutReplied(data: ShoutoutRepliedEvent) {
-            console.log('Received shoutout replied event:', data);
-            const { shoutout: parsed } = data;
+            const { shoutout } = data;
 
             const shoutoutsKey = getChatControllerGetShoutoutsInfiniteQueryKey({ type: 'received' });
 
@@ -340,7 +338,7 @@ export function useSocketEvents() {
                     ...old,
                     pages: old.pages.map((page) => ({
                         ...page,
-                        shoutouts: page.shoutouts.filter((s) => s.id !== parsed.id)
+                        shoutouts: page.shoutouts.filter((s) => s.id !== shoutout.id)
                     }))
                 };
             });
@@ -353,20 +351,20 @@ export function useSocketEvents() {
                 const newConvo: ConversationItemDto = {
                     id: data.conversationId,
                     otherUser: {
-                        id: parsed.replier.id,
-                        name: parsed.replier.name,
-                        avatarUrl: parsed.replier.avatarUrl
+                        id: shoutout.replier.id,
+                        name: shoutout.replier.name,
+                        avatarUrl: shoutout.replier.avatarUrl
                     },
                     isOnline: false,
                     lastOnline: null,
                     lastMessage: {
-                        id: parsed.id,
-                        content: parsed.content,
-                        senderId: parsed.replier.id,
-                        timestamp: parsed.createdAt
+                        id: shoutout.id,
+                        content: shoutout.content,
+                        senderId: shoutout.replier.id,
+                        timestamp: shoutout.createdAt
                     },
                     isRead: false,
-                    updatedAt: parsed.createdAt
+                    updatedAt: shoutout.createdAt
                 };
 
                 const pages = old.pages.map((page) => ({
@@ -386,7 +384,7 @@ export function useSocketEvents() {
             increaseUnreadCount(queryClient, getNotificationsControllerGetUnreadCountQueryKey());
 
             if (!isOnShoutoutsTabRef.current) {
-                toast(`${parsed.replier.name} replied your shoutout`, {
+                toast(`${shoutout.replier.name} replied your shoutout`, {
                     action: {
                         label: 'View',
                         onClick: () => {
