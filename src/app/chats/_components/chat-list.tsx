@@ -91,7 +91,7 @@ export function ChatListClient() {
                             <Avatar src={conversation.otherUser.avatarUrl} name={conversation.otherUser.name} className="size-12" />
                             {conversation.isOnline ? (
                                 <Badge className="absolute bottom-0 right-0 flex h-3 w-3 items-center justify-center rounded-full px-1 text-[9px] bg-green-500" />
-                            ) : conversation.lastOnline ? (
+                            ) : conversation.lastOnline && lastSeenToday ? (
                                 <Badge className="absolute bottom-0 right-0 flex h-4 min-w-4 items-center justify-center rounded-full text-[9px]  bg-green-500">
                                     {lastSeenToday}
                                 </Badge>

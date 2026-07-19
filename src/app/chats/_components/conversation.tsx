@@ -4,7 +4,7 @@ import type { MessageItemDto } from '@services/model/messageItemDto';
 import { ArrowLeft, Ban, Check, Flag, MoreVertical, Send, Trash, X } from 'lucide-react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useCallback, useEffect, useRef, useState } from 'react';
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import { useAuthContext } from '@/components/auth-provider';
 import { ActionConfirmDialog } from '@/components/mobile/action-confirm-dialog';
@@ -12,13 +12,7 @@ import { Avatar, EmptyState } from '@/components/mobile/app-chrome';
 import { ProfileSheet } from '@/components/mobile/profile-sheet';
 import { ReportDialog } from '@/components/report-dialog';
 import { useSocketContext } from '@/components/socket-provider';
-import {
-    DropdownMenu,
-    DropdownMenuContent,
-    DropdownMenuItem,
-    DropdownMenuSeparator,
-    DropdownMenuTrigger
-} from '@/components/ui/dropdown-menu';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 import { useBlockUser } from '@/hooks/block/use-block-user';
 import { useConversation } from '@/hooks/chat/use-conversation';
 import { useConversationMessages } from '@/hooks/chat/use-conversation-messages';
@@ -95,27 +89,16 @@ export function ChatClient({ chatId }: { chatId: string }) {
     const hasScrolledInitially = useRef(false);
 
     const scrollToBottom = useCallback(() => {
-        const el = mainRef.current;
-        if (!el) return;
-
-        console.log('Before', {
-            scrollTop: el.scrollTop,
-            scrollHeight: el.scrollHeight,
-            clientHeight: el.clientHeight
+        // Double rAF ensures layout is fully committed before we scroll.
+        requestAnimationFrame(() => {
+            requestAnimationFrame(() => {
+                messagesEndRef.current?.scrollIntoView({ block: 'end' });
+                const el = mainRef.current;
+                if (el) {
+                    el.scrollTop = el.scrollHeight;
+                }
+            });
         });
-
-        el.scrollTop = el.scrollHeight;
-
-        console.log('After', {
-            scrollTop: el.scrollTop,
-            scrollHeight: el.scrollHeight,
-            clientHeight: el.clientHeight
-        });
-    }, []);
-
-    // biome-ignore lint/correctness/useExhaustiveDependencies: <>
-    useEffect(() => {
-        console.log('ChatClient mounted', { chatId });
     }, []);
 
     useEffect(() => {
@@ -124,14 +107,12 @@ export function ChatClient({ chatId }: { chatId: string }) {
         }
     }, [chatId, conversation, markSeen]);
 
-    useEffect(() => {
-        if (messages.length > 0 && !hasScrolledInitially.current) {
-            requestAnimationFrame(() => {
-                scrollToBottom();
-                hasScrolledInitially.current = true;
-            });
+    useLayoutEffect(() => {
+        if (!isLoadingMessages && messages.length > 0 && !hasScrolledInitially.current) {
+            scrollToBottom();
+            hasScrolledInitially.current = true;
         }
-    }, [messages.length, scrollToBottom]);
+    }, [isLoadingMessages, messages.length, scrollToBottom]);
 
     useEffect(() => {
         if (!isFetchingNextPageMessages && mainRef.current && prevScrollHeight.current) {
@@ -187,7 +168,7 @@ export function ChatClient({ chatId }: { chatId: string }) {
     }
 
     if (!myId) {
-        return <EmptyState title="Authentication required" body="Please sign in to view this conversation." icon="user" />;
+        return <EmptyState title="Login required" body="Please sign in to view this conversation." icon="user" />;
     }
 
     const isOnline = getOnlineStatus(conversation.participant.id) || conversation.isOnline;
@@ -220,11 +201,10 @@ export function ChatClient({ chatId }: { chatId: string }) {
                             <Flag className="size-4" />
                             Report user
                         </DropdownMenuItem>
-                        <DropdownMenuItem className="text-red-500" onClick={() => setShowBlockConfirm(true)}>
+                        <DropdownMenuItem onClick={() => setShowBlockConfirm(true)}>
                             <Ban className="size-4" />
                             Block user
                         </DropdownMenuItem>
-                        <DropdownMenuSeparator />
                         <DropdownMenuItem className="text-red-500" onClick={() => setShowChatDeleteConfirm(true)}>
                             <Trash className="size-4" />
                             Delete chat
