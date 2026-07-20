@@ -111,6 +111,11 @@ export function useSocketEvents() {
     useEffect(() => {
         if (!socket || !myId) return;
 
+        // TODO:: remove this in production, only for debugging purposes
+        if (process.env.NODE_ENV !== 'production') {
+            (window as any).socket = socket;
+        }
+
         function handleMessageNew(data: MessageNewEvent) {
             const { conversationId, message } = data;
 

@@ -5,28 +5,36 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import { createPortal } from 'react-dom';
+import { ProfileSheet } from './mobile/profile-sheet';
 
 export function MatchCelebration() {
     const router = useRouter();
+
     const [match, setMatch] = useState<MatchItemDto | null>(null);
+    const [profileSheetId, setProfileSheetId] = useState<string | null>(null);
 
     useEffect(() => {
         function handleNewMatch(e: CustomEvent<MatchItemDto>) {
-            setMatch(e.detail);
+            const newMatch = e.detail;
+            setMatch(newMatch);
         }
 
         window.addEventListener('new-match', handleNewMatch as EventListener);
         return () => window.removeEventListener('new-match', handleNewMatch as EventListener);
     }, []);
 
-    useEffect(() => {
-        if (!match) return;
+    // useEffect(() => {
+    //     if (!match) return;
 
-        const timer = setTimeout(() => setMatch(null), 8000);
-        return () => clearTimeout(timer);
-    }, [match]);
+    //     const timer = setTimeout(() => setMatch(null), 8000);
+    //     return () => clearTimeout(timer);
+    // }, [match]);
 
     if (!match) return null;
+
+    if (profileSheetId) {
+        return createPortal(<ProfileSheet userId={profileSheetId} onClose={() => setProfileSheetId(null)} from={'visit'} />, document.body);
+    }
 
     return createPortal(
         <div
@@ -40,7 +48,7 @@ export function MatchCelebration() {
             aria-label="Match celebration"
         >
             <div
-                className="mx-8 flex flex-col items-center gap-6 rounded-3xl bg-linear-to-b from-pink-500 to-rose-600 p-10 text-center text-white shadow-2xl"
+                className="mx-8 flex flex-col items-center gap-6 rounded-3xl bg-primary p-10 text-center text-white shadow-2xl"
                 onClick={(e) => e.stopPropagation()}
                 onKeyDown={(e) => e.stopPropagation()}
                 role="document"
@@ -64,10 +72,12 @@ export function MatchCelebration() {
                 <div className="flex gap-3">
                     <button
                         type="button"
-                        onClick={() => setMatch(null)}
+                        onClick={() => {
+                            setProfileSheetId(match.matcher.id);
+                        }}
                         className="rounded-full border border-white/50 px-6 py-2.5 text-sm font-medium transition-colors hover:bg-white/10"
                     >
-                        Keep Swiping
+                        View Profile
                     </button>
                     {match.conversationId && (
                         <button
@@ -76,7 +86,7 @@ export function MatchCelebration() {
                                 setMatch(null);
                                 router.push(`/chats/${match.conversationId}`);
                             }}
-                            className="rounded-full bg-white px-6 py-2.5 text-sm font-semibold text-rose-600 transition-colors hover:bg-white/90"
+                            className="rounded-full bg-white px-6 py-2.5 text-sm font-semibold text-primary transition-colors hover:bg-white/90"
                         >
                             Send Message
                         </button>
