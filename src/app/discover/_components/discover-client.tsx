@@ -31,7 +31,6 @@ export function DiscoverClient() {
     const { like, dislike, isPending: isSwipePending } = useSwipeProfile();
     const { mutateAsync: sendShoutout, isPending: isSendingShoutout } = useSendShoutout();
     const profile = profiles[index];
-    const remainingProfiles = profiles.length - index;
 
     const queryClient = useQueryClient();
 
@@ -48,10 +47,10 @@ export function DiscoverClient() {
     }, [queryClient, profile]);
 
     useEffect(() => {
-        if (remainingProfiles <= 3 && hasNextPage && !isFetchingNextPage) {
+        if (profiles.length - index <= 3 && hasNextPage && !isFetchingNextPage) {
             fetchNextPage();
         }
-    }, [fetchNextPage, hasNextPage, isFetchingNextPage, remainingProfiles]);
+    }, [fetchNextPage, hasNextPage, isFetchingNextPage, profiles.length, index]);
 
     const handleSwipe = useCallback(
         (type: 'LIKE' | 'DISLIKE') => {
@@ -136,11 +135,6 @@ export function DiscoverClient() {
         );
     }
 
-    const dragRotation = dragX * 0.06;
-    const dragOpacity = Math.max(0, 1 - Math.abs(dragX) / 300);
-    const showLikeStamp = direction === 'right' || (!direction && dragX > SWIPE_THRESHOLD * 0.5);
-    const showPassStamp = direction === 'left' || (!direction && dragX < -SWIPE_THRESHOLD * 0.5);
-
     return (
         <div className="flex flex-1 flex-col overflow-hidden bg-background">
             <main className="flex flex-1 flex-col overflow-hidden px-5 pb-6 pt-5">
@@ -154,8 +148,8 @@ export function DiscoverClient() {
                             direction === 'right' && 'translate-x-24 rotate-6 opacity-0'
                         )}
                         style={{
-                            transform: direction ? undefined : `translateX(${dragX}px) rotate(${dragRotation}deg)`,
-                            opacity: direction ? undefined : dragOpacity
+                            transform: direction ? undefined : `translateX(${dragX}px) rotate(${dragX * 0.06}deg)`,
+                            opacity: direction ? undefined : Math.max(0, 1 - Math.abs(dragX) / 300)
                         }}
                         onTouchStart={handleTouchStart}
                         onTouchMove={handleTouchMove}
@@ -208,8 +202,10 @@ export function DiscoverClient() {
                             )}
 
                             <div className="absolute inset-x-0 bottom-0 h-36 bg-linear-to-t from-black/50 to-transparent" />
-                            {showLikeStamp && <SwipeStamp label="LIKE" className="right-8 rotate-12 border-primary text-primary" />}
-                            {showPassStamp && (
+                            {(direction === 'right' || (!direction && dragX > SWIPE_THRESHOLD * 0.5)) && (
+                                <SwipeStamp label="LIKE" className="right-8 rotate-12 border-primary text-primary" />
+                            )}
+                            {(direction === 'left' || (!direction && dragX < -SWIPE_THRESHOLD * 0.5)) && (
                                 <SwipeStamp label="PASS" className="left-8 -rotate-12 border-muted-foreground text-muted-foreground" />
                             )}
                         </div>

@@ -14,8 +14,6 @@ export function useDeleteShoutout() {
                 const { shoutoutId } = variables;
                 const queryKey = getChatControllerGetShoutoutsInfiniteQueryKey();
 
-                const previousData = queryClient.getQueryData<InfiniteData<ShoutoutsListResponseDto>>(queryKey);
-
                 queryClient.setQueryData<InfiniteData<ShoutoutsListResponseDto>>(queryKey, (old) => {
                     if (!old) return old;
                     return {
@@ -27,7 +25,9 @@ export function useDeleteShoutout() {
                     };
                 });
 
-                const wasFound = previousData?.pages.some((p) => p.shoutouts.some((s) => s.id === shoutoutId));
+                const wasFound = queryClient
+                    .getQueryData<InfiniteData<ShoutoutsListResponseDto>>(queryKey)
+                    ?.pages.some((p) => p.shoutouts.some((s) => s.id === shoutoutId));
 
                 if (!wasFound) {
                     queryClient.invalidateQueries({ queryKey });

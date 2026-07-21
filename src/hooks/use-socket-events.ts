@@ -100,12 +100,11 @@ export function useSocketEvents() {
     const isOnShoutoutsTabRef = useRef(false);
 
     useEffect(() => {
-        const match = pathname.match(/^\/chats\/([^/]+)$/);
-        activeConversationIdRef.current = match?.[1] ?? null;
+        activeConversationIdRef.current = pathname.match(/^\/chats\/([^/]+)$/)?.[1] ?? null;
 
-        const tab = typeof window !== 'undefined' ? new URLSearchParams(window.location.search).get('tab') : null;
-
-        isOnShoutoutsTabRef.current = pathname === '/chats' && tab === 'shoutouts';
+        isOnShoutoutsTabRef.current =
+            pathname === '/chats' &&
+            (typeof window !== 'undefined' ? new URLSearchParams(window.location.search).get('tab') : null) === 'shoutouts';
     }, [pathname]);
 
     useEffect(() => {

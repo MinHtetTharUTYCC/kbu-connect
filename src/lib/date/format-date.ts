@@ -20,8 +20,7 @@ export function getFormattedDate(dateStr: string): string {
 }
 
 export function formatDateToNow(dateStr: string): string {
-    const date = new Date(dateStr);
-    return formatDistanceToNow(date, { addSuffix: true });
+    return formatDistanceToNow(new Date(dateStr), { addSuffix: true });
 }
 
 export function getLastSeenToday(dateString: string): string | null {
@@ -45,12 +44,9 @@ export function getLastSeenToday(dateString: string): string | null {
         return '1m';
     }
 
-    const diffMinutes = Math.floor(diffMs / (1000 * 60));
-    const diffHours = Math.floor(diffMs / (1000 * 60 * 60));
-
-    if (diffMinutes < 60) {
-        return `${diffMinutes}m`;
+    if (diffMs < 60 * 1000 * 60) {
+        return `${Math.floor(diffMs / (1000 * 60))}m`;
     } else {
-        return `${diffHours}h`;
+        return `${Math.floor(diffMs / (1000 * 60 * 60))}h`;
     }
 }

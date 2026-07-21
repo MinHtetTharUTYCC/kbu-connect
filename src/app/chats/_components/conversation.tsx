@@ -387,7 +387,5 @@ function shouldShowTimestamp(messages: MessageItemDto[], index: number): boolean
     if (index === messages.length - 1) return true;
     if (index % 5 === 0) return true;
 
-    const current = new Date(messages[index].timestamp).getTime();
-    const next = new Date(messages[index + 1].timestamp).getTime();
-    return next - current > 5 * 60 * 1000;
+    return new Date(messages[index + 1].timestamp).getTime() - new Date(messages[index].timestamp).getTime() > 5 * 60 * 1000;
 }

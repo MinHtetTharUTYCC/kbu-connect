@@ -31,16 +31,12 @@ export default function BottomNav() {
     const { unreadCount: chatUnreadCount } = useConversationsUnreadCount(skip);
     const { unreadCount: notiUnreadCount } = useNotificationsUnreadCount(skip);
 
-    const navItems = !isLoading && user ? userLinks : [];
-
-    const isHidden = HIDDEN_ON_PATHS.some((path) => pathname.startsWith(path) || pathname === '/');
-
-    if (isHidden || isLoading || !user) return null;
+    if (HIDDEN_ON_PATHS.some((path) => pathname.startsWith(path) || pathname === '/')) return null;
 
     return (
         <nav className="sticky bottom-0 z-50 h-16 border-t border-black/10 bg-white/95 pb-[env(safe-area-inset-bottom)] backdrop-blur">
             <ul className="flex h-full items-center justify-around">
-                {navItems.map(({ label, href, icon }) => {
+                {(!isLoading && user ? userLinks : []).map(({ label, href, icon }) => {
                     const IconComponent = iconMap[icon];
                     return (
                         <li key={href}>

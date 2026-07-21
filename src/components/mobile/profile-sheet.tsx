@@ -62,15 +62,13 @@ export function ProfileSheet({
 
     const galleryImages = (profile?.gallery ?? []).toSorted((a, b) => a.order - b.order).map((item) => item.imageUrl);
 
-    const age = profile?.birthYear ? ageFromBirthYear(profile.birthYear) : null;
-
     const metadataItems = profile
         ? [
               profile.gender && {
                   icon: UserRound,
                   label: formatEnum(profile.gender)
               },
-              age && { icon: Cake, label: String(age) },
+              profile?.birthYear && { icon: Cake, label: String(ageFromBirthYear(profile.birthYear)) },
               profile.faculty && {
                   icon: GraduationCap,
                   label: formatEnum(profile.faculty)
@@ -308,11 +306,9 @@ type ProfileMetaItem = {
 };
 
 function ProfileMetaChip({ item }: { item: ProfileMetaItem }) {
-    const Icon = item.icon;
-
     return (
         <span className="inline-flex max-w-full items-center gap-1 rounded-full border border-black/10 bg-muted px-2 py-0.5 text-xs font-medium text-foreground">
-            <Icon className="size-3 shrink-0 text-primary" />
+            <item.icon className="size-3 shrink-0 text-primary" />
             <span className="truncate">{item.label}</span>
         </span>
     );

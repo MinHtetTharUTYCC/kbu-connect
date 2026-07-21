@@ -17,10 +17,7 @@ export function useReplyShoutout() {
             onSuccess: (data, variables) => {
                 const { shoutoutId } = variables;
 
-                const shoutoutsQueryKey = getChatControllerGetShoutoutsInfiniteQueryKey();
-                const chatsQueryKey = getChatControllerGetConversationsInfiniteQueryKey();
-
-                queryClient.setQueryData<InfiniteData<ShoutoutsListResponseDto>>(shoutoutsQueryKey, (old) => {
+                queryClient.setQueryData<InfiniteData<ShoutoutsListResponseDto>>(getChatControllerGetShoutoutsInfiniteQueryKey(), (old) => {
                     if (!old) return old;
                     return {
                         ...old,
@@ -31,24 +28,27 @@ export function useReplyShoutout() {
                     };
                 });
 
-                queryClient.setQueryData<InfiniteData<ConversationsListResponseDto>>(chatsQueryKey, (old) => {
-                    if (!old) return old;
+                queryClient.setQueryData<InfiniteData<ConversationsListResponseDto>>(
+                    getChatControllerGetConversationsInfiniteQueryKey(),
+                    (old) => {
+                        if (!old) return old;
 
-                    const pages = old.pages.map((page) => ({
-                        ...page,
-                        conversations: page.conversations.filter((c) => c.id !== data.id)
-                    }));
+                        const pages = old.pages.map((page) => ({
+                            ...page,
+                            conversations: page.conversations.filter((c) => c.id !== data.id)
+                        }));
 
-                    pages[0] = {
-                        ...pages[0],
-                        conversations: [data, ...pages[0].conversations]
-                    };
+                        pages[0] = {
+                            ...pages[0],
+                            conversations: [data, ...pages[0].conversations]
+                        };
 
-                    return {
-                        ...old,
-                        pages
-                    };
-                });
+                        return {
+                            ...old,
+                            pages
+                        };
+                    }
+                );
             }
         }
     });
