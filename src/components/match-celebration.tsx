@@ -23,13 +23,6 @@ export function MatchCelebration() {
         return () => window.removeEventListener('new-match', handleNewMatch as EventListener);
     }, []);
 
-    // useEffect(() => {
-    //     if (!match) return;
-
-    //     const timer = setTimeout(() => setMatch(null), 8000);
-    //     return () => clearTimeout(timer);
-    // }, [match]);
-
     if (!match) return null;
 
     if (profileSheetId) {

@@ -215,7 +215,7 @@ export function DiscoverClient() {
                             onClick={() => setSelectedProfileId(profile.id)}
                         >
                             {/* TOOD:: remove '!' */}
-                            {!profile.lastSeen && (
+                            {profile.lastSeen && (
                                 <div className="w-fit flex items-center gap-1 px-2 py-1 rounded-full bg-green-100 text-green-500 text-sm font-medium">
                                     <div className="h-2 w-2 rounded-full bg-green-500" />
                                     <p>active recently</p>

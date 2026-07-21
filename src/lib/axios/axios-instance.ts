@@ -4,17 +4,24 @@ import { baseUrl } from '../constants/app.config';
 import { retrySkipApiRoutes } from '../constants/routes';
 
 let isRefreshing = false;
-let refreshSubscribers: (() => void)[] = [];
+let refreshSubscribers: { resolve: () => void; reject: (err: unknown) => void }[] = [];
 
 const onRefreshed = () => {
-    refreshSubscribers.forEach((callback) => {
-        callback();
+    refreshSubscribers.forEach((sub) => {
+        sub.resolve();
     });
     refreshSubscribers = [];
 };
 
-const subscribeToRefresh = (callback: () => void) => {
-    refreshSubscribers.push(callback);
+const onRefreshFailed = (err: unknown) => {
+    refreshSubscribers.forEach((sub) => {
+        sub.reject(err);
+    });
+    refreshSubscribers = [];
+};
+
+const subscribeToRefresh = (resolve: () => void, reject: (err: unknown) => void) => {
+    refreshSubscribers.push({ resolve, reject });
 };
 
 const axiosInstance = axios.create({
@@ -81,10 +88,11 @@ axiosInstance.interceptors.response.use(
 
                 // If already refreshing, queue this request
                 if (isRefreshing) {
-                    return new Promise((resolve) => {
-                        subscribeToRefresh(() => {
-                            resolve(axiosInstance(originalRequest));
-                        });
+                    return new Promise((resolve, reject) => {
+                        subscribeToRefresh(
+                            () => resolve(axiosInstance(originalRequest)),
+                            (err) => reject(err ?? error)
+                        );
                     });
                 }
 
@@ -94,8 +102,6 @@ axiosInstance.interceptors.response.use(
                     // httpOnly refresh cookie is auto-sent
                     const data = await axiosInstance.post<unknown, { access_token: string }>('/auth/refresh');
 
-                    console.log('Token refreshed successfully', data);
-
                     onRefreshed();
 
                     if (data?.access_token) {
@@ -104,11 +110,13 @@ axiosInstance.interceptors.response.use(
 
                     // just retry — browser will auto-send the new cookie
                     return axiosInstance(originalRequest);
-                } catch {
+                } catch (refreshError) {
                     // refresh failed — session truly expired
+                    onRefreshFailed(refreshError);
                     if (typeof window !== 'undefined') {
                         window.location.href = '/login';
                     }
+                    return Promise.reject(refreshError);
                 } finally {
                     isRefreshing = false;
                 }

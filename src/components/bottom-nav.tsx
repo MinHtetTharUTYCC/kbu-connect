@@ -9,7 +9,7 @@ import { useNotificationsUnreadCount } from '@/hooks/notifications/use-noti-unre
 import { userLinks } from '@/lib/constants/links';
 import { publicRoutes } from '@/lib/constants/routes';
 import { cn } from '@/lib/utils';
-import { useAuthContext } from '../auth-provider';
+import { useAuthContext } from './auth-provider';
 
 const iconMap = {
     search: Search,
@@ -27,7 +27,7 @@ export default function BottomNav() {
 
     const { user, isLoading } = useAuthContext();
 
-    const skip = !!user || !isLoading;
+    const skip = !user || isLoading;
     const { unreadCount: chatUnreadCount } = useConversationsUnreadCount(skip);
     const { unreadCount: notiUnreadCount } = useNotificationsUnreadCount(skip);
 

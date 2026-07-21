@@ -1,4 +1,9 @@
+import type { Metadata } from 'next';
 import { MyProfileClient } from './_components/my-profile-client';
+
+export const metadata: Metadata = {
+    title: 'My Profile'
+};
 
 export default function MyProfilePage() {
     return <MyProfileClient />;

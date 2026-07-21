@@ -46,14 +46,14 @@ export function MatchRow({
                 <p className="text-sm text-muted-foreground">You matched{match.isNew ? ' — new!' : ''}</p>
             </div>
             {match.conversationId && (
-                <button
-                    type="button"
+                // biome-ignore lint/a11y/useKeyWithClickEvents: inside <button>, keyboard handled by parent
+                // biome-ignore lint/a11y/noStaticElementInteractions: inside <button>, keyboard handled by parent
+                <span
                     onClick={handleOpenChat}
                     className="ml-3 grid size-10 shrink-0 place-items-center rounded-full bg-primary text-white transition active:scale-90"
-                    aria-label="View chat"
                 >
                     <MessageCircle className="size-5" />
-                </button>
+                </span>
             )}
         </button>
     );

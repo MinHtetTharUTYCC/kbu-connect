@@ -4,8 +4,6 @@ import { publicRoutes } from './lib/constants/routes';
 export async function proxy(req: NextRequest) {
     const pathname = req.nextUrl.pathname;
 
-    console.log(`[Middleware: 👀] at ${pathname} | cookies:`, Object.fromEntries(req.cookies));
-
     const refreshToken = req.cookies.get('refresh_token')?.value;
     const hasRFToken = !!refreshToken;
 
@@ -15,7 +13,7 @@ export async function proxy(req: NextRequest) {
     }
 
     // Unauthenticated users on protected routes → redirect to login
-    const isPublic = publicRoutes.some((route) => pathname.startsWith(route));
+    const isPublic = publicRoutes.some((route) => (route === '/' ? pathname === '/' : pathname.startsWith(route)));
     if (!hasRFToken && !isPublic) {
         return NextResponse.redirect(new URL('/login', req.url));
     }

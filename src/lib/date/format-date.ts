@@ -4,7 +4,7 @@ export function getFormattedDate(dateStr: string): string {
     const date = new Date(dateStr);
 
     if (isToday(date)) {
-        return `Today ${format(date, 'hh:mm a')}`;
+        return `Today at ${format(date, 'hh:mm a')}`;
     } else if (isYesterday(date)) {
         return `Yesterday at ${format(date, 'hh:mm a')}`;
     } else if (isThisWeek(date)) {

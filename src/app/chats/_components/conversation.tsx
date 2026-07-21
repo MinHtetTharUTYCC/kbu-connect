@@ -353,7 +353,7 @@ export function ChatClient({ chatId }: { chatId: string }) {
                             {
                                 onSuccess: () => {
                                     setShowBlockConfirm(false);
-                                    toast.success('Block scuccessfully');
+                                    toast.success('Blocked successfully');
                                     router.replace('/chats');
                                 }
                             }

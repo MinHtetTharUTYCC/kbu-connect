@@ -1,11 +1,11 @@
 import { Inter, JetBrains_Mono } from 'next/font/google';
 
 import './globals.css';
+import BottomNav from '@/components/bottom-nav';
 import { MobileScreen } from '@/components/mobile/app-chrome';
 import { TopBarProvider } from '@/components/mobile/top-bar-provider';
 import Providers from '@/components/providers';
 import { Toaster } from '@/components/ui/sonner';
-import BottomNav from '@/components/web/bottom-nav';
 import { cn } from '@/lib/utils';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-sans' });

@@ -44,7 +44,7 @@ export function AvatarUploadStep({
                         </div>
                     )}
                 </div>
-                <div className="flexf flex-col items-center gap-2 mx-auto">
+                <div className="flex flex-col items-center gap-2 mx-auto">
                     <button
                         type="button"
                         onClick={() => avatarInputRef.current?.click()}

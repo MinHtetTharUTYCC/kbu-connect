@@ -14,7 +14,7 @@ const TopBarContext = createContext<React.Dispatch<React.SetStateAction<TopBarCo
 export function TopBarProvider({ children }: { children: ReactNode }) {
     const [config, setConfig] = useState<TopBarConfig>({});
 
-    const hasConfig = config.title || config.action || config.canBack;
+    const hasConfig = config.title || config.action || config.canBack !== undefined;
 
     return (
         <TopBarContext.Provider value={setConfig}>
