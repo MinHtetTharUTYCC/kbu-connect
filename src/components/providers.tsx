@@ -6,6 +6,7 @@ import { useState } from 'react';
 import { handleBackendError } from '@/lib/error/error-util';
 import { AuthProvider } from './auth-provider';
 import { MatchCelebration } from './match-celebration';
+import { PushNotifications } from './push-notifications';
 import { SocketEvents } from './socket-events';
 import { SocketProvider } from './socket-provider';
 
@@ -41,6 +42,7 @@ export default function Providers({ children }: { children: React.ReactNode }) {
                 <SocketProvider>
                     <SocketEvents />
                     <MatchCelebration />
+                    <PushNotifications />
                     {children}
                 </SocketProvider>
             </AuthProvider>

@@ -3,9 +3,11 @@
 import { Bell, Heart, Home, MessageCircle, Search, User } from 'lucide-react';
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
+import { useEffect, useRef } from 'react';
 import { Badge } from '@/components/ui/badge';
 import { useConversationsUnreadCount } from '@/hooks/chat/use-conversations-unread-count';
 import { useNotificationsUnreadCount } from '@/hooks/notifications/use-noti-unread-count';
+import { setAppBadge } from '@/lib/badge';
 import { userLinks } from '@/lib/constants/links';
 import { publicRoutes } from '@/lib/constants/routes';
 import { cn } from '@/lib/utils';
@@ -30,6 +32,16 @@ export default function BottomNav() {
     const skip = !user || isLoading;
     const { unreadCount: chatUnreadCount } = useConversationsUnreadCount(skip);
     const { unreadCount: notiUnreadCount } = useNotificationsUnreadCount(skip);
+
+    const prevCountRef = useRef(0);
+
+    useEffect(() => {
+        const total = chatUnreadCount + notiUnreadCount;
+        if (total !== prevCountRef.current) {
+            prevCountRef.current = total;
+            setAppBadge(total);
+        }
+    }, [chatUnreadCount, notiUnreadCount]);
 
     if (HIDDEN_ON_PATHS.some((path) => pathname.startsWith(path) || pathname === '/')) return null;
 

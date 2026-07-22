@@ -7,6 +7,7 @@ import {
 } from '@services/generated/notifications/notifications';
 import type { NotificationsListResponseDto, NotificationsUnreadCountResponseDto } from '@services/model';
 import { type InfiniteData, useQueryClient } from '@tanstack/react-query';
+import { clearAppBadge } from '@/lib/badge';
 
 export function useMarkAllNotificationsRead() {
     const queryClient = useQueryClient();
@@ -60,6 +61,7 @@ export function useMarkAllNotificationsRead() {
             onSettled: () => {
                 queryClient.invalidateQueries({ queryKey: listQueryKey });
                 queryClient.invalidateQueries({ queryKey: countQueryKey });
+                clearAppBadge();
             },
             meta: {
                 skipGlobalToast: true

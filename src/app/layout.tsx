@@ -1,3 +1,4 @@
+import type { Metadata, Viewport } from 'next';
 import { Inter, JetBrains_Mono } from 'next/font/google';
 
 import './globals.css';
@@ -15,6 +16,27 @@ const jetbrainsMono = JetBrains_Mono({
     variable: '--font-mono'
 });
 
+export const metadata: Metadata = {
+    title: 'KBU Connect',
+    description: 'Connect with KBU students',
+    appleWebApp: {
+        capable: true,
+        statusBarStyle: 'black-translucent',
+        title: 'KBU Connect'
+    },
+    formatDetection: {
+        telephone: false
+    }
+};
+
+export const viewport: Viewport = {
+    themeColor: '#1a1a1a',
+    width: 'device-width',
+    initialScale: 1,
+    maximumScale: 1,
+    userScalable: false
+};
+
 export default function RootLayout({
     children
 }: Readonly<{
@@ -22,6 +44,9 @@ export default function RootLayout({
 }>) {
     return (
         <html lang="en" suppressHydrationWarning className={cn('antialiased', jetbrainsMono.variable, 'font-sans', inter.variable)}>
+            <head>
+                <link rel="apple-touch-icon" href="/pwa/apple-touch-icon.png" />
+            </head>
             <body className="flex flex-col h-dvh">
                 <Providers>
                     <MobileScreen>

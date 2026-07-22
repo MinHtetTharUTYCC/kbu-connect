@@ -1,6 +1,6 @@
 'use client';
 
-import { type NotificationItemDto, NotificationItemDtoType } from '@services/model';
+import { type MatchItemDto, type NotificationItemDto, NotificationItemDtoType } from '@services/model';
 import { Bell, BellRing, Heart, Loader2, Megaphone, MessageCircle } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
@@ -67,9 +67,22 @@ export function NotificationClient() {
             case NotificationItemDtoType.NEW_MESSAGE:
                 router.push(`/chats/${(notification.data as Record<string, unknown>)?.conversationId}`);
                 break;
-            case NotificationItemDtoType.NEW_MATCH:
-                router.push('/matches');
+            case NotificationItemDtoType.NEW_MATCH: {
+                const d = notification.data as Record<string, string>;
+                const match: MatchItemDto = {
+                    id: d.matchId,
+                    matchedAt: notification.createdAt,
+                    isNew: true,
+                    conversationId: d.conversationId ?? null,
+                    matcher: {
+                        id: d.matchedUserId,
+                        name: d.matchedUserName,
+                        avatarUrl: d.matchedUserAvatarUrl ?? null
+                    }
+                };
+                window.dispatchEvent(new CustomEvent('new-match', { detail: match }));
                 break;
+            }
             case NotificationItemDtoType.SHOUTOUT_RECEIVED:
                 router.push('/chats?tab=shoutouts');
                 break;
