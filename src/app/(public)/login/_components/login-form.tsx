@@ -1,7 +1,7 @@
 'use client';
 
 import { zodResolver } from '@hookform/resolvers/zod';
-import { GraduationCap } from 'lucide-react';
+import Image from 'next/image';
 import Link from 'next/link';
 import { useState } from 'react';
 import { useForm } from 'react-hook-form';
@@ -58,8 +58,8 @@ export function LoginForm() {
     return (
         <main className="h-[calc(100vh-3.5rem)] mx-auto flex items-center gap-6 w-full max-w-[430px] flex-col bg-white px-5 pb-10 pt-24 text-foreground">
             <section className="mb-8 flex flex-col items-center text-center">
-                <div className="mb-4 grid size-20 place-items-center rounded-xl bg-primary text-white shadow-sm">
-                    <GraduationCap className="size-10" />
+                <div className="w-40 h-40 relative overflow-hidden">
+                    <Image src="/pwa/logo.png" alt="KBU Connect" fill className="object-cover" />
                 </div>
                 <h1 className="text-2xl font-bold tracking-normal">KBU Connect</h1>
                 <p className="mt-2 text-sm text-muted-foreground">Connect with your campus community</p>

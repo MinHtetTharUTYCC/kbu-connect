@@ -1,5 +1,6 @@
-import { GraduationCap, Heart, Mail, Megaphone, MessageCircle, ShieldCheck, Users } from 'lucide-react';
+import { Heart, Mail, Megaphone, MessageCircle, ShieldCheck, Users } from 'lucide-react';
 import type { Metadata } from 'next';
+import Image from 'next/image';
 import Link from 'next/link';
 import TopBarClient from '@/components/mobile/top-bar-client';
 
@@ -42,12 +43,12 @@ export default function HomePage() {
         <>
             <TopBarClient title="KBU Connect" canBack={false} />
             <main className="bg-background px-5 pb-10 text-foreground">
-                <section className="flex flex-col items-center py-8 text-center">
-                    <div className="mb-5 grid size-[72px] place-items-center rounded-[18px] bg-primary text-primary-foreground">
-                        <GraduationCap className="size-8" />
+                <section className="flex h-fit flex-col items-center py-8 text-center">
+                    <div className="relative w-40 h-40 overflow-hidden">
+                        <Image src="/pwa/logo.png" alt="KBU Connect" fill className="object-cover" />
                     </div>
-                    <h1 className="text-[22px] text-primary font-bold tracking-wide">KBU Connect</h1>
-                    <p className="mt-1.5 text-[13px] text-muted-foreground">Campus community · Kasem Bundit University</p>
+                    <h1 className="-mt-8 text-3xl text-primary font-bold tracking-wide">KBU Connect</h1>
+                    <p className="mt-1.5 text-sm text-muted-foreground">Campus Community · Kasem Bundit University</p>
                 </section>
 
                 <div className="mb-8 flex flex-col gap-3">
@@ -57,8 +58,8 @@ export default function HomePage() {
                     >
                         Join the Community &rarr;
                     </Link>
-                    <div className="flex items-center justify-center gap-1.5 text-[12px] text-muted-foreground">
-                        <ShieldCheck className="size-3.5 text-green-600" />
+                    <div className="flex items-center justify-center gap-1.5 text-xs text-muted-foreground">
+                        <ShieldCheck className="w-4 h-4 text-green-600" />
                         100% KBU-Mail Verified Environment
                     </div>
                 </div>
@@ -89,10 +90,10 @@ export default function HomePage() {
                                 }}
                             />
                         </div>
-                        <div className="flex flex-col items-center justify-center rounded-2xl border border-border bg-background p-4">
-                            <Users className="mb-1 size-8 text-primary" />
+                        <div className="flex flex-col items-center justify-center text-primary rounded-2xl border border-border bg-background p-4">
+                            <Users className="mb-1 size-8" />
                             <span className="text-lg font-bold">5,000+</span>
-                            <span className="text-[11px] text-muted-foreground">Active Students</span>
+                            <span className="text-[11px]">Active Students</span>
                         </div>
                     </div>
                 </section>

@@ -102,7 +102,7 @@ export default function TermsAndConditionsPage() {
             </section>
 
             <div className="mt-auto flex flex-col items-center gap-1 py-8">
-                <span className="text-xs text-muted-foreground">Last updated: July 6</span>
+                <span className="text-xs text-muted-foreground">Last updated: July 22, 2026</span>
                 <span className="text-xs text-muted-foreground">KBU Connect</span>
             </div>
         </main>

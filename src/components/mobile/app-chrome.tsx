@@ -40,7 +40,7 @@ export function TopBar({ title = 'UniMatch', action, canBack = true }: { title?:
 
     return (
         <header className="sticky top-0 z-40 flex h-14 shrink-0 items-center justify-between border-b border-black/10 bg-white/90 px-5 backdrop-blur">
-            <div className="flex min-w-0 items-center gap-2">
+            <div className="flex h-full min-w-0 items-center gap-2">
                 {canBack ? (
                     <button
                         type="button"
@@ -51,7 +51,9 @@ export function TopBar({ title = 'UniMatch', action, canBack = true }: { title?:
                         <ArrowLeft className="size-4" />
                     </button>
                 ) : (
-                    <GraduationCap className="size-6 text-primary" />
+                    <div className="relative h-12 w-12 overflow-hidden">
+                        <Image src="/pwa/logo.png" alt="KBU Connect" fill className="object-cover" />
+                    </div>
                 )}
                 <span className="truncate text-lg font-bold text-primary">{title}</span>
             </div>
