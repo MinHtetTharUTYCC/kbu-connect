@@ -48,7 +48,7 @@ export default function BottomNav() {
     return (
         <nav className="sticky bottom-0 z-50 h-16 border-t border-black/10 bg-white/95 pb-[env(safe-area-inset-bottom)] backdrop-blur">
             <ul className="flex h-full items-center justify-around">
-                {(!isLoading && user ? userLinks : []).map(({ label, href, icon }) => {
+                {userLinks.map(({ label, href, icon }) => {
                     const IconComponent = iconMap[icon];
                     return (
                         <li key={href}>

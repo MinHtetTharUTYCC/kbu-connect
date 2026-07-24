@@ -56,15 +56,13 @@ export function LoginForm() {
     };
 
     return (
-        <main className="h-[calc(100vh-3.5rem)] mx-auto flex items-center gap-6 w-full max-w-[430px] flex-col bg-white px-5 pb-10 pt-24 text-foreground">
-            <section className="mb-8 flex flex-col items-center text-center">
-                <div className="w-40 h-40 relative overflow-hidden">
-                    <Image src="/pwa/logo.png" alt="KBU Connect" fill className="object-cover" />
+        <main className="h-[calc(100vh-3.5rem)] mx-auto flex items-center gap-3 w-full max-w-[430px] flex-col bg-white px-5 pb-10 pt-24 text-foreground">
+            <section className="flex h-fit flex-col items-center py-8 text-center">
+                <div className="relative w-40 h-40 overflow-hidden">
+                    <Image src="/pwa/logo.svg" alt="KBU Connect" fill className="object-cover" />
                 </div>
-                <h1 className="text-2xl font-bold tracking-normal">KBU Connect</h1>
-                <p className="mt-2 text-sm text-muted-foreground">Connect with your campus community</p>
+                <h1 className="-mt-8 text-3xl text-primary font-bold tracking-wide">KBU Connect</h1>
             </section>
-
             {emailInAction ? (
                 <Form {...verifyForm}>
                     <form className="space-y-6" onSubmit={verifyForm.handleSubmit(onVerifySubmit)}>
@@ -122,11 +120,11 @@ export function LoginForm() {
                                 name="email"
                                 render={({ field }) => (
                                     <FormItem>
-                                        <FormLabel>University Email</FormLabel>
+                                        <FormLabel className="text-muted-foreground">University Email</FormLabel>
                                         <FormControl>
                                             <Input
                                                 {...field}
-                                                placeholder="uYourID@ms.kbu.ac.th"
+                                                placeholder="uYOURID@ms.kbu.ac.th"
                                                 type="text"
                                                 inputMode="email"
                                                 spellCheck={false}

@@ -42,10 +42,10 @@ export default function HomePage() {
     return (
         <>
             <TopBarClient title="KBU Connect" canBack={false} />
-            <main className="bg-background px-5 pb-10 text-foreground">
+            <main className="px-5 pb-10 text-foreground">
                 <section className="flex h-fit flex-col items-center py-8 text-center">
                     <div className="relative w-40 h-40 overflow-hidden">
-                        <Image src="/pwa/logo.png" alt="KBU Connect" fill className="object-cover" />
+                        <Image src="/pwa/logo.svg" alt="KBU Connect" fill className="object-cover" />
                     </div>
                     <h1 className="-mt-8 text-3xl text-primary font-bold tracking-wide">KBU Connect</h1>
                     <p className="mt-1.5 text-sm text-muted-foreground">Campus Community · Kasem Bundit University</p>

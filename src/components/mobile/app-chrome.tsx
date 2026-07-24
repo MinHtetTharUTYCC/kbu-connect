@@ -27,7 +27,7 @@ export function MobileScreen({ children, className }: { children: ReactNode; cla
     );
 }
 
-export function TopBar({ title = 'UniMatch', action, canBack = true }: { title?: string; action?: ReactNode; canBack: boolean }) {
+export function TopBar({ title = 'KBU Connect', action, canBack = true }: { title?: string; action?: ReactNode; canBack: boolean }) {
     const router = useRouter();
 
     const onBackClick = () => {
@@ -52,7 +52,7 @@ export function TopBar({ title = 'UniMatch', action, canBack = true }: { title?:
                     </button>
                 ) : (
                     <div className="relative h-12 w-12 overflow-hidden">
-                        <Image src="/pwa/logo.png" alt="KBU Connect" fill className="object-cover" />
+                        <Image src="/pwa/logo.svg" alt="KBU Connect" fill className="object-cover" />
                     </div>
                 )}
                 <span className="truncate text-lg font-bold text-primary">{title}</span>
