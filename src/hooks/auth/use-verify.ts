@@ -1,6 +1,6 @@
+'use client';
 import { useAuthControllerVerify } from '@services/generated/auth/auth';
 import { useRouter } from 'next/navigation';
-import { handleBackendError } from '@/lib/error/error-util';
 import { useAuthStore } from '@/stores/auth-store';
 
 export function useVerify() {
@@ -19,7 +19,9 @@ export function useVerify() {
                     router.replace('/profile-setup');
                 }
             },
-            onError: (error) => handleBackendError(error)
+            meta: {
+                skipGlobalToast: true
+            }
         }
     });
 }

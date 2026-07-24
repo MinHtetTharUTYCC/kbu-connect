@@ -7,7 +7,11 @@ export function cn(...inputs: ClassValue[]) {
 
 export function ageFromBirthYear(birthYear?: number | null) {
     if (!birthYear) return undefined;
-    return new Date().getFullYear() - birthYear;
+    const now = new Date();
+    const birthDate = new Date(birthYear, now.getMonth(), now.getDate());
+    let age = now.getFullYear() - birthYear;
+    if (now < birthDate) age--;
+    return age;
 }
 
 export function formatEnum(value?: string | null) {

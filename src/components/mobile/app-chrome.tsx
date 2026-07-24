@@ -1,6 +1,19 @@
 'use client';
 
-import { ArrowLeft, Ban, Bell, GraduationCap, Loader2, type LucideIcon, Megaphone, MessageCircle, Search, User, Users } from 'lucide-react';
+import {
+    ArrowLeft,
+    Ban,
+    Bell,
+    GraduationCap,
+    Loader2,
+    type LucideIcon,
+    Megaphone,
+    MessageCircle,
+    Search,
+    User,
+    UserRoundSearch,
+    Users
+} from 'lucide-react';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import type { ReactNode } from 'react';
@@ -14,7 +27,7 @@ export function MobileScreen({ children, className }: { children: ReactNode; cla
     );
 }
 
-export function TopBar({ title = 'UniMatch', action, canBack = true }: { title?: string; action?: ReactNode; canBack: boolean }) {
+export function TopBar({ title = 'KBU Connect', action, canBack = true }: { title?: string; action?: ReactNode; canBack: boolean }) {
     const router = useRouter();
 
     const onBackClick = () => {
@@ -27,7 +40,7 @@ export function TopBar({ title = 'UniMatch', action, canBack = true }: { title?:
 
     return (
         <header className="sticky top-0 z-40 flex h-14 shrink-0 items-center justify-between border-b border-black/10 bg-white/90 px-5 backdrop-blur">
-            <div className="flex min-w-0 items-center gap-2">
+            <div className="flex h-full min-w-0 items-center gap-2">
                 {canBack ? (
                     <button
                         type="button"
@@ -38,7 +51,9 @@ export function TopBar({ title = 'UniMatch', action, canBack = true }: { title?:
                         <ArrowLeft className="size-4" />
                     </button>
                 ) : (
-                    <GraduationCap className="size-6 text-primary" />
+                    <div className="relative h-12 w-12 overflow-hidden">
+                        <Image src="/pwa/logo.svg" alt="KBU Connect" fill className="object-cover" />
+                    </div>
                 )}
                 <span className="truncate text-lg font-bold text-primary">{title}</span>
             </div>
@@ -83,16 +98,19 @@ const iconMap: Record<string, LucideIcon> = {
     bell: Bell,
     shoutout: Megaphone,
     users: Users,
-    loader: Loader2
+    loader: Loader2,
+    searchUser: UserRoundSearch
 };
 
-export function EmptyState({ title, body, icon }: { title: string; body: string; icon: string }) {
+export function EmptyState({ title, body, icon, bounce = false }: { title: string; body: string; icon: string; bounce?: boolean }) {
     const Icon = iconMap[icon];
 
     return (
         <div className="mt-8 flex flex-1 flex-col items-center justify-center px-8 text-center">
             {Icon && (
-                <div className="mb-4 grid size-14 place-items-center rounded-2xl bg-primary/10 text-primary">
+                <div
+                    className={`mb-4 grid size-14 place-items-center rounded-2xl bg-primary/10 text-primary ${bounce ? 'animate-bounce' : ''}`}
+                >
                     <Icon className={`size-6 ${icon === 'loader' ? 'animate-spin' : ''}`} />
                 </div>
             )}

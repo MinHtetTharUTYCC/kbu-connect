@@ -37,7 +37,7 @@ export const getBackendErrorMessage = (err: unknown, fallback = 'An unexpected e
         rawErrorMessage.includes('network error') ||
         rawErrorMessage.includes('fetch failed')
     ) {
-        return 'Server is temporarily unavailable.';
+        return 'Service is temporarily unavailable.';
     }
 
     if (status && status >= 500) {

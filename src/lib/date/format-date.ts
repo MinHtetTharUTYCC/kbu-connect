@@ -4,7 +4,7 @@ export function getFormattedDate(dateStr: string): string {
     const date = new Date(dateStr);
 
     if (isToday(date)) {
-        return `Today ${format(date, 'hh:mm a')}`;
+        return `Today at ${format(date, 'hh:mm a')}`;
     } else if (isYesterday(date)) {
         return `Yesterday at ${format(date, 'hh:mm a')}`;
     } else if (isThisWeek(date)) {
@@ -20,6 +20,33 @@ export function getFormattedDate(dateStr: string): string {
 }
 
 export function formatDateToNow(dateStr: string): string {
-    const date = new Date(dateStr);
-    return formatDistanceToNow(date, { addSuffix: true });
+    return formatDistanceToNow(new Date(dateStr), { addSuffix: true });
+}
+
+export function getLastSeenToday(dateString: string): string | null {
+    const now = new Date();
+    const date = new Date(dateString);
+
+    // biome-ignore lint/suspicious/noGlobalIsNan: <>
+    if (isNaN(date.getTime())) {
+        console.error('Invalid timestamp:', dateString, date.getTime(), date);
+        return null;
+    }
+
+    const oneDayMs = 24 * 60 * 60 * 1000;
+    const diffMs = now.getTime() - date.getTime();
+
+    if (diffMs > oneDayMs || diffMs < 0) {
+        return null;
+    }
+
+    if (diffMs < 60 * 1000) {
+        return '1m';
+    }
+
+    if (diffMs < 60 * 1000 * 60) {
+        return `${Math.floor(diffMs / (1000 * 60))}m`;
+    } else {
+        return `${Math.floor(diffMs / (1000 * 60 * 60))}h`;
+    }
 }

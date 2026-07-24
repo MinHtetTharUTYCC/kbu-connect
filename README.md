@@ -92,5 +92,5 @@ src/
 
 ## API
 
-API json: https://.../api/json
-API swagger UI: https://.../api/docs
+API json: https://kbu-connect-backend.onrender.com/api/docs/json
+API swagger UI: https://kbu-connect-backend.onrender.com/api/docs

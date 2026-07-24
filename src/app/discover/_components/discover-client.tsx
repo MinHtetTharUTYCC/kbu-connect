@@ -31,7 +31,6 @@ export function DiscoverClient() {
     const { like, dislike, isPending: isSwipePending } = useSwipeProfile();
     const { mutateAsync: sendShoutout, isPending: isSendingShoutout } = useSendShoutout();
     const profile = profiles[index];
-    const remainingProfiles = profiles.length - index;
 
     const queryClient = useQueryClient();
 
@@ -48,10 +47,10 @@ export function DiscoverClient() {
     }, [queryClient, profile]);
 
     useEffect(() => {
-        if (remainingProfiles <= 3 && hasNextPage && !isFetchingNextPage) {
+        if (profiles.length - index <= 3 && hasNextPage && !isFetchingNextPage) {
             fetchNextPage();
         }
-    }, [fetchNextPage, hasNextPage, isFetchingNextPage, remainingProfiles]);
+    }, [fetchNextPage, hasNextPage, isFetchingNextPage, profiles.length, index]);
 
     const handleSwipe = useCallback(
         (type: 'LIKE' | 'DISLIKE') => {
@@ -118,23 +117,23 @@ export function DiscoverClient() {
     }
 
     if (isLoading) {
-        return <EmptyState title="Loading profiles" body="Looking for people from the campus." icon={'search'} />;
+        return <EmptyState title="" body="Looking for people from the campus..." icon={'search'} bounce />;
     }
 
     if (isFetchingNextPage) {
-        return <EmptyState title="Loading more profiles" body="Looking for more people from the campus." icon={'search'} />;
+        return <EmptyState title="" body="Looking for more people from the campus..." icon={'search'} bounce />;
     }
 
     if (!profile) {
         return (
-            <EmptyState title="No profiles available" body="Check back later as more students complete their profiles." icon={'search'} />
+            <EmptyState
+                title="No profiles available"
+                body="Check back later as more students complete their profiles."
+                icon={'search'}
+                bounce
+            />
         );
     }
-
-    const dragRotation = dragX * 0.06;
-    const dragOpacity = Math.max(0, 1 - Math.abs(dragX) / 300);
-    const showLikeStamp = direction === 'right' || (!direction && dragX > SWIPE_THRESHOLD * 0.5);
-    const showPassStamp = direction === 'left' || (!direction && dragX < -SWIPE_THRESHOLD * 0.5);
 
     return (
         <div className="flex flex-1 flex-col overflow-hidden bg-background">
@@ -149,8 +148,8 @@ export function DiscoverClient() {
                             direction === 'right' && 'translate-x-24 rotate-6 opacity-0'
                         )}
                         style={{
-                            transform: direction ? undefined : `translateX(${dragX}px) rotate(${dragRotation}deg)`,
-                            opacity: direction ? undefined : dragOpacity
+                            transform: direction ? undefined : `translateX(${dragX}px) rotate(${dragX * 0.06}deg)`,
+                            opacity: direction ? undefined : Math.max(0, 1 - Math.abs(dragX) / 300)
                         }}
                         onTouchStart={handleTouchStart}
                         onTouchMove={handleTouchMove}
@@ -203,14 +202,20 @@ export function DiscoverClient() {
                             )}
 
                             <div className="absolute inset-x-0 bottom-0 h-36 bg-linear-to-t from-black/50 to-transparent" />
-                            {showLikeStamp && <SwipeStamp label="LIKE" className="right-8 rotate-12 border-primary text-primary" />}
-                            {showPassStamp && (
+                            {(direction === 'right' || (!direction && dragX > SWIPE_THRESHOLD * 0.5)) && (
+                                <SwipeStamp label="LIKE" className="right-8 rotate-12 border-primary text-primary" />
+                            )}
+                            {(direction === 'left' || (!direction && dragX < -SWIPE_THRESHOLD * 0.5)) && (
                                 <SwipeStamp label="PASS" className="left-8 -rotate-12 border-muted-foreground text-muted-foreground" />
                             )}
                         </div>
-                        <div className="space-y-2 px-4 py-2">
+                        <button
+                            type="button"
+                            className="w-full space-y-2 px-4 py-2 text-left cursor-pointer active:opacity-70"
+                            onClick={() => setSelectedProfileId(profile.id)}
+                        >
                             {/* TOOD:: remove '!' */}
-                            {!profile.lastSeen && (
+                            {profile.lastSeen && (
                                 <div className="w-fit flex items-center gap-1 px-2 py-1 rounded-full bg-green-100 text-green-500 text-sm font-medium">
                                     <div className="h-2 w-2 rounded-full bg-green-500" />
                                     <p>active recently</p>
@@ -218,13 +223,7 @@ export function DiscoverClient() {
                             )}
 
                             <div className="flex items-end gap-2">
-                                <button
-                                    type="button"
-                                    onClick={() => setSelectedProfileId(profile.id)}
-                                    className="text-left text-xl line-clamp-2 font-semibold active:opacity-70 cursor-pointer"
-                                >
-                                    {profile.name}
-                                </button>
+                                <span className="text-xl line-clamp-2 font-semibold">{profile.name}</span>
                                 <p className="text-sm text-muted-foreground">
                                     {' | '}
                                     {formatEnum(profile.nationality)}
@@ -235,12 +234,12 @@ export function DiscoverClient() {
                                 <p className="line-clamp-1 font-semibold text-xs">{formatFaculty(profile.faculty)}</p>
                             </div>
 
-                            <div className="flex gap-2 overflow-x-auto pb-1 scrollbar-none [&::-webkit-scrollbar]:hidden">
+                            <div className="flex gap-2 overflow-x-hidden pb-1 scrollbar-none [&::-webkit-scrollbar]:hidden">
                                 {(profile.interests ?? []).map((interest) => (
                                     <Chip key={interest}>{formatEnum(interest)}</Chip>
                                 ))}
                             </div>
-                        </div>
+                        </button>
                     </div>
                 </section>
                 <section className="mt-4 flex shrink-0 items-center justify-center gap-8 pb-2">
@@ -271,6 +270,7 @@ export function DiscoverClient() {
             {selectedProfileId && (
                 <ProfileSheet
                     userId={selectedProfileId}
+                    initialProfile={profile}
                     onClose={() => setSelectedProfileId(null)}
                     onLike={() => handleSwipe('LIKE')}
                     onDislike={() => handleSwipe('DISLIKE')}

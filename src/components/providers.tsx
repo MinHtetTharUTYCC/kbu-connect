@@ -5,6 +5,10 @@ import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
 import { useState } from 'react';
 import { handleBackendError } from '@/lib/error/error-util';
 import { AuthProvider } from './auth-provider';
+import { MatchCelebration } from './match-celebration';
+import { PushNotifications } from './push-notifications';
+import { SocketEvents } from './socket-events';
+import { SocketProvider } from './socket-provider';
 
 export default function Providers({ children }: { children: React.ReactNode }) {
     const [queryClient] = useState(
@@ -18,6 +22,8 @@ export default function Providers({ children }: { children: React.ReactNode }) {
                 },
                 mutationCache: new MutationCache({
                     onError: (error, _variables, _context, mutation) => {
+                        console.error(error);
+
                         // Check if the specific hook wants to skip global handling
                         if (mutation.meta?.skipGlobalToast) {
                             return;
@@ -32,7 +38,14 @@ export default function Providers({ children }: { children: React.ReactNode }) {
 
     return (
         <QueryClientProvider client={queryClient}>
-            <AuthProvider>{children}</AuthProvider>
+            <AuthProvider>
+                <SocketProvider>
+                    <SocketEvents />
+                    <MatchCelebration />
+                    <PushNotifications />
+                    {children}
+                </SocketProvider>
+            </AuthProvider>
             <ReactQueryDevtools initialIsOpen={false} />
         </QueryClientProvider>
     );

@@ -1,0 +1,24 @@
+// 1. Construct the payload matching your backend's MatchGatewayDto structure
+const fakeData = {
+  type: 'NEW_MATCH',
+  match: {
+    id: 'fake-match-' + Date.now(),
+    createdAt: new Date().toISOString(),
+    conversationId: 'conv-fake-123',
+    matcher: {
+      id: 'usr-fake-99',
+      name: 'Minzo Minzo',
+      avatarUrl: 'https://pub-ffed265156c74ec384ca0dbff4696c02.r2.dev/gallery/117c8a9e-b198-4c0a-9491-263df852bd46/eb8b0ce5-b14a-424e-b3e1-e72135a9be60.webp'
+    }
+  }
+};
+
+// 2. Safely trigger the client-side socket listener
+const eventListeners = window.socket._callbacks['$match:new'] || [];
+
+if (eventListeners.length === 0) {
+  console.warn('⚠️ No listener attached for "match:new". Make sure your component is mounted!');
+} else {
+  eventListeners.forEach(handler => handler(fakeData));
+  console.log('✅ Triggered fake match:new event successfully!', fakeData);
+}

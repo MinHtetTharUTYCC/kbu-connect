@@ -1,19 +1,41 @@
-import { Geist, Geist_Mono } from 'next/font/google';
+import type { Metadata, Viewport } from 'next';
+import { Inter, JetBrains_Mono } from 'next/font/google';
 
 import './globals.css';
+import BottomNav from '@/components/bottom-nav';
 import { MobileScreen } from '@/components/mobile/app-chrome';
 import { TopBarProvider } from '@/components/mobile/top-bar-provider';
 import Providers from '@/components/providers';
 import { Toaster } from '@/components/ui/sonner';
-import BottomNav from '@/components/web/bottom-nav';
 import { cn } from '@/lib/utils';
 
-const geist = Geist({ subsets: ['latin'], variable: '--font-sans' });
+const inter = Inter({ subsets: ['latin'], variable: '--font-sans' });
 
-const fontMono = Geist_Mono({
+const jetbrainsMono = JetBrains_Mono({
     subsets: ['latin'],
     variable: '--font-mono'
 });
+
+export const metadata: Metadata = {
+    title: 'KBU Connect',
+    description: 'Connect with KBU students',
+    appleWebApp: {
+        capable: true,
+        statusBarStyle: 'black-translucent',
+        title: 'KBU Connect'
+    },
+    formatDetection: {
+        telephone: false
+    }
+};
+
+export const viewport: Viewport = {
+    themeColor: '#1a1a1a',
+    width: 'device-width',
+    initialScale: 1,
+    maximumScale: 1,
+    userScalable: false
+};
 
 export default function RootLayout({
     children
@@ -21,7 +43,10 @@ export default function RootLayout({
     children: React.ReactNode;
 }>) {
     return (
-        <html lang="en" suppressHydrationWarning className={cn('antialiased', fontMono.variable, 'font-sans', geist.variable)}>
+        <html lang="en" suppressHydrationWarning className={cn('antialiased', jetbrainsMono.variable, 'font-sans', inter.variable)}>
+            <head>
+                <link rel="apple-touch-icon" href="/pwa/apple-touch-icon.png" />
+            </head>
             <body className="flex flex-col h-dvh">
                 <Providers>
                     <MobileScreen>

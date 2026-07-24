@@ -6,9 +6,7 @@
  * OpenAPI spec version: 1.0
  */
 
-export interface MatchMarkAsSeenResponseDto {
-  /** Success message */
-  message: string;
-  /** ID of the match that was marked as seen */
-  matchId: string;
-}
+/**
+ * Users by gender
+ */
+export type UserStatsDtoByGender = { [key: string]: number };

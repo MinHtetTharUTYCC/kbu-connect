@@ -18,11 +18,9 @@ export function SendShoutoutSheet({
     onClose: () => void;
     onSubmit: (e: SubmitEvent<HTMLFormElement>) => void;
 }) {
-    const isOpen = !!name;
-
     return (
-        <Drawer open={isOpen} onOpenChange={(open) => !open && onClose()}>
-            <DrawerContent className="mx-auto w-full max-w-[398px]">
+        <Drawer open={!!name} onOpenChange={(open) => !open && onClose()}>
+            <DrawerContent aria-describedby={undefined} className="mx-auto w-full max-w-[398px]">
                 <form onSubmit={onSubmit} className="rounded-t-2xl bg-white p-5 shadow-xl flex flex-col">
                     <DrawerHeader className="mb-4 flex items-start justify-between gap-4 p-0">
                         <DrawerTitle className="text-left">

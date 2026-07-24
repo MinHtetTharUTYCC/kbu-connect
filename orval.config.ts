@@ -1,10 +1,9 @@
 import { defineConfig } from 'orval';
-import { publicApiUrl } from './src/lib/constants/app.config'; // '@/' alias is only resolved by TypeScript/bundler, not plain Node
 
 export default defineConfig({
     KBUConnectApi: {
         input: {
-            target: `${publicApiUrl}/api/json`
+            target: `${process.env.NEXT_PUBLIC_API_URL || 'https://kbu-connect-backend.onrender.com'}/api/docs/json`
         },
         output: {
             mode: 'tags-split', // one file per controller tag (auth, users, matches...)

@@ -11,8 +11,3 @@ export const userLinks: NavItem[] = [
     { href: '/notifications', label: 'Notifications', icon: 'bell' },
     { href: '/profile/me', label: 'Profile', icon: 'user' }
 ];
-
-export const adminLinks: NavItem[] = [
-    { href: '/admin', label: 'Dashboard', icon: 'home' },
-    { href: '/admin/users', label: 'Users', icon: 'user' }
-];

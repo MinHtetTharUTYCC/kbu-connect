@@ -1,9 +1,10 @@
 'use client';
 
 import { Send, Trash } from 'lucide-react';
+import { VisuallyHidden } from 'radix-ui';
 import { useState } from 'react';
 import { Avatar } from '@/components/mobile/app-chrome';
-import { Drawer, DrawerContent } from '@/components/ui/drawer';
+import { Drawer, DrawerContent, DrawerTitle } from '@/components/ui/drawer';
 import type { ShoutoutItem } from '@/hooks/chat/use-shoutouts-list';
 import { getFormattedDate } from '@/lib/date/format-date';
 
@@ -38,7 +39,14 @@ export function ShoutoutDetailSheet({
 
     return (
         <Drawer open={!!shoutout} onOpenChange={(open) => !open && onClose()}>
-            <DrawerContent className="mx-auto max-w-[430px] px-4 pb-4 gap-4 rounded-t-2xl bg-white shadow-xl">
+            <DrawerContent
+                aria-describedby={undefined}
+                aria-hidden="false"
+                className="mx-auto max-w-[430px] px-4 pb-4 gap-4 rounded-t-2xl bg-white shadow-xl"
+            >
+                <VisuallyHidden.Root>
+                    <DrawerTitle>Shoutout Details</DrawerTitle>
+                </VisuallyHidden.Root>
                 <button
                     type="button"
                     onClick={() => onProfileClick(shoutout.otherUser.id)}
@@ -82,7 +90,7 @@ export function ShoutoutDetailSheet({
                         className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-primary py-2 px-4 text-sm font-semibold text-white disabled:opacity-50"
                     >
                         <Trash className="size-4" />
-                        Delete
+                        {isDeleting ? '...' : 'Delete'}
                     </button>
                     {isReceived && (
                         <button
@@ -92,7 +100,7 @@ export function ShoutoutDetailSheet({
                             className="flex flex-1 items-center justify-center gap-2 rounded-lg bg-primary py-2 text-sm font-semibold text-white disabled:opacity-50"
                         >
                             <Send className="size-4" />
-                            Reply
+                            {isReplying ? '...' : 'Reply'}
                         </button>
                     )}
                 </div>

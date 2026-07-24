@@ -1,6 +1,6 @@
 'use client';
 
-import { type NotificationItemDto, NotificationItemDtoType } from '@services/model';
+import { type MatchItemDto, type NotificationItemDto, NotificationItemDtoType } from '@services/model';
 import { Bell, BellRing, Heart, Loader2, Megaphone, MessageCircle } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
@@ -9,6 +9,7 @@ import { LoadMoreRow } from '@/components/load-more-row';
 import { EmptyState } from '@/components/mobile/app-chrome';
 import { useTopBar } from '@/components/mobile/top-bar-provider';
 import { useMarkAllNotificationsRead } from '@/hooks/notifications/use-mark-all-notifications-read';
+import { useMarkNotificationRead } from '@/hooks/notifications/use-mark-notification-read';
 import { useNotificationsUnreadCount } from '@/hooks/notifications/use-noti-unread-count';
 import { useNotificationsList } from '@/hooks/notifications/use-notifications-list';
 import { getFormattedDate } from '@/lib/date/format-date';
@@ -20,9 +21,9 @@ export function NotificationClient() {
     const loadMoreRef = useRef<HTMLDivElement | null>(null);
     const [selectedNotification, setSelectedNotification] = useState<NotificationItemDto | null>(null);
 
-    const { notifications, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } = useNotificationsList({});
+    const { notifications, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } = useNotificationsList();
     const { mutate: markAllRead, isPending: isMarkingAllRead } = useMarkAllNotificationsRead();
-
+    const { mutate: markNotificationRead, isPending: isMarkingNotificationRead } = useMarkNotificationRead();
     const { data: countData = { unreadCount: 0 } } = useNotificationsUnreadCount();
 
     useTopBar({
@@ -58,13 +59,30 @@ export function NotificationClient() {
     }, [fetchNextPage, hasNextPage, isFetchingNextPage]);
 
     function handleNavigate(notification: NotificationItemDto) {
+        if (!notification.isRead || isMarkingNotificationRead) {
+            markNotificationRead({ id: notification.id });
+        }
+
         switch (notification.type) {
             case NotificationItemDtoType.NEW_MESSAGE:
                 router.push(`/chats/${(notification.data as Record<string, unknown>)?.conversationId}`);
                 break;
-            case NotificationItemDtoType.NEW_MATCH:
-                router.push('/matches');
+            case NotificationItemDtoType.NEW_MATCH: {
+                const d = notification.data as Record<string, string>;
+                const match: MatchItemDto = {
+                    id: d.matchId,
+                    matchedAt: notification.createdAt,
+                    isNew: true,
+                    conversationId: d.conversationId ?? null,
+                    matcher: {
+                        id: d.matchedUserId,
+                        name: d.matchedUserName,
+                        avatarUrl: d.matchedUserAvatarUrl ?? null
+                    }
+                };
+                window.dispatchEvent(new CustomEvent('new-match', { detail: match }));
                 break;
+            }
             case NotificationItemDtoType.SHOUTOUT_RECEIVED:
                 router.push('/chats?tab=shoutouts');
                 break;

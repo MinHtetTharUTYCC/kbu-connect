@@ -14,8 +14,8 @@ export function useMarkMatchSeen() {
             meta: {
                 skipGlobalToast: true
             },
-            onSuccess: (data) => {
-                const { matchId } = data;
+            onSuccess: (_data, variables) => {
+                const { matchId } = variables;
 
                 queryClient.setQueryData<InfiniteData<MatchListResponseDto>>(queryKey, (oldData) => {
                     if (!oldData || !oldData.pages) return oldData;

@@ -1,5 +1,3 @@
-import 'dotenv/config';
-
 export const publicApiUrl = process.env.NEXT_PUBLIC_API_URL;
 
 if (!publicApiUrl) {

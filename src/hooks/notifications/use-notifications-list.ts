@@ -4,7 +4,7 @@ import { useNotificationsControllerGetNotificationsInfinite } from '@services/ge
 import type { NotificationsControllerGetNotificationsParams, NotificationsListResponseDto } from '@services/model';
 import type { InfiniteData } from '@tanstack/react-query';
 
-export function useNotificationsList(params: NotificationsControllerGetNotificationsParams = {}) {
+export function useNotificationsList(params?: NotificationsControllerGetNotificationsParams) {
     const query = useNotificationsControllerGetNotificationsInfinite<InfiniteData<NotificationsListResponseDto>>(params, {
         query: {
             initialPageParam: undefined,

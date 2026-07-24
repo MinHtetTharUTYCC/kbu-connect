@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useSearchParams } from 'next/navigation';
 import { useEffect, useRef, useState } from 'react';
 import { toast } from 'sonner';
 import { LoadMoreRow } from '@/components/load-more-row';
@@ -17,7 +17,6 @@ import { cn } from '@/lib/utils';
 import ItemsLoading from './loading';
 
 export function ShoutoutsPanel() {
-    const router = useRouter();
     const searchParams = useSearchParams();
 
     const activeSubTab: ShoutoutType = searchParams.get('shoutouts') === 'sent' ? 'sent' : 'received';
@@ -82,7 +81,7 @@ export function ShoutoutsPanel() {
                         ref={loadMoreRef}
                         hasNextPage={hasNextPage}
                         isFetchingNextPage={isFetchingNextPage}
-                        endLabel="No More Sent Shoutouts"
+                        endLabel={`No More ${activeSubTab === 'received' ? 'Received' : 'Sent'} Shoutouts`}
                     />
                 </div>
             ) : (
@@ -96,21 +95,7 @@ export function ShoutoutsPanel() {
                     />
                 </div>
             )}
-
-            <LoadMoreRow
-                ref={loadMoreRef}
-                hasNextPage={hasNextPage}
-                isFetchingNextPage={isFetchingNextPage}
-                endLabel="No More Received Shoutouts"
-            />
-            {selectedProfileId && (
-                <ProfileSheet
-                    userId={selectedProfileId}
-                    onClose={() => setSelectedProfileId(null)}
-                    onMessage={() => router.push(`/chats/${selectedProfileId}`)}
-                    from="visit"
-                />
-            )}
+            {selectedProfileId && <ProfileSheet userId={selectedProfileId} onClose={() => setSelectedProfileId(null)} from="visit" />}
             {selectedShoutoutId && (
                 <ShoutoutDetailSheet
                     // biome-ignore lint/style/noNonNullAssertion: <>

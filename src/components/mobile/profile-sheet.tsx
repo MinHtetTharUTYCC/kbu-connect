@@ -1,44 +1,66 @@
 'use client';
 
-import { Cake, Flag, Globe, GraduationCap, Heart, LoaderCircle, type LucideIcon, MessageCircle, Search, UserRound, X } from 'lucide-react';
+import type { DiscoveryUserItemDto } from '@services/model';
+import {
+    Cake,
+    Flag,
+    Globe,
+    GraduationCap,
+    Heart,
+    LoaderCircle,
+    type LucideIcon,
+    Megaphone,
+    MessageCircle,
+    Search,
+    UserRound,
+    X
+} from 'lucide-react';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
+import { VisuallyHidden } from 'radix-ui';
 import { useState } from 'react';
 import { createPortal } from 'react-dom';
 import { toast } from 'sonner';
 import { Chip } from '@/components/mobile/app-chrome';
 import { FullScreenImageViewer } from '@/components/mobile/full-screen-image-viewer';
 import { ReportDialog } from '@/components/report-dialog';
-import { Drawer, DrawerContent } from '@/components/ui/drawer';
+import { useSocketContext } from '@/components/socket-provider';
+import { Drawer, DrawerContent, DrawerTitle } from '@/components/ui/drawer';
 import { useReportUser } from '@/hooks/reports/use-report-user';
+import { useUserStatus } from '@/hooks/use-user-status';
 import { useVisitProfile } from '@/hooks/users/use-visit-profile';
 import { ageFromBirthYear, formatEnum } from '@/lib/utils';
 
 export function ProfileSheet({
     userId,
+    initialProfile,
     onClose,
     onLike,
     onDislike,
     onShoutout,
-    onMessage,
     from
 }: {
     userId: string;
+    initialProfile?: DiscoveryUserItemDto;
     onClose: () => void;
     onLike?: () => void;
     onDislike?: () => void;
     onShoutout?: () => void;
-    onMessage?: () => void;
     from: 'discovery' | 'visit';
 }) {
+    const router = useRouter();
+
     const [viewerIndex, setViewerIndex] = useState<number | null>(null);
     const [showReportConfirm, setShowReportConfirm] = useState(false);
 
-    const { data: profile, isLoading } = useVisitProfile(userId);
+    const { data: fetchedProfile, isLoading } = useVisitProfile(userId);
     const { mutateAsync: reportUser, isPending: isReporting } = useReportUser();
+    const { socket } = useSocketContext();
+    const { getOnlineStatus } = useUserStatus(socket);
+
+    const profile = fetchedProfile ?? (initialProfile as unknown as typeof fetchedProfile);
 
     const galleryImages = (profile?.gallery ?? []).toSorted((a, b) => a.order - b.order).map((item) => item.imageUrl);
-
-    const age = profile?.birthYear ? ageFromBirthYear(profile.birthYear) : null;
 
     const metadataItems = profile
         ? [
@@ -46,7 +68,7 @@ export function ProfileSheet({
                   icon: UserRound,
                   label: formatEnum(profile.gender)
               },
-              age && { icon: Cake, label: String(age) },
+              profile?.birthYear && { icon: Cake, label: String(ageFromBirthYear(profile.birthYear)) },
               profile.faculty && {
                   icon: GraduationCap,
                   label: formatEnum(profile.faculty)
@@ -64,12 +86,16 @@ export function ProfileSheet({
 
     return (
         <Drawer open={!!userId} onOpenChange={(open) => !open && viewerIndex === null && onClose()}>
-            <DrawerContent className="mx-auto max-h-[85vh] w-full max-w-[430px] flex-col overflow-hidden rounded-t-2xl bg-white shadow-xl">
-                {/* No Header Here*/}
+            <DrawerContent
+                aria-describedby={undefined}
+                className="mx-auto max-h-[85vh] w-full max-w-[430px] flex-col overflow-hidden rounded-t-2xl bg-white shadow-xl"
+            >
+                <VisuallyHidden.Root>
+                    <DrawerTitle>Profile</DrawerTitle>
+                </VisuallyHidden.Root>
 
-                {/* Main Content Area */}
                 <div className="flex-1 overflow-y-auto">
-                    {isLoading ? (
+                    {isLoading && !profile ? (
                         <div className="flex items-center justify-center py-16">
                             <LoaderCircle className="size-6 animate-spin text-primary" />
                         </div>
@@ -102,6 +128,12 @@ export function ProfileSheet({
                                                 <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-primary/10 px-2 py-0.5 text-xs font-semibold text-primary">
                                                     <Heart className="size-3 fill-primary" />
                                                     Matched
+                                                </span>
+                                            )}
+                                            {getOnlineStatus(userId) && (
+                                                <span className="inline-flex shrink-0 items-center gap-1 rounded-full bg-green-100 px-2 py-0.5 text-xs font-semibold text-green-700">
+                                                    <span className="size-1.5 rounded-full bg-green-500" />
+                                                    Online
                                                 </span>
                                             )}
                                             <button
@@ -173,7 +205,7 @@ export function ProfileSheet({
                 </div>
 
                 {/* Footer Interaction Controls */}
-                {!isLoading && profile && (
+                {profile && (
                     <div className="flex shrink-0 items-center justify-center gap-6 border-t border-black/10 px-5 py-4">
                         {from === 'discovery' && (
                             <>
@@ -188,19 +220,7 @@ export function ProfileSheet({
                                 >
                                     <X className="size-6" />
                                 </button>
-                                {profile.isMatched && onMessage ? (
-                                    <button
-                                        type="button"
-                                        onClick={() => {
-                                            onMessage();
-                                            onClose();
-                                        }}
-                                        className="grid size-12 place-items-center rounded-full border border-black/10 bg-primary text-white shadow-sm transition active:scale-90"
-                                        aria-label="Message"
-                                    >
-                                        <MessageCircle className="size-5" />
-                                    </button>
-                                ) : (
+                                {!profile.isMatched && onShoutout && (
                                     <button
                                         type="button"
                                         onClick={() => {
@@ -210,7 +230,7 @@ export function ProfileSheet({
                                         className="grid size-12 place-items-center rounded-full border border-black/10 bg-white text-primary shadow-sm transition active:scale-90"
                                         aria-label="Send shoutout"
                                     >
-                                        <MessageCircle className="size-5" />
+                                        <Megaphone className="size-5" />
                                     </button>
                                 )}
                                 <button
@@ -226,11 +246,11 @@ export function ProfileSheet({
                                 </button>
                             </>
                         )}
-                        {from === 'visit' && profile.isMatched && onMessage && (
+                        {from === 'visit' && (profile.isMatched || !!profile.conversationId) && (
                             <button
                                 type="button"
                                 onClick={() => {
-                                    onMessage();
+                                    router.push(`/chats/${profile.conversationId}`);
                                     onClose();
                                 }}
                                 className="grid size-12 place-items-center rounded-full border border-black/10 bg-primary text-white shadow-sm transition active:scale-90"
@@ -286,11 +306,9 @@ type ProfileMetaItem = {
 };
 
 function ProfileMetaChip({ item }: { item: ProfileMetaItem }) {
-    const Icon = item.icon;
-
     return (
         <span className="inline-flex max-w-full items-center gap-1 rounded-full border border-black/10 bg-muted px-2 py-0.5 text-xs font-medium text-foreground">
-            <Icon className="size-3 shrink-0 text-primary" />
+            <item.icon className="size-3 shrink-0 text-primary" />
             <span className="truncate">{item.label}</span>
         </span>
     );

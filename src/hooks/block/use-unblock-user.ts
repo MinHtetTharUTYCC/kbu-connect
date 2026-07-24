@@ -11,27 +11,27 @@ export function useUnblockUser() {
     return useBlockControllerUnblockUser({
         mutation: {
             onSuccess: ({ unblockedUserId }) => {
-                const blocksListQueryKey = getBlockControllerGetBlockedUsersInfiniteQueryKey();
-                const conversationsListQueryKey = getChatControllerGetConversationsInfiniteQueryKey();
+                queryClient.setQueryData<InfiniteData<BlocksListResponseDto>>(
+                    getBlockControllerGetBlockedUsersInfiniteQueryKey(),
+                    (oldData) => {
+                        if (!oldData || !oldData.pages) return oldData;
 
-                queryClient.setQueryData<InfiniteData<BlocksListResponseDto>>(blocksListQueryKey, (oldData) => {
-                    if (!oldData || !oldData.pages) return oldData;
+                        const newPages = oldData.pages.map((page) => {
+                            return {
+                                ...page,
+                                blocks: page.blocks.filter((b) => b.blockedId !== unblockedUserId)
+                            };
+                        });
 
-                    const newPages = oldData.pages.map((page) => {
                         return {
-                            ...page,
-                            blocks: page.blocks.filter((b) => b.blockedId !== unblockedUserId)
+                            ...oldData,
+                            pages: newPages
                         };
-                    });
-
-                    return {
-                        ...oldData,
-                        pages: newPages
-                    };
-                });
+                    }
+                );
 
                 queryClient.invalidateQueries({
-                    queryKey: conversationsListQueryKey,
+                    queryKey: getChatControllerGetConversationsInfiniteQueryKey(),
                     refetchType: 'all'
                 });
             }

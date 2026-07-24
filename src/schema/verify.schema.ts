@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 export const VerifySchema = z.object({
-    code: z.string().length(6, 'Code must be 6 digits').regex(/^\d+$/, 'Digits only')
+    code: z.string().regex(/^\d{6}$/, 'Enter the 6-digit code from your email')
 });
 
 export type VerifyFormValues = z.infer<typeof VerifySchema>;

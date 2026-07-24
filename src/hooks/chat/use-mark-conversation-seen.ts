@@ -13,7 +13,7 @@ export function useMarkConversationSeen() {
 
     return useChatControllerMarkNewestConversationMessageAsSeen({
         mutation: {
-            onSuccess: (_data, variables) => {
+            onMutate: (variables) => {
                 queryClient.setQueriesData<InfiniteData<ConversationsListResponseDto>>(
                     {
                         queryKey: getChatControllerGetConversationsInfiniteQueryKey()
@@ -21,21 +21,19 @@ export function useMarkConversationSeen() {
                     (oldData) => {
                         if (!oldData) return oldData;
 
+                        const newPages = oldData.pages.map((page) => ({
+                            ...page,
+                            conversations: page.conversations.map((conversation) =>
+                                conversation.id === variables.conversationId ? { ...conversation, isRead: true } : conversation
+                            )
+                        }));
+
                         return {
                             ...oldData,
-                            pages: oldData.pages.map((page) => ({
-                                ...page,
-                                conversations: page.conversations.map((conversation) =>
-                                    conversation.id === variables.conversationId ? { ...conversation, isRead: true } : conversation
-                                )
-                            }))
+                            pages: newPages
                         };
                     }
                 );
-            },
-            onError: (error) => {
-                // silent log
-                console.error('Error marking conversation as seen:', error);
             }
         }
     });

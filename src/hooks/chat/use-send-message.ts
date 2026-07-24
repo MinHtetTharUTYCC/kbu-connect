@@ -6,7 +6,7 @@ import {
 import type { MessageItemDto, MessagesListResponseDto } from '@services/model';
 import { type InfiniteData, useQueryClient } from '@tanstack/react-query';
 
-export function useSendMessage(conversationId: string, userId: string | undefined) {
+export function useSendMessage(conversationId: string, userId: string | undefined, didTheOptimistic: () => void) {
     const queryClient = useQueryClient();
 
     const queryKey = getChatControllerGetConversationMessagesInfiniteQueryKey(conversationId);
@@ -38,6 +38,8 @@ export function useSendMessage(conversationId: string, userId: string | undefine
                 )
             };
         });
+
+        didTheOptimistic();
 
         return previous;
     };

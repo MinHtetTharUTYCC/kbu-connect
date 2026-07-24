@@ -6,8 +6,9 @@ import { useEffect, useRef } from 'react';
 import { LoadMoreRow } from '@/components/load-more-row';
 import { Avatar, EmptyState } from '@/components/mobile/app-chrome';
 import { useTopBar } from '@/components/mobile/top-bar-provider';
+import { Badge } from '@/components/ui/badge';
 import { useConversationsList } from '@/hooks/chat/use-conversations-list';
-import { getFormattedDate } from '@/lib/date/format-date';
+import { getFormattedDate, getLastSeenToday } from '@/lib/date/format-date';
 import { cn } from '@/lib/utils';
 import ItemsLoading from './loading';
 import { ShoutoutsPanel } from './shoutouts-panel';
@@ -50,9 +51,7 @@ export function ChatHomeClient() {
 }
 
 export function ChatListClient() {
-    const { conversations, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } = useConversationsList({
-        cursor: null
-    });
+    const { conversations, isLoading, fetchNextPage, hasNextPage, isFetchingNextPage } = useConversationsList();
     const loadMoreRef = useRef<HTMLDivElement | null>(null);
 
     useEffect(() => {
@@ -80,26 +79,36 @@ export function ChatListClient() {
 
     return (
         <div className="flex flex-col">
-            {conversations.map((conversation, idx) => (
-                <Link
-                    key={`${conversation.id}-${idx}`}
-                    href={`/chats/${conversation.id}`}
-                    className="flex items-center border-b border-black/10 px-5 py-4 active:bg-black/5"
-                >
-                    <div className="shrink-0">
-                        <Avatar src={conversation.otherUser.avatarUrl} name={conversation.otherUser.name} className="size-12" />
-                    </div>
-                    <div className="ml-3 min-w-0 flex-1">
-                        <div className="flex items-baseline justify-between gap-3">
-                            <span className="truncate font-semibold">{conversation.otherUser.name}</span>
-                            <span className="text-xs text-muted-foreground">{getFormattedDate(conversation.updatedAt)}</span>
+            {conversations.map((conversation, idx) => {
+                const lastSeenToday = !conversation.isOnline && conversation.lastOnline ? getLastSeenToday(conversation.lastOnline) : null;
+                return (
+                    <Link
+                        key={`${conversation.id}-${idx}`}
+                        href={`/chats/${conversation.id}`}
+                        className="flex items-center border-b border-black/10 px-5 py-4 active:bg-black/5"
+                    >
+                        <div className="shrink-0 relative">
+                            <Avatar src={conversation.otherUser.avatarUrl} name={conversation.otherUser.name} className="size-12" />
+                            {conversation.isOnline ? (
+                                <Badge className="absolute bottom-0 right-0 flex h-3 w-3 items-center justify-center rounded-full px-1 text-[9px] bg-green-500" />
+                            ) : conversation.lastOnline && lastSeenToday ? (
+                                <Badge className="absolute bottom-0 right-0 flex h-4 min-w-4 items-center justify-center rounded-full text-[9px]  bg-green-500">
+                                    {lastSeenToday}
+                                </Badge>
+                            ) : null}
                         </div>
-                        <p className="block truncate text-sm text-muted-foreground">
-                            {conversation.lastMessage?.content ?? 'No messages yet.'}
-                        </p>
-                    </div>
-                </Link>
-            ))}
+                        <div className="ml-3 min-w-0 flex-1">
+                            <div className="flex items-baseline justify-between gap-3">
+                                <span className="truncate font-semibold">{conversation.otherUser.name}</span>
+                                <span className="text-xs text-muted-foreground">{getFormattedDate(conversation.updatedAt)}</span>
+                            </div>
+                            <p className="block truncate text-sm text-muted-foreground">
+                                {conversation.lastMessage?.content ?? 'No messages yet.'}
+                            </p>
+                        </div>
+                    </Link>
+                );
+            })}
             <LoadMoreRow ref={loadMoreRef} hasNextPage={hasNextPage} isFetchingNextPage={isFetchingNextPage} endLabel="No more chats" />
         </div>
     );
