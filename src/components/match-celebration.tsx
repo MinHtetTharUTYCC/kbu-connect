@@ -41,7 +41,7 @@ export function MatchCelebration() {
             aria-label="Match celebration"
         >
             <div
-                className="mx-8 flex flex-col items-center gap-6 rounded-3xl bg-primary p-10 text-center text-white shadow-2xl"
+                className="mx-8 flex flex-col items-center gap-6 rounded-3xl bg-white p-10 text-center shadow-2xl"
                 onClick={(e) => e.stopPropagation()}
                 onKeyDown={(e) => e.stopPropagation()}
                 role="document"
@@ -49,16 +49,16 @@ export function MatchCelebration() {
                 <h1 className="text-3xl font-bold tracking-tight">It&apos;s a Match!</h1>
 
                 {match.matcher.avatarUrl ? (
-                    <div className="relative h-32 w-32 overflow-hidden rounded-full border-4 border-white">
+                    <div className="relative h-32 w-32 overflow-hidden rounded-full border-4 border-primary">
                         <Image src={match.matcher.avatarUrl} alt={match.matcher.name} fill className="object-cover" />
                     </div>
                 ) : (
-                    <div className="flex h-32 w-32 items-center justify-center rounded-full border-4 border-white bg-white/20 text-5xl">
+                    <div className="flex h-32 w-32 items-center justify-center rounded-full border-4 border-primary bg-primary/10 text-5xl text-primary">
                         {match.matcher.name.charAt(0)}
                     </div>
                 )}
 
-                <p className="text-lg">
+                <p className="text-lg text-foreground">
                     You and <span className="font-semibold">{match.matcher.name}</span> matched!
                 </p>
 
@@ -68,7 +68,7 @@ export function MatchCelebration() {
                         onClick={() => {
                             setProfileSheetId(match.matcher.id);
                         }}
-                        className="rounded-full border border-white/50 px-6 py-2.5 text-sm font-medium transition-colors hover:bg-white/10"
+                        className="rounded-full border border-black/10 px-6 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-black/5"
                     >
                         View Profile
                     </button>
@@ -79,7 +79,7 @@ export function MatchCelebration() {
                                 setMatch(null);
                                 router.push(`/chats/${match.conversationId}`);
                             }}
-                            className="rounded-full bg-white px-6 py-2.5 text-sm font-semibold text-primary transition-colors hover:bg-white/90"
+                            className="rounded-full bg-primary px-6 py-2.5 text-sm font-semibold text-white transition-colors hover:bg-primary/90"
                         >
                             Send Message
                         </button>
