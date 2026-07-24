@@ -19,7 +19,7 @@ export function LoginForm() {
     const [emailInAction, setEmailInAction] = useState('');
 
     const { mutate: login, isPending: isLoggingIn, error: loginError } = useLogin();
-    const { mutate: verify, isPending: isVerifying, error: verifyError } = useVerify();
+    const { mutate: verify, isPending: isVerifying, error: verifyError, reset: resetVerify } = useVerify();
 
     useTopBar({
         title: 'Login'
@@ -50,6 +50,8 @@ export function LoginForm() {
 
     const onVerifySubmit = (data: VerifyFormValues) => {
         if (!emailInAction) return;
+        resetVerify();
+        verifyForm.clearErrors();
         verify({
             data: { email: emailInAction, code: data.code }
         });
@@ -103,7 +105,15 @@ export function LoginForm() {
                             </Button>
                             <p className="text-center text-sm text-muted-foreground">
                                 Wrong email?{' '}
-                                <button type="button" className="font-medium text-primary" onClick={() => setEmailInAction('')}>
+                                <button
+                                    type="button"
+                                    className="font-medium text-primary"
+                                    onClick={() => {
+                                        resetVerify();
+                                        verifyForm.clearErrors();
+                                        setEmailInAction('');
+                                    }}
+                                >
                                     Go back
                                 </button>
                             </p>

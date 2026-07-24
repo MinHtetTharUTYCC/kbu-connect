@@ -163,12 +163,34 @@ export function ChatClient({ chatId }: { chatId: string }) {
 
     if (!conversation) {
         return (
-            <EmptyState title="Conversation unavailable" body="This chat may have been deleted or is no longer available." icon="message" />
+            <div className="flex flex-1 flex-col">
+                <EmptyState
+                    title="Conversation unavailable"
+                    body="This chat may have been deleted or is no longer available."
+                    icon="message"
+                />
+                <Link
+                    href="/chats"
+                    className="mx-auto mb-8 rounded-xl bg-primary px-6 py-2.5 text-sm font-medium text-white transition active:scale-95"
+                >
+                    Back to chats
+                </Link>
+            </div>
         );
     }
 
     if (!myId) {
-        return <EmptyState title="Login required" body="Please sign in to view this conversation." icon="user" />;
+        return (
+            <div className="flex flex-1 flex-col">
+                <EmptyState title="Login required" body="Please sign in to view this conversation." icon="user" />
+                <Link
+                    href="/login"
+                    className="mx-auto mb-8 rounded-xl bg-primary px-6 py-2.5 text-sm font-medium text-white transition active:scale-95"
+                >
+                    Sign in
+                </Link>
+            </div>
+        );
     }
 
     const isOnline = getOnlineStatus(conversation.participant.id) || conversation.isOnline;
