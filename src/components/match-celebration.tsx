@@ -68,7 +68,7 @@ export function MatchCelebration() {
                         onClick={() => {
                             setProfileSheetId(match.matcher.id);
                         }}
-                        className="rounded-full border border-black/10 px-6 py-2.5 text-sm font-medium text-foreground transition-colors hover:bg-black/5"
+                        className="rounded-full bg-primary px-6 py-2.5 text-sm font-medium text-white transition-colors hover:bg-primary/90"
                     >
                         View Profile
                     </button>

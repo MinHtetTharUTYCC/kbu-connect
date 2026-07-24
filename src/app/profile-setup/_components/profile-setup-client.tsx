@@ -215,7 +215,7 @@ export function ProfileSetupClient() {
                     <section className="grid gap-8">
                         <div>
                             <div className="mb-4 text-sm font-semibold tracking-wide text-muted-foreground">Select faculty</div>
-                            <div className="grid grid-cols-3 gap-2">
+                            <div className="flex flex-wrap gap-2">
                                 {faculties.map((item) => (
                                     // <button
                                     //     key={item}
